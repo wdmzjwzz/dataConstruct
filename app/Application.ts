@@ -1,7 +1,7 @@
-type Timer = Function
+
 import { Vector2 } from "./Vector2"
 import { CanvasMouseEvent, CanvasKeyBoardEvent, EInputEventType } from "./CanvasInputEvent"
-import { STimer, TimerCallback } from "./STimer"
+import { Timer, TimerCallback } from "./Timer"
 export class Application implements EventListenerObject {
     constructor(canvas: HTMLCanvasElement) {
         this.canvas = canvas;
@@ -20,7 +20,7 @@ export class Application implements EventListenerObject {
         window.addEventListener("keyup", this, false)
     }
 
-    public timers: STimer[] = [];
+    public timers: Timer[] = [];
     private _timeId: number = -1;
     public isFlipYCoord: boolean = false;
     public canvas: HTMLCanvasElement;
@@ -200,7 +200,7 @@ export class Application implements EventListenerObject {
         return false
     }
     public addTimer(callback: TimerCallback, timeout: number = 1000, onlyOnce: boolean = false, data: any = undefined): number {
-        let timer: STimer;
+        let timer: Timer;
         for (let index = 0; index < this.timers.length; index++) {
             const timer = this.timers[index];
             if (timer.enabled === false) {
@@ -214,7 +214,7 @@ export class Application implements EventListenerObject {
             }
 
         }
-        timer = new STimer(callback)
+        timer = new Timer(callback)
         timer.callback = callback;
         timer.callbackData = data;
         timer.countdown = timeout;

@@ -1,5 +1,5 @@
 export type TimerCallback = (id: number, data: any) => void
-export class STimer {
+export class Timer {
     constructor(callback: TimerCallback) {
         this.callback = callback
     }
