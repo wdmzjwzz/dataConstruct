@@ -5,6 +5,7 @@ import { createVertexShader, createFragShader, initShader } from "./utils"
 import { TreeNode } from "./tree/TreeNode"
 import { NodeEnumeratorFactory } from "./tree/NodeEnumeratorFactory"
 import { IndexerR2L } from './tree/Indexer';
+import { Application } from "./app/Application"
 export default () => {
 
   const canvas = useRef<HTMLCanvasElement>(null)
@@ -90,30 +91,22 @@ export default () => {
     resizeFun()
     drawMesh()
     window.addEventListener("resize", resizeFun)
-    let node: TreeNode<number> = new TreeNode(0, undefined, "root")
-    node.addChild(new TreeNode(1, undefined, "1"))
-    node.addChild(new TreeNode(2, undefined, "2"))
-    node.addChild(new TreeNode(3, undefined, "3"))
-    node.getChildAt(0)!.addChild(new TreeNode(4, undefined, "1-1"))
-    node.getChildAt(0)!.addChild(new TreeNode(5, undefined, "1-2"))
-    node.getChildAt(0)!.addChild(new TreeNode(6, undefined, "1-3"))
-    node.getChildAt(1)!.addChild(new TreeNode(4, undefined, "2-1"))
-    node.getChildAt(1)!.addChild(new TreeNode(5, undefined, "2-2"))
-    node.getChildAt(1)!.addChild(new TreeNode(6, undefined, "2-3"))
-    node.getChildAt(2)!.addChild(new TreeNode(4, undefined, "3-1"))
-    node.getChildAt(2)!.addChild(new TreeNode(5, undefined, "3-2"))
-    node.getChildAt(2)!.addChild(new TreeNode(6, undefined, "3-3"))
-    node.getChildAt(0)!.getChildAt(0)!.addChild(new TreeNode(7, undefined, "3-3-1"))
-    console.log(node.visit((node) => { console.log(node.name) },null,IndexerR2L))
-    // const iter = NodeEnumeratorFactory.create_df_l2r_t2b_iter(node)
-    // const iter = NodeEnumeratorFactory.create_bf_l2r_t2b_iter(node)
-    // const iter = NodeEnumeratorFactory.create_df_r2l_t2b_iter(node)
-    // const iter = NodeEnumeratorFactory.create_df_l2r_b2t_iter(node)
 
-    // while (iter.moveNext()) {
-    //   console.log(iter.current?.name)
-    // }
-    // console.log(iter)
+    if (canvas.current) {
+      const app: Application = new Application(canvas.current)
+      const timerId = app.addTimer(() => {
+        console.log("fps====", app.fps)
+        console.log("isRunning===", app.isRunning())
+      }, 800, false, 999)
+      app.start()
+      setTimeout(() => {
+        app.removeTimer(timerId)
+        app.stop()
+        console.log("isRunning===", app.isRunning())
+      }, 4000)
+
+    }
+
     return () => {
       window.removeEventListener("resize", resizeFun)
     }
