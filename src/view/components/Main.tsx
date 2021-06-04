@@ -1,18 +1,52 @@
 
 import * as React from 'react';
+import { useEffect, useRef, useState } from 'react';
 import "./main.less"
 import "../assets/font/iconfont.css"
+import { Application } from "../../app/Application"
 
 
-class Main extends React.Component {
-   
-    render() {
-        return (
-            <>
-               哈哈哈哈
-            </>
-        );
+export default () => {
+    const [fps, setFps] = useState<number>(0)
+    const canvas = useRef<HTMLCanvasElement>(null)
+    const resizeFun = () => {
+        canvas.current?.setAttribute("width", (document.body.clientWidth - 480) + "")
+        canvas.current?.setAttribute("height", (document.body.clientHeight - 40) + "")
     }
-}
+    const updateFps = (app: Application) => () => {
+        setFps(Math.ceil(app.fps))
+    }
 
-export default Main;
+    useEffect(() => {
+        resizeFun()
+        window.addEventListener("resize", resizeFun)
+        let app: Application | null = null;
+        let timerId: number = -1
+        if (canvas.current) {
+            app = new Application(canvas.current)
+            timerId = app.addTimer(updateFps(app), 800, false, 999)
+            app.start()
+
+        }
+
+        return () => {
+            window.removeEventListener("resize", resizeFun)
+            if (app) {
+                app.removeTimer(timerId)
+                app.stop()
+            }
+
+        }
+    }, [])
+    return (
+        <div className="content">
+            <div className="fps">
+                FPS: <span> {fps}</span>
+            </div>
+            <div className="canvasContent">
+                <canvas id="canvas" ref={canvas} ></canvas>
+            </div >
+        </div>
+
+    );
+};
