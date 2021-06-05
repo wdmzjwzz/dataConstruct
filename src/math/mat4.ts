@@ -12,7 +12,7 @@ export default class mat4 {
         }
     }
 
-    private values = new Float32Array(16)
+    public values = new Float32Array(16)
 
     static readonly identity = new mat4().setIdentity()
 

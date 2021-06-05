@@ -3,6 +3,10 @@ import { Application } from "./Application";
 import { EShaderType, GLHelper } from "./GLHelper";
 import colorShader from "./glsl/colorShader_vs.vert"
 import colorShader_fs from "./glsl/colorShader_fs.frag"
+import { TypedArrayList } from "../tree/TypedArrayList";
+export interface AttribMap {
+    [name: string]: any
+}
 export class BasicWebGLApplication extends Application {
     constructor(canvas: HTMLCanvasElement) {
         super(canvas);
@@ -18,7 +22,6 @@ export class BasicWebGLApplication extends Application {
         let ctx: WebGLRenderingContext | null = this.canvas.getContext("webgl", contextAttribs)
         if (ctx === null) {
             throw new Error("无法创建ctx");
-
         }
         this.gl = ctx
         this.canvas.addEventListener("webglcontextlost", (e) => {
@@ -34,7 +37,7 @@ export class BasicWebGLApplication extends Application {
         this.gl.scissor(0, 0, this.canvas.width, this.canvas.height)
         this.gl.enable(this.gl.SCISSOR_TEST)
 
-
+      
         this.vsShader = GLHelper.createShader(this.gl, EShaderType.VS_SHADER)
         GLHelper.compileShader(this.gl, this.colorShader_vs, this.vsShader)
 
@@ -42,12 +45,19 @@ export class BasicWebGLApplication extends Application {
         GLHelper.compileShader(this.gl, this.colorShader_fs, this.fsShader)
 
         this.program = GLHelper.createProgram(this.gl)
-        GLHelper.linkProgram(this.gl, this.program, this.vsShader, this.fsShader, null, this.printProgramActiveInfo.bind(this))
+        this.attribMap = {};
+        const linkProgram = GLHelper.linkProgram(this.gl, this.program, this.vsShader, this.fsShader, null, this.printProgramActiveInfo.bind(this))
+        if (linkProgram) {
+            this.printProgramActiveInfo()
+        }
+        this.verts = new TypedArrayList(Float32Array, 6 * 7);
+        this.ivbo = GLHelper.createBuffer(this.gl);
     }
     public gl: WebGLRenderingContext;
     public projectMatrix: mat4;
     public viewMatrix: mat4;
     public viewProjectMatrix: mat4
+    public attribMap: AttribMap;
 
     public colorShader_vs: string = colorShader
     public colorShader_fs: string = colorShader_fs
@@ -55,9 +65,42 @@ export class BasicWebGLApplication extends Application {
     public fsShader: WebGLShader;
     public program: WebGLProgram;
 
+    public verts: TypedArrayList<Float32Array>;
+    public ivbo: WebGLBuffer;
 
     public printProgramActiveInfo(): void {
-        GLHelper.getProgramActiveAttribs(this.gl, this.program);
-        GLHelper.getProgramActiveUniforms(this.gl, this.program)
+        GLHelper.getProgramActiveAttribs(this.gl, this.program, this.attribMap);
+        GLHelper.getProgramActiveUniforms(this.gl, this.program, this.attribMap)
+    }
+    public drawRectByInterleavedVBO() {
+        this.verts.clear()
+        let data: number[] = [
+            -0.5, -0.5, 0, 1, 0, 0, 1,
+            0.5, -0.5, 0, 0, 1, 0, 1,
+            0.5, 0.5, 0, 0, 0, 1, 0,
+
+            0.5, 0.5, 0, 0, 0, 1, 0,
+            -0.5, 0.5, 0, 0, 1, 0, 1,
+            -0.5, -0.5, 0, 1, 0, 0, 1
+        ]
+        this.verts.pushArray(data)
+        console.log(this.verts.subArray())
+        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.ivbo);
+        this.gl.bufferData(this.gl.ARRAY_BUFFER, this.verts.subArray(), this.gl.DYNAMIC_DRAW);
+
+        this.gl.vertexAttribPointer(this.attribMap["aPosition"].location, 3, this.gl.FLOAT, false, Float32Array.BYTES_PER_ELEMENT * 7, 0)
+        this.gl.vertexAttribPointer(this.attribMap["aColor"].location, 4, this.gl.FLOAT, false, Float32Array.BYTES_PER_ELEMENT * 7, 3 * 4);
+        this.gl.enableVertexAttribArray(this.attribMap["aPosition"].location);
+        this.gl.enableVertexAttribArray(this.attribMap["aColor"].location);
+        // 绘制
+        this.gl.useProgram(this.program);
+        this.gl.uniformMatrix4fv(this.attribMap['uMVMatrix'].location, false, this.viewProjectMatrix.values);
+        this.gl.drawArrays(this.gl.TRIANGLES, 0, 6);
+
+
+        this.gl.useProgram(null)
+        this.gl.disableVertexAttribArray(this.attribMap["aPosition"].location)
+        this.gl.disableVertexAttribArray(this.attribMap["aColor"].location)
+        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, null)
     }
 }

@@ -3,8 +3,6 @@ import React, { useEffect, useRef, useState } from 'react';
 import "./main.less"
 import "../assets/font/iconfont.css"
 import { BasicWebGLApplication } from "../../app/BasicWebGLApplication"
-
-
 export default () => {
     const [fps, setFps] = useState<number>(0)
     const canvas = useRef<HTMLCanvasElement>(null)
@@ -25,8 +23,9 @@ export default () => {
             app = new BasicWebGLApplication(canvas.current)
             timerId = app.addTimer(updateFps(app), 800, false, 999)
             app.start()
+            app.drawRectByInterleavedVBO()
         }
-       
+
         return () => {
             window.removeEventListener("resize", resizeFun)
             if (app) {

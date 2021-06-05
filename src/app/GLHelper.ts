@@ -1,3 +1,5 @@
+import { AttribMap } from "./BasicWebGLApplication";
+
 export enum EShaderType {
     VS_SHADER,
     FS_SHADER
@@ -91,7 +93,7 @@ export class GLHelper {
         }
         return true
     }
-    static getProgramActiveAttribs(gl: WebGLRenderingContext, program: WebGLProgram): void {
+    static getProgramActiveAttribs(gl: WebGLRenderingContext, program: WebGLProgram, out: AttribMap): void {
         // 获取当前active状态的att和uniforms的数量
         let attCount: number = gl.getProgramParameter(program, gl.ACTIVE_ATTRIBUTES);
 
@@ -100,18 +102,20 @@ export class GLHelper {
             if (info) {
                 let obj = new GLAttInfo(info.size, info.type, gl.getAttribLocation(program, info.name))
                 console.log("getProgramActiveAttribs|name====" + info.name + JSON.stringify(obj))
+                out[info.name] = obj
             }
         }
     }
-    static getProgramActiveUniforms(gl: WebGLRenderingContext, program: WebGLProgram): void {
+    static getProgramActiveUniforms(gl: WebGLRenderingContext, program: WebGLProgram, out: AttribMap): void {
         // 获取当前active状态的att和uniforms的数量
         let attCount: number = gl.getProgramParameter(program, gl.ACTIVE_UNIFORMS);
 
         for (let index = 0; index < attCount; index++) {
-            let info = gl.getActiveAttrib(program, index);
+            let info = gl.getActiveUniform(program, index);
             if (info) {
                 let obj = new GLAttInfo(info.size, info.type, gl.getUniformLocation(program, info.name))
                 console.log("getProgramActiveUniforms|name====" + info.name + JSON.stringify(obj))
+                out[info.name] = obj
             }
         }
     }
