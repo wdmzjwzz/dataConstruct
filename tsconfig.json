@@ -1,15 +1,13 @@
 {
   "include": [
-    "src/"
+    "src/",
+    "global.d.ts"
   ],
-  "exclude": [
-    "build",
-    "node_modules",
-    "tests"
-  ],
+ 
   "compilerOptions": {
-    "baseUrl": ".",
+    "baseUrl": "./",
     "moduleResolution": "node",
+    "allowSyntheticDefaultImports": true,
     "target": "es6",
     "jsx": "react",
     "module": "esnext",

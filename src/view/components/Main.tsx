@@ -1,9 +1,8 @@
 
-import * as React from 'react';
-import { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import "./main.less"
 import "../assets/font/iconfont.css"
-import { Application } from "../../app/Application"
+import { BasicWebGLApplication } from "../../app/BasicWebGLApplication"
 
 
 export default () => {
@@ -13,22 +12,21 @@ export default () => {
         canvas.current?.setAttribute("width", (document.body.clientWidth - 480) + "")
         canvas.current?.setAttribute("height", (document.body.clientHeight - 40) + "")
     }
-    const updateFps = (app: Application) => () => {
+    const updateFps = (app: BasicWebGLApplication) => () => {
         setFps(Math.ceil(app.fps))
     }
 
     useEffect(() => {
         resizeFun()
         window.addEventListener("resize", resizeFun)
-        let app: Application | null = null;
+        let app: BasicWebGLApplication | null = null;
         let timerId: number = -1
         if (canvas.current) {
-            app = new Application(canvas.current)
+            app = new BasicWebGLApplication(canvas.current)
             timerId = app.addTimer(updateFps(app), 800, false, 999)
             app.start()
-
         }
-
+       
         return () => {
             window.removeEventListener("resize", resizeFun)
             if (app) {
