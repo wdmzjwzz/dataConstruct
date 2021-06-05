@@ -23,7 +23,9 @@ export default () => {
             app = new BasicWebGLApplication(canvas.current)
             timerId = app.addTimer(updateFps(app), 800, false, 999)
             app.start()
-            app.drawRectByInterleavedVBO()
+            // app.drawRectByInterleavedVBO(3, 3)
+            // app.drawRectByInterleavedVBO(0, 3)
+            app.drawRectByInterleavedWithEBO(3, app.gl.TRIANGLES)
         }
 
         return () => {
