@@ -1,4 +1,4 @@
-import { Vector2 } from "./Vector2"
+import { vec2 } from "../math/tsm"
 export enum EInputEventType {
     MOUSEEVENT,
     MOUSEDOWN,
@@ -26,14 +26,14 @@ export class CanvasInputEvent {
 
 }
 export class CanvasMouseEvent extends CanvasInputEvent {
-    constructor(altKey: boolean = false, ctrlKey: boolean = false, shiftKey: boolean = false, type: EInputEventType = EInputEventType.MOUSEDOWN, button: number, canvasPos: Vector2) {
+    constructor(altKey: boolean = false, ctrlKey: boolean = false, shiftKey: boolean = false, type: EInputEventType = EInputEventType.MOUSEDOWN, button: number, canvasPos: vec2) {
         super(altKey, ctrlKey, shiftKey, type)
         this.button = button;
         this.canvasPostion = canvasPos;
         console.log(this.button)
     }
     public button: number //0：鼠标左键，1：鼠标中键，2：鼠标右键
-    public canvasPostion: Vector2;
+    public canvasPostion: vec2;
 
 }
 export class CanvasKeyBoardEvent extends CanvasInputEvent {

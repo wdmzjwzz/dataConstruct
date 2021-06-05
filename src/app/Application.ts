@@ -1,9 +1,10 @@
 
-import { Vector2 } from "./Vector2"
+import { vec2 } from "../math/tsm"
 import { CanvasMouseEvent, CanvasKeyBoardEvent, EInputEventType } from "./CanvasInputEvent"
 import { Timer, TimerCallback } from "./Timer"
 export class Application implements EventListenerObject {
     constructor(canvas: HTMLCanvasElement) {
+      
         this.canvas = canvas;
         this.isSupportMouseMove = false
         this._isMouseDown = false;
@@ -107,7 +108,7 @@ export class Application implements EventListenerObject {
      * render
      */
     public render(): void { }
-    protected viewportToCanvasCoordinate(evt: MouseEvent): Vector2 {
+    protected viewportToCanvasCoordinate(evt: MouseEvent): vec2 {
         let rect: ClientRect = this.getMouseCanvas().getBoundingClientRect();
         if (evt.target) {
             let x: number = evt.clientX - rect.left
@@ -115,9 +116,9 @@ export class Application implements EventListenerObject {
             if (this.isFlipYCoord) {
                 y = this.getMouseCanvas().height - y
             }
-            return new Vector2(x, y)
+            return new vec2([x, y])
         }
-        return new Vector2(0, 0)
+        return new vec2([0, 0])
     }
     private getMouseCanvas(): HTMLCanvasElement {
         return this.canvas
@@ -133,7 +134,7 @@ export class Application implements EventListenerObject {
         if (this._isRightMouseDown && type === EInputEventType.MOUSEDRAG) {
             buttonNum = 2
         }
-        let mousePostion: Vector2 = this.viewportToCanvasCoordinate(event)
+        let mousePostion: vec2 = this.viewportToCanvasCoordinate(event)
         return new CanvasMouseEvent(event.altKey, event.ctrlKey, event.shiftKey, type, buttonNum, mousePostion)
     }
     private _toCanvasKeyBoardEvent(evt: Event, type: EInputEventType): CanvasKeyBoardEvent {
@@ -176,17 +177,17 @@ export class Application implements EventListenerObject {
         console.log("mousedown", evt.canvasPostion)
     }
     public dispatchMouseUp(evt: CanvasMouseEvent): void {
-        console.log("mouseup",evt.canvasPostion)
+        console.log("mouseup", evt.canvasPostion)
     }
     public dispatchMouseMove(evt: CanvasMouseEvent): void {
-        console.log("mousemove",evt.canvasPostion)
+        console.log("mousemove", evt.canvasPostion)
     }
     public dispatchMouseDrag(evt: CanvasMouseEvent): void {
         console.log("drag", evt.canvasPostion)
     }
-    public dispatchKeyPress(evt: CanvasKeyBoardEvent): void {}
-    public dispatchKeyDown(evt: CanvasKeyBoardEvent): void {}
-    public dispatchKeyUp(evt: CanvasKeyBoardEvent): void {}
+    public dispatchKeyPress(evt: CanvasKeyBoardEvent): void { }
+    public dispatchKeyDown(evt: CanvasKeyBoardEvent): void { }
+    public dispatchKeyUp(evt: CanvasKeyBoardEvent): void { }
 
 
     public removeTimer(id: number): boolean {
