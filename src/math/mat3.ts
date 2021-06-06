@@ -13,7 +13,7 @@ export default class mat3 {
         }
     }
 
-    private values = new Float32Array(9)
+    public values = new Float32Array(9)
 
     static readonly identity = new mat3().setIdentity()
 

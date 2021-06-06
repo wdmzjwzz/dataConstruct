@@ -61,7 +61,7 @@ export default class vec3 {
         }
     }
 
-    private values = new Float32Array(3)
+    public values = new Float32Array(3)
 
     static readonly zero = new vec3([0, 0, 0])
     static readonly one = new vec3([1, 1, 1])
