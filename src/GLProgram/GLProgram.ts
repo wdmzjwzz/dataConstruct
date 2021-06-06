@@ -2,6 +2,7 @@ import { AttribMap } from "src/app/BasicWebGLApplication";
 import { EShaderType, GLHelper } from "../utils/GLHelper";
 import { GLAttribBits, GLAttribState } from "../utils/GLAttribState";
 import { mat4, mat3, vec3, vec4 } from "../math/tsm";
+import { GLShaderSource } from "./GLShaderSource";
 
 export class GLProgram {
     // uniforms 相关定义
@@ -141,5 +142,11 @@ export class GLProgram {
             return true
         }
         return false
+    }
+    public static createDefaultTextureProgram(gl: WebGLRenderingContext): GLProgram {
+        return new GLProgram(gl, GLAttribState.makeVertexAtrribs(true, false, false, false, false), GLShaderSource.textureShader.vs, GLShaderSource.textureShader.fs)
+    }
+    public static createDefaultColorProgram(gl: WebGLRenderingContext): GLProgram {
+        return new GLProgram(gl, GLAttribState.makeVertexAtrribs(false, false, false, false, true), GLShaderSource.colorShader.vs, GLShaderSource.colorShader.fs)
     }
 }
