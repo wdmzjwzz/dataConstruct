@@ -1,4 +1,4 @@
-import { AttribMap } from "./BasicWebGLApplication";
+import { AttribMap } from "../app/BasicWebGLApplication";
 
 export enum EShaderType {
     VS_SHADER,

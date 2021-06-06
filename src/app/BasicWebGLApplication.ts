@@ -1,6 +1,6 @@
 import { mat4, vec3 } from "../math/tsm"
 import { Application } from "./Application";
-import { EShaderType, GLHelper } from "./GLHelper";
+import { EShaderType, GLHelper } from "../utils/GLHelper";
 import colorShader from "./glsl/colorShader_vs.vert"
 import colorShader_fs from "./glsl/colorShader_fs.frag"
 import { TypedArrayList } from "../tree/TypedArrayList";
@@ -29,9 +29,9 @@ export class BasicWebGLApplication extends Application {
         }, false)
         // GLHelper.triggerContextLostEvent(this.gl)
         // 投影举证
-        this.projectMatrix = mat4.perspective(1, this.canvas.width / this.canvas.height, 0.1, 100)
+        this.projectMatrix = mat4.perspective(1, this.canvas.width / this.canvas.height, 0.1, 1000)
         // 视矩阵
-        this.viewMatrix = mat4.lookAt(new vec3([0, 0, 100]), new vec3())
+        this.viewMatrix = mat4.lookAt(new vec3([0, 0, 200]), new vec3())
         this.viewProjectMatrix = mat4.product(this.projectMatrix, this.viewMatrix, new mat4())
         this.gl.viewport(0, 0, this.canvas.width, this.canvas.height)
         this.gl.scissor(0, 0, this.canvas.width, this.canvas.height)
