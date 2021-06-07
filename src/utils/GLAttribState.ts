@@ -157,7 +157,7 @@ export class GLAttribState {
         offsets[GLAttribState.ATTRIBBYTELENGTH] = byteOffset
         return offsets
     }
-    public static getSepratedLayoutAttribOffsetMap(attribBits: GLAttribBits, vertCount: number): GLAttribOffsetMap {
+    public static getSepratedLayoutAttribOffsetMap(attribBits: GLAttribBits): GLAttribOffsetMap {
         let offsets: GLAttribOffsetMap = {}
 
         if (GLAttribState.hasPosition(attribBits)) {
@@ -184,7 +184,7 @@ export class GLAttribState {
     /**
      *  getVertexByteStride
      */
-    public getVertexByteStride(attribBits: GLAttribBits): number {
+    public static getVertexByteStride(attribBits: GLAttribBits): number {
         let byteOffset: number = 0;
 
         if (GLAttribState.hasPosition(attribBits)) {

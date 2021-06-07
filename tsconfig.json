@@ -5,14 +5,15 @@
   ],
  
   "compilerOptions": {
-    "baseUrl": "./",
+    "outDir": "/dist",
+    "baseUrl": "/",
     "moduleResolution": "node",
     "allowSyntheticDefaultImports": true,
     "target": "es6",
     "jsx": "react",
     "module": "esnext",
     "noImplicitAny": true,
-    "strictNullChecks": true,
+    "strictNullChecks": false,
     "noUnusedLocals": true
   }
 }

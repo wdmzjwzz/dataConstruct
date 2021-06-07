@@ -1,4 +1,4 @@
-import { AttribMap } from "src/app/BasicWebGLApplication";
+import { AttribMap } from "../app/BasicWebGLApplication";
 import { EShaderType, GLHelper } from "../utils/GLHelper";
 import { GLAttribBits, GLAttribState } from "../utils/GLAttribState";
 import { mat4, mat3, vec3, vec4 } from "../math/tsm";
