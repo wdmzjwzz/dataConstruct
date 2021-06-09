@@ -1,9 +1,9 @@
-import { GLProgram } from "../GLProgram/GLProgram";
-import { GLProgramCache } from "../GLProgram/GLProgramCache";
+// import { GLProgram } from "../GLProgram/GLProgram";
+// import { GLProgramCache } from "../GLProgram/GLProgramCache";
 import { Application } from "./Application";
-import { GLMeshBuilder } from "../GLMesh/GLMeshBuilder"
-import mat4 from "../math/mat4";
-import { vec3 } from "../math/tsm";
+// import { GLMeshBuilder } from "../GLMesh/GLMeshBuilder"
+// import mat4 from "../math/mat4";
+// import { vec3 } from "../math/tsm";
 export class WebGLApplication extends Application {
     constructor(canvas: HTMLCanvasElement) {
         super(canvas);
