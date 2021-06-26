@@ -1,5 +1,5 @@
-import { HttpRequest } from "../common/utils/HttpRequest";
-import { Application } from "../common/Application";
+import { HttpRequest } from "../app/common/utils/HttpRequest";
+import { Application } from "../app/common/Application";
 
 export class AsyncLoadTestApplication extends Application
 {

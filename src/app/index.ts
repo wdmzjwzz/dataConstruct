@@ -1,5 +1,5 @@
 export { Application } from "./common/Application";
-export { AsyncLoadTestApplication } from "./demo/AsyncLoadTestApplication";
+export { AsyncLoadTestApplication } from "../controller/AsyncLoadTestApplication";
 export { GLProgram } from "./webgl/WebGLProgram";
 export { GLMeshBuilder, EVertexLayout, GLStaticMesh } from "./webgl/WebGLMesh";
 export { GLTexture } from "./webgl/WebGLTexture";

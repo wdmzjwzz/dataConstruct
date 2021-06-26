@@ -1,9 +1,9 @@
-import { CameraApplication } from "../lib/CameraApplication";
-import { MathHelper, EAxisType } from "../common/math/MathHelper";
-import { DrawHelper, CoordSystem } from "../lib/DrawHelper";
-import { mat4, vec3, vec4 } from "../common/math/TSM";
-import { CanvasKeyBoardEvent } from "../common/Application";
-import { GLCoordSystem } from "../webgl/WebGLCoordSystem";
+import { CameraApplication } from "../app/lib/CameraApplication";
+import { MathHelper, EAxisType } from "../app/common/math/MathHelper";
+import { DrawHelper, CoordSystem } from "../app/lib/DrawHelper";
+import { mat4, vec3, vec4 } from "../app/common/math/TSM";
+import { CanvasKeyBoardEvent } from "../app/common/Application";
+import { GLCoordSystem } from "../app/webgl/WebGLCoordSystem";
 
 export class CoordSystemApplication extends CameraApplication
 {
