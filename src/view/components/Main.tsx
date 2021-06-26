@@ -2,7 +2,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import "./main.less"
 import "../assets/font/iconfont.css"
-import { BasicWebGLApplication } from "../../app/BasicWebGLApplication"
+import { RotatingCubeApplication } from "../../controller/RotatingCubeApplication"
+
 export default () => {
     const [fps, setFps] = useState<number>(0)
     const canvas = useRef<HTMLCanvasElement>(null)
@@ -10,31 +11,21 @@ export default () => {
         canvas.current?.setAttribute("width", (document.body.clientWidth - 480) + "")
         canvas.current?.setAttribute("height", (document.body.clientHeight - 40) + "")
     }
-    const updateFps = (app: BasicWebGLApplication) => () => {
+    let app: RotatingCubeApplication;
+    const frameCallback = () => {
         setFps(Math.ceil(app.fps))
+    };
+    const init = () => {
+        app = new RotatingCubeApplication(canvas.current);
+        app.addTimer(frameCallback, 1)
+        app.run();
     }
-
     useEffect(() => {
         resizeFun()
+        init()
         window.addEventListener("resize", resizeFun)
-        let app: BasicWebGLApplication | null = null;
-        let timerId: number = -1
-        if (canvas.current) {
-            app = new BasicWebGLApplication(canvas.current)
-            timerId = app.addTimer(updateFps(app), 800, false, 999)
-            app.start()
-            // app.drawRectByInterleavedVBO(3, 3)
-            // app.drawRectByInterleavedVBO(0, 3)
-            app.drawRectByInterleavedWithEBO(3, app.gl.TRIANGLES)
-        }
-
         return () => {
-            window.removeEventListener("resize", resizeFun)
-            if (app) {
-                app.removeTimer(timerId)
-                app.stop()
-            }
-
+            app.stop()
         }
     }, [])
     return (
