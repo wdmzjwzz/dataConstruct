@@ -1,5 +1,3 @@
-
-
 export { CameraApplication } from "./lib/CameraApplication";
 export { GLProgram } from "../app/webgl/WebGLProgram";
 export { GLTexture } from "../app/webgl/WebGLTexture";
