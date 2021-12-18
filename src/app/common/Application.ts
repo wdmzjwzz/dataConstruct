@@ -262,10 +262,10 @@ export class Application implements EventListenerObject {
 
   //虚方法，子类能覆写（override），用于更新
   //注意: 第二个参数是秒为单位，第一参数是毫秒为单位
-  public update(elapsedMsec: number, intervalSec: number): void {}
+  public update(elapsedMsec: number, intervalSec: number): void { }
 
   //虚方法，子类能覆写（override），用于渲染
-  public render(): void {}
+  public render(): void { }
 
   // 虚函数，子类覆写（overide），用于同步各种资源后启动Application
   public async run(): Promise<void> {
@@ -273,7 +273,7 @@ export class Application implements EventListenerObject {
     // 然后不停的进行回调
     this.start();
   }
-
+  public clearCanvas() { }
   // 调用dispatchXXXX虚方法进行事件分发
   // handleEvent是接口EventListenerObject定义的协议分发，必须要实现
   public handleEvent(evt: Event): void {

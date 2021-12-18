@@ -118,7 +118,7 @@ export class MeshBuilderApplicaton extends CameraApplication {
     // 很重要，由于我们后续使用多视口渲染，因此必须要调用camera的setviewport方法
     this.camera.setViewport(0, 0, this.canvas.width, this.canvas.height);
     // 使用cleartColor方法设置当前颜色缓冲区背景色是什么颜色
-    this.gl.clearColor(0.8, 0.8, 0.8, 1);
+    this.gl.clearColor(0, 0, 0, 1);
     // 调用clear清屏操作
     this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
     // 关闭三角形背面剔除功能，这是因为在初始化是，我们是开启了该功能
