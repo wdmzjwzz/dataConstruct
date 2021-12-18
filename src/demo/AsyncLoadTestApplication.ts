@@ -1,5 +1,5 @@
-import { HttpRequest } from "../app/common/utils/HttpRequest";
-import { Application } from "../app/common/Application";
+import { HttpRequest } from "../theWorld/common/utils/HttpRequest";
+import { Application } from "../theWorld/common/Application";
 
 export class AsyncLoadTestApplication extends Application {
   private _urls: string[] = ["data/uv.jpg", "data/test.jpg", "data/p1.jpg"];

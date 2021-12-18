@@ -14,7 +14,7 @@ import {
   CanvasKeyBoardEvent,
   vec3,
   mat4,
-} from "../app";
+} from "../theWorld";
 export class RotatingCubeApplication extends CameraApplication {
   // GPU可编程管线对象，后面章节详解
   colorProgram: GLProgram; // 使用纹理GPU Program对象

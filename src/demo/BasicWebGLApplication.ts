@@ -1,14 +1,14 @@
-import { Application } from "../app/common/Application";
-import { mat4, vec3 } from "../app/common/math/TSM";
-import { MathHelper } from "../app/common/math/MathHelper";
+import { Application } from "../theWorld/common/Application";
+import { mat4, vec3 } from "../theWorld/common/math/TSM";
+import { MathHelper } from "../theWorld/common/math/MathHelper";
 import {
   GLHelper,
   EShaderType,
   GLUniformMap,
   GLAttribMap,
-} from "../app/webgl/WebGLHepler";
-import { TypedArrayList } from "../app/common/container/TypedArrayList";
-import { GLCoordSystem } from "../app/webgl/WebGLCoordSystem";
+} from "../theWorld/webgl/WebGLHepler";
+import { TypedArrayList } from "../theWorld/common/container/TypedArrayList";
+import { GLCoordSystem } from "../theWorld/webgl/WebGLCoordSystem";
 
 export class BasicWebGLApplication extends Application {
   public gl: WebGLRenderingContext;

@@ -1,15 +1,15 @@
-import { CameraApplication } from "../app/lib/CameraApplication";
-import { GLMeshBuilder, EVertexLayout } from "../app/webgl/WebGLMesh";
-import { GLAttribState } from "../app/webgl/WebGLAttribState";
-import { mat4, vec3 } from "../app/common/math/TSM";
-import { GLTextureCache } from "../app/webgl/WebGLTextureCache";
-import { GLProgram } from "../app/webgl/WebGLProgram";
-import { GLProgramCache } from "../app/webgl/WebGLProgramCache";
-import { GLCoordSystem } from "../app/webgl/WebGLCoordSystem";
-import { CanvasKeyBoardEvent } from "../app/common/Application";
-import { DrawHelper } from "../app/lib/DrawHelper";
-import { GLTexture } from "../app/webgl/WebGLTexture";
-import { EAxisType } from "../app/common/math/MathHelper";
+import { CameraApplication } from "../theWorld/lib/CameraApplication";
+import { GLMeshBuilder, EVertexLayout } from "../theWorld/webgl/WebGLMesh";
+import { GLAttribState } from "../theWorld/webgl/WebGLAttribState";
+import { mat4, vec3 } from "../theWorld/common/math/TSM";
+import { GLTextureCache } from "../theWorld/webgl/WebGLTextureCache";
+import { GLProgram } from "../theWorld/webgl/WebGLProgram";
+import { GLProgramCache } from "../theWorld/webgl/WebGLProgramCache";
+import { GLCoordSystem } from "../theWorld/webgl/WebGLCoordSystem";
+import { CanvasKeyBoardEvent } from "../theWorld/common/Application";
+import { DrawHelper } from "../theWorld/lib/DrawHelper";
+import { GLTexture } from "../theWorld/webgl/WebGLTexture";
+import { EAxisType } from "../theWorld/common/math/MathHelper";
 
 export class MeshBuilderApplicaton extends CameraApplication {
   public colorShader: GLProgram; // 颜色着色器
