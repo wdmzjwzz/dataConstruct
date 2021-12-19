@@ -104,19 +104,3 @@ export class LinkList<T> {
     }
 }
 
-/*
-let list:LinkList<number> = new LinkList();
-        list.push(0);
-        list.push(1);
-        list.push(2);
-
-        list.pop();
-
-        list.forNext((data:number):void =>{
-            console.log(data);
-        });
-
-        list.forPrev((data:number):void =>{
-            console.log(data);
-        });
-*/

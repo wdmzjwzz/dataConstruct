@@ -1,7 +1,9 @@
 import React, { useEffect, useRef, useState } from "react";
 import "./main.less";
 import "../assets/font/iconfont.css";
-import { CoordSystemApplication } from "../../demo/CoordSystemApplicationDemo";
+import { MeshBuilderApplication } from "../../demo/MeshBuilderApplication";
+import { Face } from "../../theWorld/Geometry/Face";
+import { Point } from "../../theWorld/Geometry/Point";
 
 export default () => {
   const [fps, setFps] = useState<number>(0);
@@ -13,12 +15,12 @@ export default () => {
       document.body.clientHeight - 40 + ""
     );
   };
-  let app: CoordSystemApplication;
+  let app: MeshBuilderApplication;
   const frameCallback = () => {
     setFps(Math.ceil(app.fps));
   };
   const init = () => {
-    app = new CoordSystemApplication(canvas.current);
+    app = new MeshBuilderApplication(canvas.current);
     app.addTimer(frameCallback, 1);
     app.run();
   };

@@ -10,8 +10,7 @@ import { CanvasKeyBoardEvent } from "../theWorld/common/Application";
 import { DrawHelper } from "../theWorld/lib/DrawHelper";
 import { GLTexture } from "../theWorld/webgl/WebGLTexture";
 import { EAxisType } from "../theWorld/common/math/MathHelper";
-
-export class MeshBuilderApplicaton extends CameraApplication {
+export class MeshBuilderApplication extends CameraApplication {
   public colorShader: GLProgram; // 颜色着色器
   public textureShader: GLProgram; // 纹理着色器
   public texture: GLTexture; // 纹理着色器所使用的纹理对象
@@ -115,6 +114,7 @@ export class MeshBuilderApplicaton extends CameraApplication {
   }
 
   public drawByMatrixWithColorShader(): void {
+    
     // 很重要，由于我们后续使用多视口渲染，因此必须要调用camera的setviewport方法
     this.camera.setViewport(0, 0, this.canvas.width, this.canvas.height);
     // 使用cleartColor方法设置当前颜色缓冲区背景色是什么颜色
