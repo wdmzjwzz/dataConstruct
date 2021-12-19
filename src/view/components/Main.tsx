@@ -2,8 +2,6 @@ import React, { useEffect, useRef, useState } from "react";
 import "./main.less";
 import "../assets/font/iconfont.css";
 import { MeshBuilderApplication } from "../../demo/MeshBuilderApplication";
-import { Face } from "../../theWorld/Geometry/Face";
-import { Point } from "../../theWorld/Geometry/Point";
 
 export default () => {
   const [fps, setFps] = useState<number>(0);
