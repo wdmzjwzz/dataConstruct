@@ -375,7 +375,7 @@ export class GLProgram {
   ): GLProgram {
     let pro: GLProgram = new GLProgram(
       gl,
-      GLAttribState.makeVertexAttribs(true, false, false, false, false),
+      GLAttribState.makeVertexAttribs(true, false, false, false, false,false),
       GLShaderSource.textureShader.vs,
       GLShaderSource.textureShader.fs
     );
@@ -387,7 +387,7 @@ export class GLProgram {
   ): GLProgram {
     let pro: GLProgram = new GLProgram(
       gl,
-      GLAttribState.makeVertexAttribs(false, false, false, false, true),
+      GLAttribState.makeVertexAttribs(false, false, false, false, true, false),
       GLShaderSource.colorShader.vs,
       GLShaderSource.colorShader.fs
     );

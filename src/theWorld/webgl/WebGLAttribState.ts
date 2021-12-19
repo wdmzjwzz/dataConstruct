@@ -33,6 +33,11 @@ export class GLAttribState {
   public static readonly COLOR_NAME: string = "aColor";
   public static readonly COLOR_LOCATION: number = 5;
 
+  public static readonly SIZE_BIT: number = 1 << 6;
+  public static readonly SIZE_COMPONENT: number = 1;
+  public static readonly SIZE_NAME: string = "aSize";
+  public static readonly SIZE_LOCATION: number = 6;
+
   /*
     public static readonly WEIGHT0_BIT: number = (1 << 7);
     public static readonly WEIGHT1_BIT: number = (1 << 8);
@@ -51,7 +56,8 @@ export class GLAttribState {
     useTexcoord1: boolean,
     useNormal: boolean,
     useTangent: boolean,
-    useColor: boolean
+    useColor: boolean,
+    useSize: boolean
   ): GLAttribBits {
     // 不管如何，总是使用位置坐标属性
     let bits: GLAttribBits = GLAttribState.POSITION_BIT;
@@ -71,6 +77,10 @@ export class GLAttribState {
     if (useColor === true) {
       bits |= GLAttribState.COLOR_BIT;
     }
+    if (useSize === true) {
+      bits |= GLAttribState.SIZE_BIT;
+    }
+
     return bits;
   }
 
@@ -92,6 +102,9 @@ export class GLAttribState {
   }
   public static hasTangent(attribBits: GLAttribBits): boolean {
     return (attribBits & GLAttribState.TANGENT_BIT) !== 0;
+  }
+  public static hasSize(attribBits: GLAttribBits): boolean {
+    return (attribBits & GLAttribState.SIZE_BIT) !== 0;
   }
 
   public static setAttribVertexArrayPointer(
@@ -183,6 +196,17 @@ export class GLAttribState {
         offset
       );
     }
+    offset = offsetMap[GLAttribState.SIZE_NAME];
+    if (offset !== undefined) {
+      gl.vertexAttribPointer(
+        GLAttribState.SIZE_LOCATION,
+        GLAttribState.SIZE_COMPONENT,
+        gl.FLOAT,
+        false,
+        stride,
+        offset
+      );
+    }
   }
 
   public static setAttribVertexArrayState(
@@ -249,6 +273,15 @@ export class GLAttribState {
     } else {
       gl.disableVertexAttribArray(GLAttribState.TANGENT_LOCATION);
     }
+    if (GLAttribState.hasSize(attribBits)) {
+      if (enable) {
+        gl.enableVertexAttribArray(GLAttribState.SIZE_LOCATION);
+      } else {
+        gl.disableVertexAttribArray(GLAttribState.SIZE_LOCATION);
+      }
+    } else {
+      gl.disableVertexAttribArray(GLAttribState.SIZE_LOCATION);
+    }
   }
 
   public static getVertexByteStride(attribBits: GLAttribBits): number {
@@ -281,7 +314,10 @@ export class GLAttribState {
       byteOffset +=
         GLAttribState.TANGENT_COMPONENT * GLAttribState.FLOAT32_SIZE;
     }
-
+    if (GLAttribState.hasSize(attribBits)) {
+      byteOffset +=
+        GLAttribState.SIZE_COMPONENT * GLAttribState.FLOAT32_SIZE;
+    }
     return byteOffset;
   }
 
@@ -331,7 +367,13 @@ export class GLAttribState {
         GLAttribState.TANGENT_COMPONENT *
         GLAttribState.FLOAT32_SIZE;
     }
-
+    if (GLAttribState.hasSize(attribBits)) {
+      offsets[GLAttribState.SIZE_NAME] = byteOffset;
+      byteOffset +=
+        vertCount *
+        GLAttribState.SIZE_COMPONENT *
+        GLAttribState.FLOAT32_SIZE;
+    }
     //SequencedLayout具有ATTRIBSTRIDE和ATTRIBSTRIDE属性
     offsets[GLAttribState.ATTRIBSTRIDE] = byteOffset / vertCount; // 总的字节数 / 顶点数量  = 每个顶点的stride，实际上顺序存储时不需要这个值
     offsets[GLAttribState.ATTRIBBYTELENGTH] = byteOffset; // 总的字节数
@@ -378,7 +420,11 @@ export class GLAttribState {
       byteOffset +=
         GLAttribState.TANGENT_COMPONENT * GLAttribState.FLOAT32_SIZE;
     }
-
+    if (GLAttribState.hasSize(attribBits)) {
+      offsets[GLAttribState.SIZE_NAME] = byteOffset;
+      byteOffset +=
+        GLAttribState.SIZE_COMPONENT * GLAttribState.FLOAT32_SIZE;
+    }
     // stride和length相等
     offsets[GLAttribState.ATTRIBSTRIDE] = byteOffset; // 间隔数组方法存储的话，顶点的stride非常重要
     offsets[GLAttribState.ATTRIBBYTELENGTH] = byteOffset;
@@ -414,7 +460,9 @@ export class GLAttribState {
     if (GLAttribState.hasTangent(attribBits)) {
       offsets[GLAttribState.TANGENT_NAME] = 0;
     }
-
+    if (GLAttribState.hasSize(attribBits)) {
+      offsets[GLAttribState.SIZE_NAME] = 0;
+    }
     return offsets;
   }
 
