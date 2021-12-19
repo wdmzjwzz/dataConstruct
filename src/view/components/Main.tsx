@@ -3,7 +3,6 @@ import "./main.less";
 import "../assets/font/iconfont.css";
 // import { MeshBuilderApplication } from "../../demo/MeshBuilderApplication";
 import { MeshApplication } from "../../system/MeshApplication";
-import { Point } from "../../theWorld/Geometry/Point";
 
 export default () => {
   const [fps, setFps] = useState<number>(0);
