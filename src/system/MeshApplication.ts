@@ -1,5 +1,5 @@
 import { CameraApplication } from "../theWorld/lib/CameraApplication";
-import { GLMeshBuilder, EVertexLayout } from "../theWorld/webgl/WebGLMesh";
+import { GLMeshBuilder } from "../theWorld/webgl/WebGLMesh";
 import { GLAttribState } from "../theWorld/webgl/WebGLAttribState";
 import { mat4, vec3 } from "../theWorld/common/math/TSM";
 import { GLTextureCache } from "../theWorld/webgl/WebGLTextureCache";
@@ -31,10 +31,9 @@ export class MeshApplication extends CameraApplication {
 
     this.builder = new GLMeshBuilder(
       this.gl,
-      GLAttribState.POSITION_BIT | GLAttribState.COLOR_BIT| GLAttribState.SIZE_BIT,
+      GLAttribState.POSITION_BIT | GLAttribState.COLOR_BIT | GLAttribState.SIZE_BIT,
       this.colorShader,
-      null,
-      EVertexLayout.SEPARATED
+      null
     );
     this.coords = new GLCoordSystem([0, 0, this.canvas.height])
     this.camera.z = 2; // 调整摄像机位置
@@ -64,8 +63,8 @@ export class MeshApplication extends CameraApplication {
     this.matStack.pushMatrix(); // 矩阵堆栈进栈
     {
       // this.matStack.translate(new vec3([1, 1, 0])); 
-      this.matStack.rotate(-70, new vec3([1, 0, 0]).normalize());
-      this.matStack.rotate(-20, new vec3([0, 0, 1]).normalize());
+      this.matStack.rotate(-this.angle, new vec3([0, 1, 0]).normalize());
+      // this.matStack.rotate(-20, new vec3([0, 0, 1]).normalize());
       // 合成model-view-projection矩阵，存储到mat4的静态变量中，减少内存的重新分配
       mat4.product(
         this.camera.viewProjectionMatrix,
@@ -75,7 +74,7 @@ export class MeshApplication extends CameraApplication {
       DrawHelper.drawWireFrameCubeBox(this.builder, mat4.m0, 0.2); // 调用DrawHelper类的静态drawWireFrameCubeBox方法
       this.matStack.popMatrix(); // 矩阵出堆栈
       DrawHelper.drawCoordSystem(this.builder, mat4.m0, EAxisType.NONE, 1);
-
+      this.createPoints([new Point(0.5, 0.5, 0)],mat4.m0)
     }
     // 恢复三角形背面剔除功能
     this.gl.enable(this.gl.CULL_FACE);
@@ -85,22 +84,15 @@ export class MeshApplication extends CameraApplication {
   public render(): void {
     // 调用的的currentDrawMethod这个回调函数，该函数指向当前要渲染的页面方法
     this.drawByMatrixWithColorShader();
+    
   }
-  public createPoints(points: Point[]) {
-    this.matStack.pushMatrix(); // 矩阵堆栈进栈
-
-    mat4.product(
-      this.camera.viewProjectionMatrix,
-      this.matStack.modelViewMatrix,
-      mat4.m0
-    );
-    this.builder.begin(this.gl.POINTS); // 注意这里我们使用TRIANGLE_FAN图元而不是TRIANGLES图元绘制
+  public createPoints(points: Point[],mat:mat4) {
+   
+    this.builder.begin(this.gl.POINTS);
     points.forEach(point => {
-      this.builder.color(0, 0, 0).vertex(point.x, point.y, point.z);
+      this.builder.color(1, 1, 0).size(50).vertex(point.x, point.y, point.z);
     })
-    this.builder.end(mat4.m0); // 向GPU提交绘制命令
-    this.matStack.popMatrix(); // 矩阵出堆栈
-
+    this.builder.end(mat); // 向GPU提交绘制命令
   }
   public onKeyPress(evt: CanvasKeyBoardEvent): void {
     super.onKeyPress(evt);

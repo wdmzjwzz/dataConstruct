@@ -23,7 +23,7 @@ export default () => {
     app = new MeshApplication(canvas.current);
     app.addTimer(frameCallback, 1);
     app.run();
-    app.createPoints([new Point(0, 0, 0)])
+    
   };
   useEffect(() => {
     resizeFun();

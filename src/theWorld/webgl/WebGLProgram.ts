@@ -118,6 +118,13 @@ export class GLProgram {
         GLAttribState.TANGENT_NAME
       );
     }
+    if (GLAttribState.hasSize(this._attribState)) {
+      gl.bindAttribLocation(
+        program,
+        GLAttribState.SIZE_LOCATION,
+        GLAttribState.SIZE_NAME
+      );
+    }
   }
 
   // 链接后的回调函数实际上在本类中是多余的
@@ -354,28 +361,12 @@ export class GLProgram {
     return this.setSampler(GLProgram.Sampler, unit);
   }
 
-  /*
-    public static createDefaultTextureProgram ( gl: WebGLRenderingContext ): GLProgram
-    {
-        let pro: GLProgram = new GLProgram( gl, GLAttribState.POSITION_BIT | GLAttribState.TEXCOORD_BIT,
-            GLShaderSource.textureShader.vs, GLShaderSource.textureShader.fs );
-        return pro;
-    }
-
-    public static createDefaultColorProgram ( gl: WebGLRenderingContext ): GLProgram
-    {
-        let pro: GLProgram = new GLProgram( gl, GLAttribState.POSITION_BIT | GLAttribState.COLOR_BIT,
-            GLShaderSource.colorShader.vs, GLShaderSource.colorShader.fs );
-        return pro;
-    }
-    */
-
   public static createDefaultTextureProgram(
     gl: WebGLRenderingContext
   ): GLProgram {
     let pro: GLProgram = new GLProgram(
       gl,
-      GLAttribState.makeVertexAttribs(true, false, false, false, false,false),
+      GLAttribState.makeVertexAttribs(true, false, false, false, false, false),
       GLShaderSource.textureShader.vs,
       GLShaderSource.textureShader.fs
     );
