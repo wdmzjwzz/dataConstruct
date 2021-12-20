@@ -77,6 +77,7 @@ export class GLAttribState {
     if (useColor === true) {
       bits |= GLAttribState.COLOR_BIT;
     }
+    
     if (useSize === true) {
       bits |= GLAttribState.SIZE_BIT;
     }

@@ -1,6 +1,5 @@
 import { vec3, mat4, vec4 } from "../common/math/TSM";
 import { TypedArrayList } from "../common/container/TypedArrayList";
-import { EAxisType } from "../common/math/MathHelper";
 import { GLMeshBuilder } from "../webgl/WebGLMesh";
 export class CoordSystem {
   public viewport: number[] = []; // 当前坐标系被绘制在哪个视口中
@@ -28,7 +27,7 @@ export class CoordSystem {
 }
 
 export class DrawHelper {
-  public static defaultHitCollor: vec4 = new vec4([1, 1, 0]);
+  public static defaultHitCollor: vec4 = new vec4([1, 1, 1]);
 
   public static getCirclePointsOnXYPlane(
     pts: TypedArrayList<Float32Array>,
@@ -100,97 +99,20 @@ export class DrawHelper {
   public static drawCoordSystem(
     builder: GLMeshBuilder,
     mat: mat4,
-    hitAxis: EAxisType,
-    len: number = 5,
-    rotateAxis: vec3 | null = null,
-    isLeftHandness: boolean = false
+    len: number = 5
   ): void {
     builder.gl.lineWidth(5);
     builder.gl.disable(builder.gl.DEPTH_TEST);
     builder.begin(builder.gl.LINES);
-    if (hitAxis === EAxisType.XAXIS) {
-      builder
-        .color(
-          DrawHelper.defaultHitCollor.r,
-          DrawHelper.defaultHitCollor.g,
-          DrawHelper.defaultHitCollor.b
-        )
-        .vertex(0.0, 0.0, 0.0);
-      builder
-        .color(
-          DrawHelper.defaultHitCollor.r,
-          DrawHelper.defaultHitCollor.g,
-          DrawHelper.defaultHitCollor.b
-        )
-        .vertex(len, 0, 0);
-    } else {
-      builder.color(1.0, 0.0, 0.0).vertex(0.0, 0.0, 0.0);
-      builder.color(1.0, 0.0, 0.0).vertex(len, 0, 0);
-    }
 
-    if (hitAxis === EAxisType.YAXIS) {
-      builder
-        .color(
-          DrawHelper.defaultHitCollor.r,
-          DrawHelper.defaultHitCollor.g,
-          DrawHelper.defaultHitCollor.b
-        )
-        .vertex(0.0, 0.0, 0.0);
-      builder
-        .color(
-          DrawHelper.defaultHitCollor.r,
-          DrawHelper.defaultHitCollor.g,
-          DrawHelper.defaultHitCollor.b
-        )
-        .vertex(0, len, 0);
-    } else {
-      builder.color(0.0, 1.0, 0.0).vertex(0.0, 0.0, 0.0);
-      builder.color(0.0, 1.0, 0.0).vertex(0.0, len, 0.0);
-    }
+    builder.color(1.0, 0.0, 0.0).vertex(0.0, 0.0, 0.0);
+    builder.color(1.0, 0.0, 0.0).vertex(len, 0, 0);
 
-    if (hitAxis === EAxisType.ZAXIS) {
-      builder
-        .color(
-          DrawHelper.defaultHitCollor.r,
-          DrawHelper.defaultHitCollor.g,
-          DrawHelper.defaultHitCollor.b
-        )
-        .vertex(0.0, 0.0, 0.0);
-      if (isLeftHandness === true) {
-        builder
-          .color(
-            DrawHelper.defaultHitCollor.r,
-            DrawHelper.defaultHitCollor.g,
-            DrawHelper.defaultHitCollor.b
-          )
-          .vertex(0, 0, -len);
-      } else {
-        builder
-          .color(
-            DrawHelper.defaultHitCollor.r,
-            DrawHelper.defaultHitCollor.g,
-            DrawHelper.defaultHitCollor.b
-          )
-          .vertex(0, 0, len);
-      }
-    } else {
-      builder.color(0.0, 0.0, 1.0).vertex(0.0, 0.0, 0.0);
-      if (isLeftHandness === true) {
-        builder.color(0.0, 0.0, 1.0).vertex(0.0, 0.0, -len);
-      } else {
-        builder.color(0.0, 0.0, 1.0).vertex(0.0, 0.0, len);
-      }
-    }
+    builder.color(0.0, 1.0, 0.0).vertex(0.0, 0.0, 0.0);
+    builder.color(0.0, 1.0, 0.0).vertex(0.0, len, 0.0);
 
-    if (rotateAxis !== null) {
-      let scale: vec3 = rotateAxis.scale(len);
-      builder.color(0.0, 0.0, 0).vertex(0, 0, 0);
-      if (isLeftHandness === true) {
-        builder.color(0.0, 0.0, 0.0).vertex(scale.x, scale.y, -scale.z);
-      } else {
-        builder.color(0.0, 0.0, 0.0).vertex(scale.x, scale.y, scale.z);
-      }
-    }
+    builder.color(0.0, 0.0, 1.0).vertex(0.0, 0.0, 0.0);
+    builder.color(0.0, 0.0, 1.0).vertex(0.0, 0.0, len);
 
     builder.end(mat);
     builder.gl.lineWidth(1);

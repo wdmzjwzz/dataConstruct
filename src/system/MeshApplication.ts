@@ -1,15 +1,11 @@
 import { CameraApplication } from "../theWorld/lib/CameraApplication";
 import { GLMeshBuilder } from "../theWorld/webgl/WebGLMesh";
-import { GLAttribState } from "../theWorld/webgl/WebGLAttribState";
 import { mat4, vec3 } from "../theWorld/common/math/TSM";
-import { GLTextureCache } from "../theWorld/webgl/WebGLTextureCache";
 import { GLProgram } from "../theWorld/webgl/WebGLProgram";
-import { GLProgramCache } from "../theWorld/webgl/WebGLProgramCache";
 import { GLCoordSystem } from "../theWorld/webgl/WebGLCoordSystem";
 import { CanvasKeyBoardEvent } from "../theWorld/common/Application";
 import { DrawHelper } from "../theWorld/lib/DrawHelper";
 import { GLTexture } from "../theWorld/webgl/WebGLTexture";
-import { EAxisType } from "../theWorld/common/math/MathHelper";
 import { Point } from "../theWorld/Geometry/Point";
 export class MeshApplication extends CameraApplication {
   public colorShader: GLProgram; // 颜色着色器
@@ -24,19 +20,7 @@ export class MeshApplication extends CameraApplication {
     canvas: HTMLCanvasElement
   ) {
     super(canvas, { premultipliedAlpha: false }, true);
-    // 使用default纹理和着色器
-    this.texture = GLTextureCache.instance.getMust("default");
-    this.colorShader = GLProgramCache.instance.getMust("color");
-    this.textureShader = GLProgramCache.instance.getMust("texture");
-
-    this.builder = new GLMeshBuilder(
-      this.gl,
-      GLAttribState.POSITION_BIT | GLAttribState.COLOR_BIT | GLAttribState.SIZE_BIT,
-      this.colorShader,
-      null
-    );
     this.coords = new GLCoordSystem([0, 0, this.canvas.height])
-    this.camera.z = 2; // 调整摄像机位置
   }
 
   public update(elapsedMsec: number, intervalSec: number): void {
@@ -73,8 +57,8 @@ export class MeshApplication extends CameraApplication {
       );
       DrawHelper.drawWireFrameCubeBox(this.builder, mat4.m0, 0.2); // 调用DrawHelper类的静态drawWireFrameCubeBox方法
       this.matStack.popMatrix(); // 矩阵出堆栈
-      DrawHelper.drawCoordSystem(this.builder, mat4.m0, EAxisType.NONE, 1);
-      this.createPoints([new Point(0.5, 0.5, 0)],mat4.m0)
+      DrawHelper.drawCoordSystem(this.builder, mat4.m0, 1);
+      this.createPoints([new Point(0.8, 0.8, 0.8)], mat4.m0)
     }
     // 恢复三角形背面剔除功能
     this.gl.enable(this.gl.CULL_FACE);
@@ -84,13 +68,13 @@ export class MeshApplication extends CameraApplication {
   public render(): void {
     // 调用的的currentDrawMethod这个回调函数，该函数指向当前要渲染的页面方法
     this.drawByMatrixWithColorShader();
-    
+
   }
-  public createPoints(points: Point[],mat:mat4) {
-   
+  public createPoints(points: Point[], mat: mat4) {
+
     this.builder.begin(this.gl.POINTS);
     points.forEach(point => {
-      this.builder.color(1, 1, 0).size(50).vertex(point.x, point.y, point.z);
+      this.builder.color(0, 0, 1).size(20).vertex(point.x, point.y, point.z);
     })
     this.builder.end(mat); // 向GPU提交绘制命令
   }

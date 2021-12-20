@@ -48,13 +48,13 @@ export class GLProgram {
   public fsShader: WebGLShader; // fragment shader编译器
 
   // 主要用于信息输出
-  public attribMap: GLAttribMap;
-  public uniformMap: GLUniformMap;
+  public attribMap: GLAttribMap = {};
+  public uniformMap: GLUniformMap = {};
 
   // 当调用gl.useProgram(this.program)后触发bindCallback回调
-  public bindCallback: ((program: GLProgram) => void) | null;
+  public bindCallback: ((program: GLProgram) => void) | null = null;
   // 当调用gl.useProgram(null)前触发unbindCallback回调函数
-  public unbindCallback: ((program: GLProgram) => void) | null;
+  public unbindCallback: ((program: GLProgram) => void) | null = null;
 
   private _vsShaderDefineStrings: string[] = [];
   private _fsShaderDefineStrings: string[] = [];
@@ -145,43 +145,20 @@ export class GLProgram {
   public constructor(
     context: WebGLRenderingContext,
     attribState: GLAttribBits,
-    vsShader: string | null = null,
-    fsShader: string | null = null,
+    vsShader: string,
+    fsShader: string,
     name: string = ""
   ) {
     this.gl = context;
     this._attribState = attribState; //最好从shader中抽取
-    this.bindCallback = null;
-    this.unbindCallback = null;
 
-    let shader: WebGLShader | null = GLHelper.createShader(
-      this.gl,
-      EShaderType.VS_SHADER
-    );
-    if (shader === null) {
-      throw new Error("Create Vertex Shader Object Fail!!!");
-    }
-    this.vsShader = shader;
+    this.vsShader = GLHelper.createShader(this.gl, EShaderType.VS_SHADER);
 
-    shader = null;
-    shader = GLHelper.createShader(this.gl, EShaderType.FS_SHADER);
-    if (shader === null) {
-      throw new Error("Create Fragment Shader Object Fail!!!");
-    }
-    this.fsShader = shader;
+    this.fsShader = GLHelper.createShader(this.gl, EShaderType.FS_SHADER);
 
-    let program: WebGLProgram | null = GLHelper.createProgram(this.gl);
-    if (program === null) {
-      throw new Error("Create WebGLProgram Object Fail!!!");
-    }
-    this.program = program;
+    this.program = GLHelper.createProgram(this.gl);
 
-    this.attribMap = {};
-    this.uniformMap = {};
-
-    if (vsShader !== null && fsShader !== null) {
-      this.loadShaders(vsShader, fsShader);
-    }
+    this.loadShaders(vsShader, fsShader);
 
     this.name = name;
   }
@@ -221,26 +198,18 @@ export class GLProgram {
       let join: string = this._fsShaderDefineStrings.join("\n");
       fs = join + fs;
     }
-
-    if (GLHelper.compileShader(this.gl, vs, this.vsShader) === false) {
-      throw new Error(" WebGL顶点Shader链接不成功! ");
-    }
-
-    if (GLHelper.compileShader(this.gl, fs, this.fsShader) === false) {
-      throw new Error(" WebGL像素片段Shader链接不成功! ");
-    }
-
-    if (
-      GLHelper.linkProgram(
-        this.gl,
-        this.program,
-        this.vsShader,
-        this.fsShader,
-        this.progromBeforeLink.bind(this),
-        this.progromAfterLink.bind(this)
-      ) === false
-    ) {
-      throw new Error(" WebGLProgram链接不成功! ");
+    const compileVS = GLHelper.compileShader(this.gl, vs, this.vsShader)
+    const compileFS = GLHelper.compileShader(this.gl, fs, this.fsShader)
+    const linkProgram = GLHelper.linkProgram(
+      this.gl,
+      this.program,
+      this.vsShader,
+      this.fsShader,
+      this.progromBeforeLink.bind(this),
+      this.progromAfterLink.bind(this)
+    )
+    if (!compileVS || !compileFS || !linkProgram) {
+      throw new Error(" loadShaders失败! ");
     }
 
     console.log(JSON.stringify(this.attribMap));
@@ -378,7 +347,7 @@ export class GLProgram {
   ): GLProgram {
     let pro: GLProgram = new GLProgram(
       gl,
-      GLAttribState.makeVertexAttribs(false, false, false, false, true, false),
+      GLAttribState.makeVertexAttribs(false, false, false, false, true, true),
       GLShaderSource.colorShader.vs,
       GLShaderSource.colorShader.fs
     );

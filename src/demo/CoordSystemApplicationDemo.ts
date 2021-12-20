@@ -192,11 +192,7 @@ export class CoordSystemApplication extends CameraApplication {
       // 调用DrawHelper.drawCoordSystem的方法绘制X / Y / Z坐标系
       DrawHelper.drawCoordSystem(
         this.builder,
-        this.mvp,
-        EAxisType.NONE,
-        1,
-        s.isDrawAxis ? s.axis : null,
-        s.isD3D
+        this.mvp
       );
     }
     this.matStack.popMatrix();
