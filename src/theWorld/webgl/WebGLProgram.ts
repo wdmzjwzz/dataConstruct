@@ -7,7 +7,7 @@ import {
   GLUniformInfoMap,
   GLAttribInfoMap,
 } from "./WebGLHepler";
-import { GLAttribBits, GLAttribName } from "../type";
+import { GLAttribBits } from "../type";
 import { attribNames, GLAttribMap } from "../constants";
 /*
 比较特别的是Texture Unit
@@ -284,11 +284,12 @@ export class GLProgram {
   }
 
   public static createDefaultTextureProgram(
-    gl: WebGLRenderingContext
+    gl: WebGLRenderingContext,
+    bit: GLAttribBits
   ): GLProgram {
     let pro: GLProgram = new GLProgram(
       gl,
-      GLAttribStateManager.makeVertexAttribs([]),
+      bit,
       GLShaderSource.textureShader.vs,
       GLShaderSource.textureShader.fs
     );
@@ -296,15 +297,12 @@ export class GLProgram {
   }
 
   public static createDefaultColorProgram(
-    gl: WebGLRenderingContext
+    gl: WebGLRenderingContext,
+    bit: GLAttribBits
   ): GLProgram {
     let pro: GLProgram = new GLProgram(
       gl,
-      GLAttribStateManager.makeVertexAttribs([
-        GLAttribName.POSITION,
-        GLAttribName.TEXCOORD,
-        GLAttribName.SIZE,
-      ]),
+      bit,
       GLShaderSource.colorShader.vs,
       GLShaderSource.colorShader.fs
     );

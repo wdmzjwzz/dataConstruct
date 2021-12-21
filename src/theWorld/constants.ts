@@ -12,8 +12,8 @@ export const GLAttribMap: { [key: string]: GLAttribInfo } = {
   };
   export const attribNames = [
     GLAttribName.POSITION,
-    GLAttribName.NORMAL,
     GLAttribName.TEXCOORD,
+    GLAttribName.NORMAL,
     GLAttribName.COLOR,
     GLAttribName.SIZE,
   ];

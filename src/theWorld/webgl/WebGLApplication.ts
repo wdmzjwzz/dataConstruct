@@ -1,6 +1,5 @@
 import { Application } from "../common/Application";
 import { GLWorldMatrixStack } from "./WebGLMatrixStack";
-import { GLProgramCache } from "./WebGLProgramCache";
 import { GLProgram } from "./WebGLProgram";
 import { GLMeshBuilder } from "./WebGLMesh";
 import { GLHelper } from "./WebGLHepler";
@@ -29,16 +28,7 @@ export class WebGLApplication extends Application {
     need2D: boolean = false
   ) {
     super(canvas);
-    let ctx: WebGLRenderingContext | null = this.canvas.getContext(
-      "webgl",
-      contextAttributes
-    );
-    if (ctx === null) {
-      alert(" 无法创建WebGLRenderingContext上下文对象 ");
-      throw new Error(" 无法创建WebGLRenderingContext上下文对象 ");
-    }
-
-    this.gl = ctx;
+    this.gl = this.canvas.getContext("webgl", contextAttributes);
 
     if (need2D === true) {
       let canvasElem: HTMLCanvasElement = document.createElement(
@@ -77,18 +67,15 @@ export class WebGLApplication extends Application {
 
     // 由于Canvas是左手系，而webGL是右手系，需要FilpYCoord
     this.isFlipYCoord = true;
-    const defaultColorProgram = GLProgram.createDefaultColorProgram(this.gl);
-    const defaultTextureProgram = GLProgram.createDefaultTextureProgram(
-      this.gl
-    );
-    // 初始化时，创建颜色和纹理Program
-    GLProgramCache.instance.set("color", defaultColorProgram);
-    GLProgramCache.instance.set("texture", defaultTextureProgram);
     const bit = GLAttribStateManager.makeVertexAttribs([
       GLAttribName.POSITION,
       GLAttribName.COLOR,
       GLAttribName.SIZE,
     ]);
+    const defaultColorProgram = GLProgram.createDefaultColorProgram(
+      this.gl,
+      bit
+    );
     // 初始化时，创建颜色GLMeshBuilder对象
     this.builder = new GLMeshBuilder(this.gl, bit, defaultColorProgram);
   }

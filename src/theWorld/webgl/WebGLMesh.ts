@@ -1,10 +1,10 @@
 import { GLAttribStateManager } from "./WebGLAttribState";
-import { vec4, vec2, vec3, mat4 } from "../common/math/TSM";
+import { mat4 } from "../common/math/TSM";
 import { TypedArrayList } from "../common/container/TypedArrayList";
 import { GLProgram } from "./WebGLProgram";
 import { GLTexture } from "./WebGLTexture";
 import { GLAttribBits, GLAttribName } from "../type";
-import { attribNames } from "../constants";
+import { attribNames, GLAttribMap } from "../constants";
 
 // 使用abstract声明抽象类
 export abstract class GLMeshBase {
@@ -83,10 +83,14 @@ export class GLMeshBuilder extends GLMeshBase {
 
   // 为了简单起见，只支持顶点的位置坐标、纹理0坐标、颜色和法线这四种顶点属性格式
   // 表示当前正在输入的顶点属性值
-  private _color: vec4 = new vec4([0, 0, 0, 0]);
-  private _texCoord: vec2 = new vec2([0, 0]);
-  private _normal: vec3 = new vec3([0, 0, 1]);
-  private _size: number = 0;
+
+  private attribValue: { [key: string]: number[] } = {
+    [GLAttribName.POSITION]: [],
+    [GLAttribName.COLOR]: [],
+    [GLAttribName.TEXCOORD]: [],
+    [GLAttribName.NORMAL]: [],
+    [GLAttribName.SIZE]: [],
+  };
 
   // 渲染的数据源
   private _lists: { [key: string]: TypedArrayList<Float32Array> } = {};
@@ -167,79 +171,58 @@ export class GLMeshBuilder extends GLMeshBase {
     b: number,
     a: number = 1.0
   ): GLMeshBuilder {
-    if (GLAttribStateManager.hasAttrib(GLAttribName.COLOR, this._attribState)) {
-      this._color.r = r;
-      this._color.g = g;
-      this._color.b = b;
-      this._color.a = a;
+    if (
+      !GLAttribStateManager.hasAttrib(GLAttribName.COLOR, this._attribState)
+    ) {
+      throw new Error("GLAttribBits is not include COLOR");
     }
+    this.attribValue[GLAttribName.COLOR] = [r, g, b, a];
     return this;
   }
   // 输入点的大小,返回this,都是链式操作
   public size(size: number): GLMeshBuilder {
-    if (GLAttribStateManager.hasAttrib(GLAttribName.SIZE, this._attribState)) {
-      this._size = size;
+    if (!GLAttribStateManager.hasAttrib(GLAttribName.SIZE, this._attribState)) {
+      throw new Error("GLAttribBits is not include SIZE");
     }
+    this.attribValue[GLAttribName.SIZE] = [size];
     return this;
   }
   // 输入uv纹理坐标值，返回this,都是链式操作
   public texcoord(u: number, v: number): GLMeshBuilder {
     if (
-      GLAttribStateManager.hasAttrib(GLAttribName.TEXCOORD, this._attribState)
+      !GLAttribStateManager.hasAttrib(GLAttribName.TEXCOORD, this._attribState)
     ) {
-      this._texCoord.x = u;
-      this._texCoord.y = v;
+      throw new Error("GLAttribBits is not include TEXCOORD");
     }
+    this.attribValue[GLAttribName.TEXCOORD] = [u, v];
     return this;
   }
 
   // 输入法线值xyz，返回this,都是链式操作
   public normal(x: number, y: number, z: number): GLMeshBuilder {
     if (
-      GLAttribStateManager.hasAttrib(GLAttribName.NORMAL, this._attribState)
+      !GLAttribStateManager.hasAttrib(GLAttribName.NORMAL, this._attribState)
     ) {
-      this._normal.x = x;
-      this._normal.y = y;
-      this._normal.z = z;
+      throw new Error("GLAttribBits is not include NORMAL");
     }
+    this.attribValue[GLAttribName.NORMAL] = [x, y, z];
     return this;
   }
 
   // vertex必须要最后调用，输入xyz,返回this,都是链式操作
   public vertex(x: number, y: number, z: number): GLMeshBuilder {
-    // sequenced和separated都是具有多个ArrayList
-    // 针对除interleaved存储方式外的操作
-    let list: TypedArrayList<Float32Array> = this._lists[GLAttribName.POSITION];
-    list.push(x);
-    list.push(y);
-    list.push(z);
-    if (
-      GLAttribStateManager.hasAttrib(GLAttribName.TEXCOORD, this._attribState)
-    ) {
-      list = this._lists[GLAttribName.TEXCOORD];
-      list.push(this._texCoord.x);
-      list.push(this._texCoord.y);
-    }
-    if (
-      GLAttribStateManager.hasAttrib(GLAttribName.NORMAL, this._attribState)
-    ) {
-      list = this._lists[GLAttribName.NORMAL];
-      list.push(this._normal.x);
-      list.push(this._normal.y);
-      list.push(this._normal.z);
-    }
-    if (GLAttribStateManager.hasAttrib(GLAttribName.COLOR, this._attribState)) {
-      list = this._lists[GLAttribName.COLOR];
-      list.push(this._color.r);
-      list.push(this._color.g);
-      list.push(this._color.b);
-      list.push(this._color.a);
-    }
-
-    if (GLAttribStateManager.hasAttrib(GLAttribName.SIZE, this._attribState)) {
-      list = this._lists[GLAttribName.SIZE];
-      list.push(this._size);
-    }
+    this.attribValue[GLAttribName.POSITION].push(x);
+    this.attribValue[GLAttribName.POSITION].push(y);
+    this.attribValue[GLAttribName.POSITION].push(z);
+    attribNames.forEach((name) => {
+      if (GLAttribStateManager.hasAttrib(name, this._attribState)) {
+        let list = this._lists[name];
+        const component = GLAttribMap[name].component;
+        for (let index = 0; index < component; index++) {
+          this.attribValue[name].forEach((n) => list.push(n));
+        }
+      }
+    });
     // 记录更新后的顶点数量
     this._vertCount++;
     return this;
@@ -267,7 +250,6 @@ export class GLMeshBuilder extends GLMeshBase {
       this.program.loadSampler();
     }
     this.bind(); // 绑定VAO
-
     attribNames.forEach((name) => {
       if (GLAttribStateManager.hasAttrib(name, this._attribState)) {
         let buffer = this._buffers[name];
