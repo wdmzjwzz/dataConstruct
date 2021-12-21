@@ -2,7 +2,8 @@ import { GLAttribInfo, GLAttribName } from "./type";
 
 export const FLOAT32_SIZE = Float32Array.BYTES_PER_ELEMENT;
 export const UINT16_SIZE = Uint16Array.BYTES_PER_ELEMENT;
-
+export const ATTRIBSTRIDE = 'STRIDE'
+export const ATTRIBBYTELENGTH = 'BYTELENGTH'
 export const GLAttribMap: { [key: string]: GLAttribInfo } = {
     [GLAttribName.POSITION]: { bit: 1 << 0, component: 3, location: 0 },
     [GLAttribName.TEXCOORD]: { bit: 1 << 1, component: 2, location: 1 },

@@ -1,4 +1,4 @@
-import { attribNames, FLOAT32_SIZE, GLAttribMap } from "../constants";
+import { ATTRIBBYTELENGTH, attribNames, ATTRIBSTRIDE, FLOAT32_SIZE, GLAttribMap } from "../constants";
 import { GLAttribBits, GLAttribName, GLAttribOffsetMap } from "../type";
 
 class GLAttribState {
@@ -22,23 +22,27 @@ class GLAttribState {
     gl: WebGLRenderingContext,
     offsetMap: GLAttribOffsetMap
   ): void {
+    let stride: number = offsetMap[ATTRIBSTRIDE];
+    if (stride === 0) {
+      throw new Error("vertex Array有问题！！");
+    }
     attribNames.forEach((name) => {
-      this.vertexAttrib(gl, name, offsetMap[name]);
+      this.vertexAttrib(gl, name, stride, offsetMap[name]);
     });
   }
   public vertexAttrib(
     gl: WebGLRenderingContext,
     name: GLAttribName,
+    stride: number,
     offset: number
   ) {
     if (offset !== undefined) {
-      // sequenced的话stride为0
       gl.vertexAttribPointer(
         GLAttribMap[name].location,
         GLAttribMap[name].component,
         gl.FLOAT,
         false,
-        0,
+        stride,
         offset
       );
     }
@@ -67,18 +71,23 @@ class GLAttribState {
 
     return byteOffset;
   }
-
-  public getSepratedLayoutAttribOffsetMap(
+  public getInterleavedLayoutAttribOffsetMap(
     attribBits: GLAttribBits
   ): GLAttribOffsetMap {
-    // 每个顶点属性使用一个vbo的话，每个offsets中的顶点属性的偏移都是为0
-    // 并且offsets的length = vbo的个数，不需要顶点stride和byteLenth属性
-    let offsets: GLAttribOffsetMap = {};
+    let offsets: GLAttribOffsetMap = {}; // 初始化顶点属性偏移表
+    let byteOffset: number = 0; // 初始化时的首地址为0
+
     attribNames.forEach((name) => {
       if (this.hasAttrib(name, attribBits)) {
-        offsets[name] = 0;
+        offsets[name] = byteOffset;
+        byteOffset += GLAttribMap[name].component * FLOAT32_SIZE;
       }
     });
+
+    // stride和length相等
+    offsets[ATTRIBSTRIDE] = byteOffset; // 间隔数组方法存储的话，顶点的stride非常重要
+    offsets[ATTRIBBYTELENGTH] = byteOffset;
+
     return offsets;
   }
 

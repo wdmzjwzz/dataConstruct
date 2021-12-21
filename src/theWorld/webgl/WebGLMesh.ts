@@ -3,7 +3,7 @@ import { mat4 } from "../common/math/TSM";
 import { TypedArrayList } from "../common/container/TypedArrayList";
 import { GLProgram } from "./WebGLProgram";
 import { GLTexture } from "./WebGLTexture";
-import { GLAttribBits, GLAttribName } from "../type";
+import { GLAttribBits, GLAttribName, GLAttribOffsetMap } from "../type";
 import { attribNames, GLAttribMap } from "../constants";
 
 // 使用abstract声明抽象类
@@ -93,9 +93,9 @@ export class GLMeshBuilder extends GLMeshBase {
   };
 
   // 渲染的数据源
-  private _lists: { [key: string]: TypedArrayList<Float32Array> } = {};
+  private _lists: TypedArrayList<Float32Array>;
   // 渲染用的VBO
-  private _buffers: { [key: string]: WebGLBuffer } = {};
+  private _buffer: WebGLBuffer;
   // 要渲染的顶点数量
   private _vertCount: number = 0;
 
@@ -140,30 +140,24 @@ export class GLMeshBuilder extends GLMeshBase {
 
     // 先绑定VAO对象
     this.bind();
-    // seperated的话：
-    // 使用n个arraylist,n个顶点缓存
-    // 调用的是getSepratedLayoutAttribOffsetMap方法
-    // 能够使用能够使用GLAttribStateManager.setAttribVertexArrayPointer方法预先固定地址
-    // 能够使用GLAttribStateManager.setAttribVertexArrayState开启顶点属性寄存器
-    attribNames.forEach((name) => {
-      if (GLAttribStateManager.hasAttrib(name, this._attribState)) {
-        this.GLbindBuffer(name);
-      }
-    });
+    // interleaved的话：
+    // 使用一个arraylist,一个顶点缓存
+    // 调用的是GLAttribState.getInterleavedLayoutAttribOffsetMap方法
+    this._lists = new TypedArrayList<Float32Array>(
+      Float32Array
+    );
+    this._buffer = this.gl.createBuffer();
+    this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this._buffer);
+    let map: GLAttribOffsetMap =
+      GLAttribStateManager.getInterleavedLayoutAttribOffsetMap(this._attribState);
+    // 调用如下两个方法
+    GLAttribStateManager.setAttribVertexArrayPointer(this.gl, map);
+    GLAttribStateManager.setAttribVertexArrayState(this.gl, this._attribState);
 
-    GLAttribStateManager.setAttribVertexArrayState(this.gl, state);
     this.unbind();
   }
-  private GLbindBuffer(name: GLAttribName) {
-    this._lists[name] = new TypedArrayList<Float32Array>(Float32Array);
-    let buffer = this.gl.createBuffer();
-    if (buffer === null) {
-      throw new Error("WebGLBuffer创建不成功!");
-    }
-    this._buffers[name] = buffer;
-    this.gl.bindBuffer(this.gl.ARRAY_BUFFER, buffer);
-    GLAttribStateManager.vertexAttrib(this.gl, name, 0);
-  }
+
+
   // 输入rgba颜色值，取值范围为[ 0 , 1 ]之间,返回this,都是链式操作
   public color(
     r: number,
@@ -211,18 +205,19 @@ export class GLMeshBuilder extends GLMeshBase {
 
   // vertex必须要最后调用，输入xyz,返回this,都是链式操作
   public vertex(x: number, y: number, z: number): GLMeshBuilder {
-    this.attribValue[GLAttribName.POSITION].push(x);
-    this.attribValue[GLAttribName.POSITION].push(y);
-    this.attribValue[GLAttribName.POSITION].push(z);
+    // position
+    this._lists.push(x);
+    this._lists.push(y);
+    this._lists.push(z);
     attribNames.forEach((name) => {
       if (GLAttribStateManager.hasAttrib(name, this._attribState)) {
-        let list = this._lists[name];
         const component = GLAttribMap[name].component;
         for (let index = 0; index < component; index++) {
-          this.attribValue[name].forEach((n) => list.push(n));
+          this.attribValue[name].forEach((n) => this._lists.push(n));
         }
       }
     });
+
     // 记录更新后的顶点数量
     this._vertCount++;
     return this;
@@ -230,14 +225,8 @@ export class GLMeshBuilder extends GLMeshBase {
 
   // 每次调用上述几个添加顶点属性的方法之前，必须要先调用begin方法，返回this指针，链式操作
   public begin(drawMode: number = this.gl.TRIANGLES): GLMeshBuilder {
-    this.drawMode = drawMode; // 设置要绘制的mode，7种基本几何图元
-    this._vertCount = 0; // 清空顶点数为0
-    attribNames.forEach((name) => {
-      if (GLAttribStateManager.hasAttrib(name, this._attribState)) {
-        let list = this._lists[name];
-        list.clear();
-      }
-    });
+    this.drawMode = drawMode;
+    this._lists.clear();
     return this;
   }
 
@@ -250,20 +239,18 @@ export class GLMeshBuilder extends GLMeshBase {
       this.program.loadSampler();
     }
     this.bind(); // 绑定VAO
-    attribNames.forEach((name) => {
-      if (GLAttribStateManager.hasAttrib(name, this._attribState)) {
-        let buffer = this._buffers[name];
-        let list = this._lists[name];
-        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, buffer);
-        this.gl.bufferData(
-          this.gl.ARRAY_BUFFER,
-          list.subArray(),
-          this.gl.DYNAMIC_DRAW
-        );
-      }
-    });
-    // 针对seperated存储方式的渲染数据处理
-    // 需要每个VBO都绑定一次
+    // 获取数据源
+
+    // 获取VBO
+    let buffer: WebGLBuffer = this._buffer;
+    // 绑定VBO
+    this.gl.bindBuffer(this.gl.ARRAY_BUFFER, buffer);
+    // 上传渲染数据到VBO中
+    this.gl.bufferData(
+      this.gl.ARRAY_BUFFER,
+      this._lists.subArray(),
+      this.gl.DYNAMIC_DRAW
+    );
 
     // GLMeshBuilder不使用索引缓冲区绘制方式，因此调用drawArrays方法
     if (this._ibo !== null) {

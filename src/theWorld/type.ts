@@ -1,6 +1,6 @@
 export type GLAttribBits = number;
 export type GLAttribOffsetMap = { [key: string]: number };
-
+export type INTERLEAVED = 'INTERLEAVED';
 export interface GLAttribInfo {
   bit: number;
   component: number;
