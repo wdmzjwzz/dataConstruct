@@ -3,8 +3,9 @@ import { GLWorldMatrixStack } from "./WebGLMatrixStack";
 import { GLProgramCache } from "./WebGLProgramCache";
 import { GLProgram } from "./WebGLProgram";
 import { GLMeshBuilder } from "./WebGLMesh";
-import { GLAttribState } from "./WebGLAttribState";
 import { GLHelper } from "./WebGLHepler";
+import { GLAttribStateManager } from "./WebGLAttribState";
+import { GLAttribName } from "../type";
 
 export class WebGLApplication extends Application {
   // 可以直接操作WebGL相关内容
@@ -76,24 +77,20 @@ export class WebGLApplication extends Application {
 
     // 由于Canvas是左手系，而webGL是右手系，需要FilpYCoord
     this.isFlipYCoord = true;
-
-
+    const defaultColorProgram = GLProgram.createDefaultColorProgram(this.gl);
+    const defaultTextureProgram = GLProgram.createDefaultTextureProgram(
+      this.gl
+    );
     // 初始化时，创建颜色和纹理Program
-    GLProgramCache.instance.set(
-      "color",
-      GLProgram.createDefaultColorProgram(this.gl)
-    );
-    GLProgramCache.instance.set(
-      "texture",
-      GLProgram.createDefaultTextureProgram(this.gl)
-    );
-
+    GLProgramCache.instance.set("color", defaultColorProgram);
+    GLProgramCache.instance.set("texture", defaultTextureProgram);
+    const bit = GLAttribStateManager.makeVertexAttribs([
+      GLAttribName.POSITION,
+      GLAttribName.COLOR,
+      GLAttribName.SIZE,
+    ]);
     // 初始化时，创建颜色GLMeshBuilder对象
-    this.builder = new GLMeshBuilder(
-      this.gl,
-      GLAttribState.POSITION_BIT | GLAttribState.COLOR_BIT | GLAttribState.SIZE_BIT,
-      GLProgramCache.instance.getMust("color")
-    );
+    this.builder = new GLMeshBuilder(this.gl, bit, defaultColorProgram);
   }
 
   protected getMouseCanvas(): HTMLCanvasElement {
