@@ -6,7 +6,7 @@ import { GLCoordSystem } from "../theWorld/webgl/WebGLCoordSystem";
 import { CanvasKeyBoardEvent } from "../theWorld/common/Application";
 import { GLTexture } from "../theWorld/webgl/WebGLTexture";
 import { Point } from "../theWorld/Geometry/Point";
-import { DrawHelper } from "../theWorld";
+// import { DrawHelper } from "../theWorld";
 export class MeshApplication extends CameraApplication {
   public colorShader: GLProgram; // 颜色着色器
   public textureShader: GLProgram; // 纹理着色器
