@@ -49,8 +49,8 @@ export class GLAttribInfo {
   }
 }
 
-export type GLUniformMap = { [key: string]: GLUniformInfo };
-export type GLAttribMap = { [key: string]: GLAttribInfo };
+export type GLUniformInfoMap = { [key: string]: GLUniformInfo };
+export type GLAttribInfoMap = { [key: string]: GLAttribInfo };
 
 export class GLHelper {
   public static printStates(gl: WebGLRenderingContext): void {
@@ -235,7 +235,7 @@ export class GLHelper {
   public static getProgramActiveAttribs(
     gl: WebGLRenderingContext,
     program: WebGLProgram,
-    out: GLAttribMap
+    out: GLAttribInfoMap
   ): void {
     //获取当前active状态的attribute和uniform的数量
     //很重要一点，active_attributes/uniforms必须在link后才能获得
@@ -261,7 +261,7 @@ export class GLHelper {
   public static getProgramAtciveUniforms(
     gl: WebGLRenderingContext,
     program: WebGLProgram,
-    out: GLUniformMap
+    out: GLUniformInfoMap
   ): void {
     let uniformsCount: number = gl.getProgramParameter(
       program,

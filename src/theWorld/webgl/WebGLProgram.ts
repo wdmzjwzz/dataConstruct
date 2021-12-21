@@ -1,12 +1,14 @@
-import { GLAttribBits, GLAttribState } from "./WebGLAttribState";
+import { GLAttribStateManager } from "./WebGLAttribState";
 import { vec2, vec3, vec4, mat4, quat } from "../common/math/TSM";
 import { GLShaderSource } from "./WebGLShaderSource";
 import {
   GLHelper,
   EShaderType,
-  GLAttribMap,
-  GLUniformMap,
+  GLUniformInfoMap,
+  GLAttribInfoMap,
 } from "./WebGLHepler";
+import { GLAttribBits, GLAttribName } from "../type";
+import { attribNames, GLAttribMap } from "../constants";
 /*
 比较特别的是Texture Unit
 glActiveTexture 激活某个TextureUnit
@@ -48,8 +50,8 @@ export class GLProgram {
   public fsShader: WebGLShader; // fragment shader编译器
 
   // 主要用于信息输出
-  public attribMap: GLAttribMap = {};
-  public uniformMap: GLUniformMap = {};
+  public attribInfoMap: GLAttribInfoMap = {};
+  public uniformInfoMap: GLUniformInfoMap = {};
 
   // 当调用gl.useProgram(this.program)后触发bindCallback回调
   public bindCallback: ((program: GLProgram) => void) | null = null;
@@ -71,60 +73,11 @@ export class GLProgram {
     //1 attrib名字必须和shader中的命名要一致
     //2 数量必须要和mesh中一致
     //3 mesh中的数组的component必须固定
-    if (GLAttribState.hasPosition(this._attribState)) {
-      gl.bindAttribLocation(
-        program,
-        GLAttribState.POSITION_LOCATION,
-        GLAttribState.POSITION_NAME
-      );
-    }
-
-    if (GLAttribState.hasNormal(this._attribState)) {
-      gl.bindAttribLocation(
-        program,
-        GLAttribState.NORMAL_LOCATION,
-        GLAttribState.NORMAL_NAME
-      );
-    }
-
-    if (GLAttribState.hasTexCoord_0(this._attribState)) {
-      gl.bindAttribLocation(
-        program,
-        GLAttribState.TEXCOORD_LOCATION,
-        GLAttribState.TEXCOORD_NAME
-      );
-    }
-
-    if (GLAttribState.hasTexCoord_1(this._attribState)) {
-      gl.bindAttribLocation(
-        program,
-        GLAttribState.TEXCOORD1_LOCATION,
-        GLAttribState.TEXCOORD1_NAME
-      );
-    }
-
-    if (GLAttribState.hasColor(this._attribState)) {
-      gl.bindAttribLocation(
-        program,
-        GLAttribState.COLOR_LOCATION,
-        GLAttribState.COLOR_NAME
-      );
-    }
-
-    if (GLAttribState.hasTangent(this._attribState)) {
-      gl.bindAttribLocation(
-        program,
-        GLAttribState.TANGENT_LOCATION,
-        GLAttribState.TANGENT_NAME
-      );
-    }
-    if (GLAttribState.hasSize(this._attribState)) {
-      gl.bindAttribLocation(
-        program,
-        GLAttribState.SIZE_LOCATION,
-        GLAttribState.SIZE_NAME
-      );
-    }
+    attribNames.forEach((name) => {
+      if (GLAttribStateManager.hasAttrib(name, this._attribState)) {
+        gl.bindAttribLocation(program, GLAttribMap[name].location, name);
+      }
+    });
   }
 
   // 链接后的回调函数实际上在本类中是多余的
@@ -136,10 +89,10 @@ export class GLProgram {
   ): void {
     //获取当前active状态的attribute和uniform的数量
     //很重要一点，active_attributes/uniforms必须在link后才能获得
-    GLHelper.getProgramActiveAttribs(gl, program, this.attribMap);
-    GLHelper.getProgramAtciveUniforms(gl, program, this.uniformMap);
-    console.log(JSON.stringify(this.attribMap));
-    console.log(JSON.stringify(this.uniformMap));
+    GLHelper.getProgramActiveAttribs(gl, program, this.attribInfoMap);
+    GLHelper.getProgramAtciveUniforms(gl, program, this.uniformInfoMap);
+    console.log(JSON.stringify(this.attribInfoMap));
+    console.log(JSON.stringify(this.uniformInfoMap));
   }
 
   public constructor(
@@ -198,8 +151,8 @@ export class GLProgram {
       let join: string = this._fsShaderDefineStrings.join("\n");
       fs = join + fs;
     }
-    const compileVS = GLHelper.compileShader(this.gl, vs, this.vsShader)
-    const compileFS = GLHelper.compileShader(this.gl, fs, this.fsShader)
+    const compileVS = GLHelper.compileShader(this.gl, vs, this.vsShader);
+    const compileFS = GLHelper.compileShader(this.gl, fs, this.fsShader);
     const linkProgram = GLHelper.linkProgram(
       this.gl,
       this.program,
@@ -207,12 +160,12 @@ export class GLProgram {
       this.fsShader,
       this.progromBeforeLink.bind(this),
       this.progromAfterLink.bind(this)
-    )
+    );
     if (!compileVS || !compileFS || !linkProgram) {
       throw new Error(" loadShaders失败! ");
     }
 
-    console.log(JSON.stringify(this.attribMap));
+    console.log(JSON.stringify(this.attribInfoMap));
   }
 
   public bind(): void {
@@ -335,7 +288,7 @@ export class GLProgram {
   ): GLProgram {
     let pro: GLProgram = new GLProgram(
       gl,
-      GLAttribState.makeVertexAttribs(true, false, false, false, false, false),
+      GLAttribStateManager.makeVertexAttribs([]),
       GLShaderSource.textureShader.vs,
       GLShaderSource.textureShader.fs
     );
@@ -347,7 +300,11 @@ export class GLProgram {
   ): GLProgram {
     let pro: GLProgram = new GLProgram(
       gl,
-      GLAttribState.makeVertexAttribs(false, false, false, false, true, true),
+      GLAttribStateManager.makeVertexAttribs([
+        GLAttribName.POSITION,
+        GLAttribName.TEXCOORD,
+        GLAttribName.SIZE,
+      ]),
       GLShaderSource.colorShader.vs,
       GLShaderSource.colorShader.fs
     );

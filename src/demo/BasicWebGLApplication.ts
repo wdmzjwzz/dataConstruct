@@ -4,8 +4,8 @@ import { MathHelper } from "../theWorld/common/math/MathHelper";
 import {
   GLHelper,
   EShaderType,
-  GLUniformMap,
-  GLAttribMap,
+  GLUniformInfoMap,
+  GLAttribInfoMap,
 } from "../theWorld/webgl/WebGLHepler";
 import { TypedArrayList } from "../theWorld/common/container/TypedArrayList";
 import { GLCoordSystem } from "../theWorld/webgl/WebGLCoordSystem";
@@ -78,8 +78,8 @@ export class BasicWebGLApplication extends Application {
   public fsShader: WebGLShader;
   public program: WebGLProgram;
 
-  public uniformMap: GLUniformMap = {};
-  public attribMap: GLAttribMap = {};
+  public uniformMap: GLUniformInfoMap = {};
+  public attribMap: GLAttribInfoMap = {};
 
   public ivbo: WebGLBuffer; // i表示interleaved Array存储方式
   public verts: TypedArrayList<Float32Array>; // 使用第二章中实现的动态类型数组，我们会重用该数组
