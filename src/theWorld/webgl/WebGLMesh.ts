@@ -4,7 +4,7 @@ import { TypedArrayList } from "../common/container/TypedArrayList";
 import { GLProgram } from "./WebGLProgram";
 import { GLTexture } from "./WebGLTexture";
 import { GLAttribBits, GLAttribName, GLAttribOffsetMap } from "../type";
-import { attribNames, GLAttribMap } from "../constants";
+import { attribNames } from "../constants";
 
 // 使用abstract声明抽象类
 export abstract class GLMeshBase {
@@ -114,7 +114,7 @@ export class GLMeshBuilder extends GLMeshBase {
   public setIBO(data: Uint16Array): void {
     // 创建ibo
     this._ibo = this.gl.createBuffer();
-    if (this._ibo === null) {
+    if (!this._ibo) {
       throw new Error("IBO creation fail");
     }
     // 绑定ibo
@@ -128,7 +128,8 @@ export class GLMeshBuilder extends GLMeshBase {
     gl: WebGLRenderingContext,
     state: GLAttribBits,
     program: GLProgram,
-    texture: WebGLTexture | null = null
+    texture: WebGLTexture | null = null,
+    ibo: Uint16Array | null = null,
   ) {
     super(gl, state); // 调用基类的构造方法
 
@@ -153,7 +154,7 @@ export class GLMeshBuilder extends GLMeshBase {
     // 调用如下两个方法
     GLAttribStateManager.setAttribVertexArrayPointer(this.gl, map);
     GLAttribStateManager.setAttribVertexArrayState(this.gl, this._attribState);
-
+    // this.setIBO(ibo)
     this.unbind();
   }
 
@@ -170,7 +171,7 @@ export class GLMeshBuilder extends GLMeshBase {
     ) {
       throw new Error("GLAttribBits is not include COLOR");
     }
-    [r, g, b, a].forEach(item => this.attribValue[GLAttribName.COLOR].push(item))
+    this.attribValue[GLAttribName.COLOR] = [r, g, b, a]
     return this;
   }
   // 输入点的大小,返回this,都是链式操作
@@ -211,13 +212,11 @@ export class GLMeshBuilder extends GLMeshBase {
     this._lists.push(z);
     attribNames.forEach((name) => {
       if (GLAttribStateManager.hasAttrib(name, this._attribState)) {
-        const component = GLAttribMap[name].component;
-        for (let index = 0; index < component; index++) {
-          this.attribValue[name].forEach((n) => this._lists.push(n));
+        if (this.attribValue[name].length > 0) {
+          this._lists.pushArray([...this.attribValue[name]])
         }
       }
     });
-
     // 记录更新后的顶点数量
     this._vertCount++;
     return this;
@@ -226,6 +225,11 @@ export class GLMeshBuilder extends GLMeshBase {
   // 每次调用上述几个添加顶点属性的方法之前，必须要先调用begin方法，返回this指针，链式操作
   public begin(drawMode: number = this.gl.TRIANGLES): GLMeshBuilder {
     this.drawMode = drawMode;
+    attribNames.forEach((name) => {
+      if (GLAttribStateManager.hasAttrib(name, this._attribState)) {
+        this.attribValue[name] = []
+      }
+    });
     this._lists.clear();
     return this;
   }
@@ -245,6 +249,8 @@ export class GLMeshBuilder extends GLMeshBase {
     let buffer: WebGLBuffer = this._buffer;
     // 绑定VBO
     this.gl.bindBuffer(this.gl.ARRAY_BUFFER, buffer);
+    console.log(this._lists);
+
     // 上传渲染数据到VBO中
     this.gl.bufferData(
       this.gl.ARRAY_BUFFER,

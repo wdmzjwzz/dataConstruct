@@ -7,7 +7,7 @@ export class CoordSystem {
   public angle: number; // 当前坐标系的旋转的角度(不是弧度！)
   public pos: vec3; // 当前坐标系的位置，如果是多视口渲染的话，就为[0,0,0]
   public isDrawAxis: boolean; // 是否绘制旋转轴
-  public isD3D: boolean; // 是否绘制为D3D左手系
+  public isD3D: boolean; // 是否绘制D3D左手系
 
   public constructor(
     viewport: number[],
@@ -105,14 +105,14 @@ export class DrawHelper {
     builder.gl.disable(builder.gl.DEPTH_TEST);
     builder.begin(builder.gl.LINES);
 
-    builder.color(1.0, 0.0, 0.0).vertex(0.0, 0.0, 0.0);
-    builder.color(1.0, 0.0, 0.0).vertex(len, 0, 0);
+    builder.color(1.0, 0.0, 0.0).size(5).vertex(0.0, 0.0, 0.0);
+    builder.color(1.0, 0.0, 0.0).size(5).vertex(len, 0, 0);
 
-    builder.color(0.0, 1.0, 0.0).vertex(0.0, 0.0, 0.0);
-    builder.color(0.0, 1.0, 0.0).vertex(0.0, len, 0.0);
+    builder.color(0.0, 1.0, 0.0).size(5).vertex(0.0, 0.0, 0.0);
+    builder.color(0.0, 1.0, 0.0).size(5).vertex(0.0, len, 0.0);
 
-    builder.color(0.0, 0.0, 1.0).vertex(0.0, 0.0, 0.0);
-    builder.color(0.0, 0.0, 1.0).vertex(0.0, 0.0, len);
+    builder.color(0.0, 0.0, 1.0).size(5).vertex(0.0, 0.0, 0.0);
+    builder.color(0.0, 0.0, 1.0).size(5).vertex(0.0, 0.0, len);
 
     builder.end(mat);
     builder.gl.lineWidth(1);

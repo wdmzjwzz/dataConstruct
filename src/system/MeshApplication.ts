@@ -4,9 +4,9 @@ import { mat4, vec3 } from "../theWorld/common/math/TSM";
 import { GLProgram } from "../theWorld/webgl/WebGLProgram";
 import { GLCoordSystem } from "../theWorld/webgl/WebGLCoordSystem";
 import { CanvasKeyBoardEvent } from "../theWorld/common/Application";
-import { DrawHelper } from "../theWorld/lib/DrawHelper";
 import { GLTexture } from "../theWorld/webgl/WebGLTexture";
 import { Point } from "../theWorld/Geometry/Point";
+import { DrawHelper } from "../theWorld";
 export class MeshApplication extends CameraApplication {
   public colorShader: GLProgram; // 颜色着色器
   public textureShader: GLProgram; // 纹理着色器
@@ -21,6 +21,7 @@ export class MeshApplication extends CameraApplication {
   ) {
     super(canvas, { premultipliedAlpha: false }, true);
     this.coords = new GLCoordSystem([0, 0, this.canvas.height])
+    this.drawByMatrixWithColorShader();
   }
 
   public update(elapsedMsec: number, intervalSec: number): void {
@@ -55,10 +56,12 @@ export class MeshApplication extends CameraApplication {
         this.matStack.modelViewMatrix,
         mat4.m0
       );
-      DrawHelper.drawWireFrameCubeBox(this.builder, mat4.m0, 0.2); // 调用DrawHelper类的静态drawWireFrameCubeBox方法
+      // DrawHelper.drawWireFrameCubeBox(this.builder, mat4.m0, 0.2); // 调用DrawHelper类的静态drawWireFrameCubeBox方法
       // this.matStack.popMatrix(); // 矩阵出堆栈
-      DrawHelper.drawCoordSystem(this.builder, mat4.m0, 1);
+      // DrawHelper.drawCoordSystem(this.builder, mat4.m0, 1);
+
       this.createPoints([new Point(0.8, 0, 0), new Point(0, 0, 0)], mat4.m0)
+
       this.matStack.popMatrix();
     }
     // 恢复三角形背面剔除功能
@@ -68,7 +71,7 @@ export class MeshApplication extends CameraApplication {
 
   public render(): void {
     // 调用的的currentDrawMethod这个回调函数，该函数指向当前要渲染的页面方法
-    this.drawByMatrixWithColorShader();
+    // this.drawByMatrixWithColorShader();
 
   }
   public createPoints(points: Point[], mat: mat4) {
