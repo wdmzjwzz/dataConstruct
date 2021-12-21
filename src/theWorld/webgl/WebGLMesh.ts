@@ -176,7 +176,7 @@ export class GLMeshBuilder extends GLMeshBase {
     ) {
       throw new Error("GLAttribBits is not include COLOR");
     }
-    this.attribValue[GLAttribName.COLOR] = [r, g, b, a];
+    [r, g, b, a].forEach(item => this.attribValue[GLAttribName.COLOR].push(item))
     return this;
   }
   // 输入点的大小,返回this,都是链式操作

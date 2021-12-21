@@ -48,7 +48,7 @@ export class MeshApplication extends CameraApplication {
     {
       // this.matStack.translate(new vec3([1, 1, 0])); 
       this.matStack.rotate(-this.angle, new vec3([0, 1, 0]).normalize());
-      // this.matStack.rotate(-20, new vec3([0, 0, 1]).normalize());
+
       // 合成model-view-projection矩阵，存储到mat4的静态变量中，减少内存的重新分配
       mat4.product(
         this.camera.viewProjectionMatrix,
@@ -56,9 +56,10 @@ export class MeshApplication extends CameraApplication {
         mat4.m0
       );
       DrawHelper.drawWireFrameCubeBox(this.builder, mat4.m0, 0.2); // 调用DrawHelper类的静态drawWireFrameCubeBox方法
-      this.matStack.popMatrix(); // 矩阵出堆栈
+      // this.matStack.popMatrix(); // 矩阵出堆栈
       DrawHelper.drawCoordSystem(this.builder, mat4.m0, 1);
-      this.createPoints([new Point(0.8, 0.8, 0.8)], mat4.m0)
+      this.createPoints([new Point(0.8, 0, 0), new Point(0, 0, 0)], mat4.m0)
+      this.matStack.popMatrix();
     }
     // 恢复三角形背面剔除功能
     this.gl.enable(this.gl.CULL_FACE);
@@ -73,9 +74,8 @@ export class MeshApplication extends CameraApplication {
   public createPoints(points: Point[], mat: mat4) {
 
     this.builder.begin(this.gl.POINTS);
-    points.forEach(point => {
-      this.builder.color(0, 0, 1).size(20).vertex(point.x, point.y, point.z);
-    })
+    this.builder.color(0, 0, 1).size(20).vertex(points[0].x, points[0].y, points[0].z);
+    this.builder.color(0, 1, 0).size(10).vertex(points[1].x, points[1].y, points[1].z);
     this.builder.end(mat); // 向GPU提交绘制命令
   }
   public onKeyPress(evt: CanvasKeyBoardEvent): void {
