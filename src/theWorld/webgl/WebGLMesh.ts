@@ -4,7 +4,7 @@ import { TypedArrayList } from "../common/container/TypedArrayList";
 import { GLProgram } from "./WebGLProgram";
 import { GLTexture } from "./WebGLTexture";
 import { GLAttribBits, GLAttribName, GLAttribOffsetMap } from "../type";
-import { attribNames } from "../constants";
+import { attribNames, defaultCollor } from "../constants";
 
 // 使用abstract声明抽象类
 export abstract class GLMeshBase {
@@ -78,15 +78,14 @@ export enum EVertexLayout {
 }
 
 export class GLMeshBuilder extends GLMeshBase {
-  // 字符串常量key
-  // private _layout: EVertexLayout; // 顶点在内存或显存中的布局方式
-
-  // 为了简单起见，只支持顶点的位置坐标、纹理0坐标、颜色和法线这四种顶点属性格式
-  // 表示当前正在输入的顶点属性值
-
   private attribValue: { [key: string]: number[] } = {
     [GLAttribName.POSITION]: [0, 0, 0],
-    [GLAttribName.COLOR]: [0, 0, 1, 1],
+    [GLAttribName.COLOR]: [
+      defaultCollor.r,
+      defaultCollor.g,
+      defaultCollor.b,
+      1,
+    ],
     [GLAttribName.TEXCOORD]: [0, 0],
     [GLAttribName.NORMAL]: [0, 0, 1],
     [GLAttribName.SIZE]: [1],
@@ -106,21 +105,27 @@ export class GLMeshBuilder extends GLMeshBase {
 
   private _ibo: WebGLBuffer | null;
   private _indexCount: number = -1;
-
+  public indices: TypedArrayList<Uint16Array> = new TypedArrayList(Uint16Array); // 索引缓存的数据
   public setTexture(tex: GLTexture): void {
     this.texture = tex.texture;
   }
 
-  public setIBO(data: Uint16Array): void {
+  public setIBO(data: number[]): void {
     // 创建ibo
     this._ibo = this.gl.createBuffer();
     if (!this._ibo) {
       throw new Error("IBO creation fail");
     }
+    this.indices.clear();
+    this.indices.pushArray(data);
     // 绑定ibo
     this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this._ibo);
     // 将索引数据上传到ibo中
-    this.gl.bufferData(this.gl.ELEMENT_ARRAY_BUFFER, data, this.gl.STATIC_DRAW);
+    this.gl.bufferData(
+      this.gl.ELEMENT_ARRAY_BUFFER,
+      this.indices.subArray(),
+      this.gl.STATIC_DRAW
+    );
     this._indexCount = data.length;
   }
 
@@ -128,7 +133,7 @@ export class GLMeshBuilder extends GLMeshBase {
     gl: WebGLRenderingContext,
     state: GLAttribBits,
     program: GLProgram,
-    texture: WebGLTexture | null = null,
+    texture: WebGLTexture | null = null
   ) {
     super(gl, state); // 调用基类的构造方法
 
@@ -227,7 +232,12 @@ export class GLMeshBuilder extends GLMeshBase {
   resetDefaultAttribValue() {
     this.attribValue = {
       [GLAttribName.POSITION]: [0, 0, 0],
-      [GLAttribName.COLOR]: [0, 0, 1, 1],
+      [GLAttribName.COLOR]: [
+        defaultCollor.r,
+        defaultCollor.g,
+        defaultCollor.b,
+        1,
+      ],
       [GLAttribName.TEXCOORD]: [0, 0],
       [GLAttribName.NORMAL]: [0, 0, 1],
       [GLAttribName.SIZE]: [1],
@@ -269,7 +279,7 @@ export class GLMeshBuilder extends GLMeshBase {
     } else {
       this.gl.drawArrays(this.drawMode, 0, this._vertCount);
     }
-    this._ibo = null
+    this._ibo = null;
     this.unbind(); // 解绑VAO
     this.program.unbind(); // 解绑GLProgram
   }

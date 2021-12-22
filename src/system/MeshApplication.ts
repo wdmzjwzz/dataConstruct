@@ -51,7 +51,7 @@ export class MeshApplication extends CameraApplication {
         mat4.m0
       );
       DrawHelper.drawCoordSystem(this.builder, mat4.m0, 1);
-      DrawHelper.drawSolidPoint(this.builder, mat4.m0, 0.2); // 调用DrawHelper类的静态drawWireFrameCubeBox方法
+      DrawHelper.drawSolidCubeBox(this.builder, mat4.m0); // 调用DrawHelper类的静态drawWireFrameCubeBox方法
       this.createPoints([new Point(0.8, 0, 0), new Point(0, 0, 0)], mat4.m0);
 
       this.matStack.popMatrix();

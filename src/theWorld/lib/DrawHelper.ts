@@ -1,6 +1,9 @@
 import { vec3, mat4, vec4 } from "../common/math/TSM";
 import { TypedArrayList } from "../common/container/TypedArrayList";
 import { GLMeshBuilder } from "../webgl/WebGLMesh";
+import { Point } from "../Geometry/Point";
+import { getIndices } from "../common/utils/tools";
+import { defaultCollor } from "../constants";
 export class CoordSystem {
   public viewport: number[] = []; // 当前坐标系被绘制在哪个视口中
   public axis: vec3; // 当前坐标系绕哪个轴旋转
@@ -27,8 +30,6 @@ export class CoordSystem {
 }
 
 export class DrawHelper {
-  public static defaultHitCollor: vec4 = new vec4([1, 1, 1]);
-
   public static getCirclePointsOnXYPlane(
     pts: TypedArrayList<Float32Array>,
     radius: number,
@@ -188,7 +189,7 @@ export class DrawHelper {
     let maxs: vec3 = new vec3([halfLen, halfLen, halfLen]);
     DrawHelper.drawBoundBox(builder, mat, mins, maxs, color);
   }
-  public static drawSolidPoint(
+  public static drawSolidCubeBox(
     builder: GLMeshBuilder,
     mat: mat4,
     halfLen: number = 0.2,
@@ -201,47 +202,25 @@ export class DrawHelper {
     // 使用LINE_LOOP绘制底面，注意顶点顺序，逆时针方向，根据右手螺旋定则可知，法线朝外
     builder.begin(builder.gl.TRIANGLE_FAN); // 使用的是LINE_LOOP图元绘制模式
     ibo.clear();
-    {
-      ibo.pushArray([0, 1, 2, 0, 2, 3]);
-      builder.setIBO(ibo.subArray());
-      builder.color(color.r, color.g, color.b).vertex(mins.x, mins.y, mins.z); // 2  - - -
-      builder.color(color.r, color.g, color.b).vertex(mins.x, mins.y, maxs.z); // 0  - - +
-      builder.color(color.r, color.g, color.b).vertex(maxs.x, mins.y, maxs.z); // 4  + - +
-      builder.color(color.r, color.g, color.b).vertex(maxs.x, mins.y, mins.z); // 6  + - -
-    
-      builder.end(mat);
-    }
-
-    // 使用LINE_LOOP绘制顶面，注意顶点顺序，逆时针方向，根据右手螺旋定则可知，法线朝外
-    builder.begin(builder.gl.TRIANGLES); // 使用的是LINE_LOOP图元绘制模式
-    ibo.clear();
-    {
-      ibo.pushArray([0, 1, 2, 0, 2, 3]);
-      builder.setIBO(ibo.subArray());
-      builder.color(color.r, color.g, color.b).vertex(mins.x, maxs.y, mins.z); // 3  - + -
-      builder.color(color.r, color.g, color.b).vertex(maxs.x, maxs.y, mins.z); // 7  + + -
-      builder.color(color.r, color.g, color.b).vertex(maxs.x, maxs.y, maxs.z); // 5  + + +
-      builder.color(color.r, color.g, color.b).vertex(mins.x, maxs.y, maxs.z); // 1  - + +
-      builder.end(mat);
-    }
-
-    // 使用LINES绘制
-    builder.begin(builder.gl.LINES); // 使用的是LINES图元绘制模式
-    ibo.clear();
-    {
-      builder.color(color.r, color.g, color.b).vertex(mins.x, mins.y, mins.z); // 2  - - -
-      builder.color(color.r, color.g, color.b).vertex(mins.x, maxs.y, mins.z); // 3  - + -
-
-      builder.color(color.r, color.g, color.b).vertex(mins.x, mins.y, maxs.z); // 0  - - +
-      builder.color(color.r, color.g, color.b).vertex(mins.x, maxs.y, maxs.z); // 1  - + +
-
-      builder.color(color.r, color.g, color.b).vertex(maxs.x, mins.y, maxs.z); // 4  + - +
-      builder.color(color.r, color.g, color.b).vertex(maxs.x, maxs.y, maxs.z); // 5  + + +
-
-      builder.color(color.r, color.g, color.b).vertex(maxs.x, mins.y, mins.z); // 6  + - -
-      builder.color(color.r, color.g, color.b).vertex(maxs.x, maxs.y, mins.z); // 7  + + -
-      builder.end(mat);
-    }
+    const p0 = new Point(mins.x, mins.y, maxs.z);
+    const p1 = new Point(mins.x, maxs.y, maxs.z);
+    const p2 = new Point(mins.x, mins.y, mins.z);
+    const p3 = new Point(mins.x, maxs.y, mins.z);
+    const p4 = new Point(maxs.x, mins.y, maxs.z);
+    const p5 = new Point(maxs.x, maxs.y, maxs.z);
+    const p6 = new Point(maxs.x, mins.y, mins.z);
+    const p7 = new Point(maxs.x, maxs.y, mins.z);
+    const faces = [
+      [p0, p4, p6, p2],
+      [p1, p5, p7, p3],
+      [p4, p6, p7, p5],
+      [p6, p2, p3, p7],
+      [p2, p0, p1, p3],
+      [p0, p4, p5, p1],
+    ];
+    faces.forEach((face) => {
+      DrawHelper.drawFace(builder, mat, face);
+    });
     builder.gl.enable(builder.gl.DEPTH_TEST);
   }
   /*
@@ -431,5 +410,22 @@ export class DrawHelper {
       builder.end(mat);
     }
     builder.gl.enable(builder.gl.DEPTH_TEST);
+  }
+  public static drawFace(
+    builder: GLMeshBuilder,
+    mat: mat4,
+    points: Point[],
+    color = defaultCollor
+  ) {
+    const indices = getIndices(points);
+    builder.gl.disable(builder.gl.DEPTH_TEST);
+    builder.begin(builder.gl.TRIANGLE_STRIP);
+    builder.setIBO(indices);
+    points.forEach((point) => {
+      builder
+        .color(color.r, color.g, color.b)
+        .vertex(point.x, point.y, point.z);
+    });
+    builder.end(mat);
   }
 }
