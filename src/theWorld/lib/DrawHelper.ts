@@ -103,7 +103,6 @@ export class DrawHelper {
     len: number = 5
   ): void {
     builder.gl.lineWidth(5);
-    builder.gl.disable(builder.gl.DEPTH_TEST);
     builder.begin(builder.gl.LINES);
 
     builder.color(1.0, 0.0, 0.0).size(5).vertex(0.0, 0.0, 0.0);
@@ -117,7 +116,6 @@ export class DrawHelper {
 
     builder.end(mat);
     builder.gl.lineWidth(1);
-    builder.gl.enable(builder.gl.DEPTH_TEST);
   }
 
   /*
@@ -192,16 +190,24 @@ export class DrawHelper {
   public static drawSolidCubeBox(
     builder: GLMeshBuilder,
     mat: mat4,
+    center: Point = new Point(0, 0, 0),
     halfLen: number = 0.2,
     color: vec4 = vec4.green
   ): void {
-    let mins: vec3 = new vec3([-halfLen, -halfLen, -halfLen]);
-    let maxs: vec3 = new vec3([halfLen, halfLen, halfLen]);
-    const ibo = new TypedArrayList(Uint16Array, 6);
-    builder.gl.disable(builder.gl.DEPTH_TEST);
+    let mins: vec3 = new vec3([
+      center.x - halfLen,
+      center.y - halfLen,
+      center.y - halfLen,
+    ]);
+    let maxs: vec3 = new vec3([
+      center.x + halfLen,
+      center.y + halfLen,
+      center.y + halfLen,
+    ]);
+
     // 使用LINE_LOOP绘制底面，注意顶点顺序，逆时针方向，根据右手螺旋定则可知，法线朝外
     builder.begin(builder.gl.TRIANGLE_FAN); // 使用的是LINE_LOOP图元绘制模式
-    ibo.clear();
+
     const p0 = new Point(mins.x, mins.y, maxs.z);
     const p1 = new Point(mins.x, maxs.y, maxs.z);
     const p2 = new Point(mins.x, mins.y, mins.z);
@@ -219,9 +225,8 @@ export class DrawHelper {
       [p0, p4, p5, p1],
     ];
     faces.forEach((face) => {
-      DrawHelper.drawFace(builder, mat, face);
+      DrawHelper.drawFace(builder, mat, face, color);
     });
-    builder.gl.enable(builder.gl.DEPTH_TEST);
   }
   /*
        /3--------/7  |
