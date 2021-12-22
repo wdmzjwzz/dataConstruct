@@ -129,7 +129,6 @@ export class GLMeshBuilder extends GLMeshBase {
     state: GLAttribBits,
     program: GLProgram,
     texture: WebGLTexture | null = null,
-    ibo: Uint16Array | null = null
   ) {
     super(gl, state); // 调用基类的构造方法
 
@@ -154,7 +153,6 @@ export class GLMeshBuilder extends GLMeshBase {
     // 调用如下两个方法
     GLAttribStateManager.setAttribVertexArrayPointer(this.gl, map);
     GLAttribStateManager.setAttribVertexArrayState(this.gl, this._attribState);
-    // this.setIBO(ibo)
     this.unbind();
   }
 
@@ -271,6 +269,7 @@ export class GLMeshBuilder extends GLMeshBase {
     } else {
       this.gl.drawArrays(this.drawMode, 0, this._vertCount);
     }
+    this._ibo = null
     this.unbind(); // 解绑VAO
     this.program.unbind(); // 解绑GLProgram
   }

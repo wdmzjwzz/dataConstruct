@@ -196,21 +196,28 @@ export class DrawHelper {
   ): void {
     let mins: vec3 = new vec3([-halfLen, -halfLen, -halfLen]);
     let maxs: vec3 = new vec3([halfLen, halfLen, halfLen]);
-  
+    const ibo = new TypedArrayList(Uint16Array, 6);
     builder.gl.disable(builder.gl.DEPTH_TEST);
     // 使用LINE_LOOP绘制底面，注意顶点顺序，逆时针方向，根据右手螺旋定则可知，法线朝外
-    builder.begin(builder.gl.LINE_LOOP); // 使用的是LINE_LOOP图元绘制模式
+    builder.begin(builder.gl.TRIANGLE_FAN); // 使用的是LINE_LOOP图元绘制模式
+    ibo.clear();
     {
+      ibo.pushArray([0, 1, 2, 0, 2, 3]);
+      builder.setIBO(ibo.subArray());
       builder.color(color.r, color.g, color.b).vertex(mins.x, mins.y, mins.z); // 2  - - -
       builder.color(color.r, color.g, color.b).vertex(mins.x, mins.y, maxs.z); // 0  - - +
       builder.color(color.r, color.g, color.b).vertex(maxs.x, mins.y, maxs.z); // 4  + - +
       builder.color(color.r, color.g, color.b).vertex(maxs.x, mins.y, mins.z); // 6  + - -
+    
       builder.end(mat);
     }
 
     // 使用LINE_LOOP绘制顶面，注意顶点顺序，逆时针方向，根据右手螺旋定则可知，法线朝外
-    builder.begin(builder.gl.LINE_LOOP); // 使用的是LINE_LOOP图元绘制模式
+    builder.begin(builder.gl.TRIANGLES); // 使用的是LINE_LOOP图元绘制模式
+    ibo.clear();
     {
+      ibo.pushArray([0, 1, 2, 0, 2, 3]);
+      builder.setIBO(ibo.subArray());
       builder.color(color.r, color.g, color.b).vertex(mins.x, maxs.y, mins.z); // 3  - + -
       builder.color(color.r, color.g, color.b).vertex(maxs.x, maxs.y, mins.z); // 7  + + -
       builder.color(color.r, color.g, color.b).vertex(maxs.x, maxs.y, maxs.z); // 5  + + +
@@ -220,6 +227,7 @@ export class DrawHelper {
 
     // 使用LINES绘制
     builder.begin(builder.gl.LINES); // 使用的是LINES图元绘制模式
+    ibo.clear();
     {
       builder.color(color.r, color.g, color.b).vertex(mins.x, mins.y, mins.z); // 2  - - -
       builder.color(color.r, color.g, color.b).vertex(mins.x, maxs.y, mins.z); // 3  - + -
