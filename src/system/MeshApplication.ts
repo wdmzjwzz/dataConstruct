@@ -6,22 +6,18 @@ import { GLCoordSystem } from "../theWorld/webgl/WebGLCoordSystem";
 import { CanvasKeyBoardEvent } from "../theWorld/common/Application";
 import { GLTexture } from "../theWorld/webgl/WebGLTexture";
 import { Point } from "../theWorld/Geometry/Point";
-// import { DrawHelper } from "../theWorld";
+import { DrawHelper } from "../theWorld";
 export class MeshApplication extends CameraApplication {
   public colorShader: GLProgram; // 颜色着色器
   public textureShader: GLProgram; // 纹理着色器
   public texture: GLTexture; // 纹理着色器所使用的纹理对象
   public builder: GLMeshBuilder;
 
-
   public angle: number = 0; // 用来更新旋转角度
   public coords: GLCoordSystem; // 用于多视口渲染使用的GLCoordSystem对象
-  public constructor(
-    canvas: HTMLCanvasElement
-  ) {
+  public constructor(canvas: HTMLCanvasElement) {
     super(canvas, { premultipliedAlpha: false }, true);
-    this.coords = new GLCoordSystem([0, 0, this.canvas.height])
-    this.drawByMatrixWithColorShader();
+    this.coords = new GLCoordSystem([0, 0, this.canvas.height]);
   }
 
   public update(elapsedMsec: number, intervalSec: number): void {
@@ -32,7 +28,6 @@ export class MeshApplication extends CameraApplication {
   }
 
   public drawByMatrixWithColorShader(): void {
-
     // 很重要，由于我们后续使用多视口渲染，因此必须要调用camera的setviewport方法
     this.camera.setViewport(0, 0, this.canvas.width, this.canvas.height);
     // 使用cleartColor方法设置当前颜色缓冲区背景色是什么颜色
@@ -43,11 +38,10 @@ export class MeshApplication extends CameraApplication {
     // 但是由于我们下面会渲染三角形和四边形这两个2d形体，所以要关闭，否则不会显示三角形或四边形的背面部分
     this.gl.disable(this.gl.CULL_FACE);
 
-
     // EVertexLayout.SEPARATED 顶点存储格式绘制绘制绕[ 1 , 1 , 1 ]轴转转的立方体
     this.matStack.pushMatrix(); // 矩阵堆栈进栈
     {
-      // this.matStack.translate(new vec3([1, 1, 0])); 
+      // this.matStack.translate(new vec3([1, 1, 0]));
       this.matStack.rotate(-this.angle, new vec3([0, 1, 0]).normalize());
 
       // 合成model-view-projection矩阵，存储到mat4的静态变量中，减少内存的重新分配
@@ -56,11 +50,11 @@ export class MeshApplication extends CameraApplication {
         this.matStack.modelViewMatrix,
         mat4.m0
       );
-      // DrawHelper.drawWireFrameCubeBox(this.builder, mat4.m0, 0.2); // 调用DrawHelper类的静态drawWireFrameCubeBox方法
-      // this.matStack.popMatrix(); // 矩阵出堆栈
-      // DrawHelper.drawCoordSystem(this.builder, mat4.m0, 1);
+      DrawHelper.drawWireFrameCubeBox(this.builder, mat4.m0, 0.2); // 调用DrawHelper类的静态drawWireFrameCubeBox方法
 
-      this.createPoints([new Point(0.8, 0, 0), new Point(0, 0, 0)], mat4.m0)
+      DrawHelper.drawCoordSystem(this.builder, mat4.m0, 1);
+
+      this.createPoints([new Point(0.8, 0, 0), new Point(0, 0, 0)], mat4.m0);
 
       this.matStack.popMatrix();
     }
@@ -68,17 +62,20 @@ export class MeshApplication extends CameraApplication {
     this.gl.enable(this.gl.CULL_FACE);
   }
 
-
   public render(): void {
     // 调用的的currentDrawMethod这个回调函数，该函数指向当前要渲染的页面方法
-    // this.drawByMatrixWithColorShader();
-
+    this.drawByMatrixWithColorShader();
   }
   public createPoints(points: Point[], mat: mat4) {
-
     this.builder.begin(this.gl.POINTS);
-    this.builder.color(0, 0, 1).size(20).vertex(points[0].x, points[0].y, points[0].z);
-    this.builder.color(0, 1, 0).size(10).vertex(points[1].x, points[1].y, points[1].z);
+    this.builder
+      .color(0, 0, 1)
+      .size(20)
+      .vertex(points[0].x, points[0].y, points[0].z);
+    this.builder
+      .color(0, 1, 0)
+      .size(10)
+      .vertex(points[1].x, points[1].y, points[1].z);
     this.builder.end(mat); // 向GPU提交绘制命令
   }
   public onKeyPress(evt: CanvasKeyBoardEvent): void {

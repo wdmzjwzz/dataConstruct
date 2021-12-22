@@ -149,32 +149,32 @@ export class DrawHelper {
       builder.end(mat);
     }
 
-    // // 使用LINE_LOOP绘制顶面，注意顶点顺序，逆时针方向，根据右手螺旋定则可知，法线朝外
-    // builder.begin(builder.gl.LINE_LOOP); // 使用的是LINE_LOOP图元绘制模式
-    // {
-    //   builder.color(color.r, color.g, color.b).vertex(mins.x, maxs.y, mins.z); // 3  - + -
-    //   builder.color(color.r, color.g, color.b).vertex(maxs.x, maxs.y, mins.z); // 7  + + -
-    //   builder.color(color.r, color.g, color.b).vertex(maxs.x, maxs.y, maxs.z); // 5  + + +
-    //   builder.color(color.r, color.g, color.b).vertex(mins.x, maxs.y, maxs.z); // 1  - + +
-    //   builder.end(mat);
-    // }
+    // 使用LINE_LOOP绘制顶面，注意顶点顺序，逆时针方向，根据右手螺旋定则可知，法线朝外
+    builder.begin(builder.gl.LINE_LOOP); // 使用的是LINE_LOOP图元绘制模式
+    {
+      builder.color(color.r, color.g, color.b).vertex(mins.x, maxs.y, mins.z); // 3  - + -
+      builder.color(color.r, color.g, color.b).vertex(maxs.x, maxs.y, mins.z); // 7  + + -
+      builder.color(color.r, color.g, color.b).vertex(maxs.x, maxs.y, maxs.z); // 5  + + +
+      builder.color(color.r, color.g, color.b).vertex(mins.x, maxs.y, maxs.z); // 1  - + +
+      builder.end(mat);
+    }
 
-    // // 使用LINES绘制
-    // builder.begin(builder.gl.LINES); // 使用的是LINES图元绘制模式
-    // {
-    //   builder.color(color.r, color.g, color.b).vertex(mins.x, mins.y, mins.z); // 2  - - -
-    //   builder.color(color.r, color.g, color.b).vertex(mins.x, maxs.y, mins.z); // 3  - + -
+    // 使用LINES绘制
+    builder.begin(builder.gl.LINES); // 使用的是LINES图元绘制模式
+    {
+      builder.color(color.r, color.g, color.b).vertex(mins.x, mins.y, mins.z); // 2  - - -
+      builder.color(color.r, color.g, color.b).vertex(mins.x, maxs.y, mins.z); // 3  - + -
 
-    //   builder.color(color.r, color.g, color.b).vertex(mins.x, mins.y, maxs.z); // 0  - - +
-    //   builder.color(color.r, color.g, color.b).vertex(mins.x, maxs.y, maxs.z); // 1  - + +
+      builder.color(color.r, color.g, color.b).vertex(mins.x, mins.y, maxs.z); // 0  - - +
+      builder.color(color.r, color.g, color.b).vertex(mins.x, maxs.y, maxs.z); // 1  - + +
 
-    //   builder.color(color.r, color.g, color.b).vertex(maxs.x, mins.y, maxs.z); // 4  + - +
-    //   builder.color(color.r, color.g, color.b).vertex(maxs.x, maxs.y, maxs.z); // 5  + + +
+      builder.color(color.r, color.g, color.b).vertex(maxs.x, mins.y, maxs.z); // 4  + - +
+      builder.color(color.r, color.g, color.b).vertex(maxs.x, maxs.y, maxs.z); // 5  + + +
 
-    //   builder.color(color.r, color.g, color.b).vertex(maxs.x, mins.y, mins.z); // 6  + - -
-    //   builder.color(color.r, color.g, color.b).vertex(maxs.x, maxs.y, mins.z); // 7  + + -
-    //   builder.end(mat);
-    // }
+      builder.color(color.r, color.g, color.b).vertex(maxs.x, mins.y, mins.z); // 6  + - -
+      builder.color(color.r, color.g, color.b).vertex(maxs.x, maxs.y, mins.z); // 7  + + -
+      builder.end(mat);
+    }
     builder.gl.enable(builder.gl.DEPTH_TEST);
   }
 
@@ -188,7 +188,54 @@ export class DrawHelper {
     let maxs: vec3 = new vec3([halfLen, halfLen, halfLen]);
     DrawHelper.drawBoundBox(builder, mat, mins, maxs, color);
   }
+  public static drawSolidPoint(
+    builder: GLMeshBuilder,
+    mat: mat4,
+    halfLen: number = 0.2,
+    color: vec4 = vec4.green
+  ): void {
+    let mins: vec3 = new vec3([-halfLen, -halfLen, -halfLen]);
+    let maxs: vec3 = new vec3([halfLen, halfLen, halfLen]);
+  
+    builder.gl.disable(builder.gl.DEPTH_TEST);
+    // 使用LINE_LOOP绘制底面，注意顶点顺序，逆时针方向，根据右手螺旋定则可知，法线朝外
+    builder.begin(builder.gl.LINE_LOOP); // 使用的是LINE_LOOP图元绘制模式
+    {
+      builder.color(color.r, color.g, color.b).vertex(mins.x, mins.y, mins.z); // 2  - - -
+      builder.color(color.r, color.g, color.b).vertex(mins.x, mins.y, maxs.z); // 0  - - +
+      builder.color(color.r, color.g, color.b).vertex(maxs.x, mins.y, maxs.z); // 4  + - +
+      builder.color(color.r, color.g, color.b).vertex(maxs.x, mins.y, mins.z); // 6  + - -
+      builder.end(mat);
+    }
 
+    // 使用LINE_LOOP绘制顶面，注意顶点顺序，逆时针方向，根据右手螺旋定则可知，法线朝外
+    builder.begin(builder.gl.LINE_LOOP); // 使用的是LINE_LOOP图元绘制模式
+    {
+      builder.color(color.r, color.g, color.b).vertex(mins.x, maxs.y, mins.z); // 3  - + -
+      builder.color(color.r, color.g, color.b).vertex(maxs.x, maxs.y, mins.z); // 7  + + -
+      builder.color(color.r, color.g, color.b).vertex(maxs.x, maxs.y, maxs.z); // 5  + + +
+      builder.color(color.r, color.g, color.b).vertex(mins.x, maxs.y, maxs.z); // 1  - + +
+      builder.end(mat);
+    }
+
+    // 使用LINES绘制
+    builder.begin(builder.gl.LINES); // 使用的是LINES图元绘制模式
+    {
+      builder.color(color.r, color.g, color.b).vertex(mins.x, mins.y, mins.z); // 2  - - -
+      builder.color(color.r, color.g, color.b).vertex(mins.x, maxs.y, mins.z); // 3  - + -
+
+      builder.color(color.r, color.g, color.b).vertex(mins.x, mins.y, maxs.z); // 0  - - +
+      builder.color(color.r, color.g, color.b).vertex(mins.x, maxs.y, maxs.z); // 1  - + +
+
+      builder.color(color.r, color.g, color.b).vertex(maxs.x, mins.y, maxs.z); // 4  + - +
+      builder.color(color.r, color.g, color.b).vertex(maxs.x, maxs.y, maxs.z); // 5  + + +
+
+      builder.color(color.r, color.g, color.b).vertex(maxs.x, mins.y, mins.z); // 6  + - -
+      builder.color(color.r, color.g, color.b).vertex(maxs.x, maxs.y, mins.z); // 7  + + -
+      builder.end(mat);
+    }
+    builder.gl.enable(builder.gl.DEPTH_TEST);
+  }
   /*
        /3--------/7  |
        / |       /   |

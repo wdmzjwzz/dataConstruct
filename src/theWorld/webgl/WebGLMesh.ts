@@ -85,11 +85,11 @@ export class GLMeshBuilder extends GLMeshBase {
   // 表示当前正在输入的顶点属性值
 
   private attribValue: { [key: string]: number[] } = {
-    [GLAttribName.POSITION]: [],
-    [GLAttribName.COLOR]: [],
-    [GLAttribName.TEXCOORD]: [],
-    [GLAttribName.NORMAL]: [],
-    [GLAttribName.SIZE]: [],
+    [GLAttribName.POSITION]: [0, 0, 0],
+    [GLAttribName.COLOR]: [0, 0, 1, 1],
+    [GLAttribName.TEXCOORD]: [0, 0],
+    [GLAttribName.NORMAL]: [0, 0, 1],
+    [GLAttribName.SIZE]: [1],
   };
 
   // 渲染的数据源
@@ -129,7 +129,7 @@ export class GLMeshBuilder extends GLMeshBase {
     state: GLAttribBits,
     program: GLProgram,
     texture: WebGLTexture | null = null,
-    ibo: Uint16Array | null = null,
+    ibo: Uint16Array | null = null
   ) {
     super(gl, state); // 调用基类的构造方法
 
@@ -144,20 +144,19 @@ export class GLMeshBuilder extends GLMeshBase {
     // interleaved的话：
     // 使用一个arraylist,一个顶点缓存
     // 调用的是GLAttribState.getInterleavedLayoutAttribOffsetMap方法
-    this._lists = new TypedArrayList<Float32Array>(
-      Float32Array
-    );
+    this._lists = new TypedArrayList<Float32Array>(Float32Array);
     this._buffer = this.gl.createBuffer();
     this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this._buffer);
     let map: GLAttribOffsetMap =
-      GLAttribStateManager.getInterleavedLayoutAttribOffsetMap(this._attribState);
+      GLAttribStateManager.getInterleavedLayoutAttribOffsetMap(
+        this._attribState
+      );
     // 调用如下两个方法
     GLAttribStateManager.setAttribVertexArrayPointer(this.gl, map);
     GLAttribStateManager.setAttribVertexArrayState(this.gl, this._attribState);
     // this.setIBO(ibo)
     this.unbind();
   }
-
 
   // 输入rgba颜色值，取值范围为[ 0 , 1 ]之间,返回this,都是链式操作
   public color(
@@ -171,7 +170,7 @@ export class GLMeshBuilder extends GLMeshBase {
     ) {
       throw new Error("GLAttribBits is not include COLOR");
     }
-    this.attribValue[GLAttribName.COLOR] = [r, g, b, a]
+    this.attribValue[GLAttribName.COLOR] = [r, g, b, a];
     return this;
   }
   // 输入点的大小,返回this,都是链式操作
@@ -207,16 +206,13 @@ export class GLMeshBuilder extends GLMeshBase {
   // vertex必须要最后调用，输入xyz,返回this,都是链式操作
   public vertex(x: number, y: number, z: number): GLMeshBuilder {
     // position
-    this._lists.push(x);
-    this._lists.push(y);
-    this._lists.push(z);
+    this.attribValue[GLAttribName.POSITION] = [x, y, z];
     attribNames.forEach((name) => {
       if (GLAttribStateManager.hasAttrib(name, this._attribState)) {
-        if (this.attribValue[name].length > 0) {
-          this._lists.pushArray([...this.attribValue[name]])
-        }
+        this._lists.pushArray([...this.attribValue[name]]);
       }
     });
+
     // 记录更新后的顶点数量
     this._vertCount++;
     return this;
@@ -225,15 +221,20 @@ export class GLMeshBuilder extends GLMeshBase {
   // 每次调用上述几个添加顶点属性的方法之前，必须要先调用begin方法，返回this指针，链式操作
   public begin(drawMode: number = this.gl.TRIANGLES): GLMeshBuilder {
     this.drawMode = drawMode;
-    attribNames.forEach((name) => {
-      if (GLAttribStateManager.hasAttrib(name, this._attribState)) {
-        this.attribValue[name] = []
-      }
-    });
+    this.resetDefaultAttribValue();
     this._lists.clear();
+    this._vertCount = 0;
     return this;
   }
-
+  resetDefaultAttribValue() {
+    this.attribValue = {
+      [GLAttribName.POSITION]: [0, 0, 0],
+      [GLAttribName.COLOR]: [0, 0, 1, 1],
+      [GLAttribName.TEXCOORD]: [0, 0],
+      [GLAttribName.NORMAL]: [0, 0, 1],
+      [GLAttribName.SIZE]: [1],
+    };
+  }
   // end方法用于渲染操作
   public end(mvp: mat4): void {
     this.program.bind(); // 绑定GLProgram
@@ -249,7 +250,6 @@ export class GLMeshBuilder extends GLMeshBase {
     let buffer: WebGLBuffer = this._buffer;
     // 绑定VBO
     this.gl.bindBuffer(this.gl.ARRAY_BUFFER, buffer);
-    console.log(this._lists);
 
     // 上传渲染数据到VBO中
     this.gl.bufferData(
