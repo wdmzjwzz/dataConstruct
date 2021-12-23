@@ -4,7 +4,7 @@ import { Camera } from "./Camera";
 
 export class CameraApplication extends WebGLApplication {
   public camera: Camera; // 在WebGLApplication的基础上增加了对摄像机系统的支持
-
+  public angle: number = 0; // 用来更新旋转角度
   public constructor(
     canvas: HTMLCanvasElement,
     contextAttributes: WebGLContextAttributes = { premultipliedAlpha: false },

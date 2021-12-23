@@ -53,14 +53,14 @@ export class DrawHelper {
     builder.gl.lineWidth(5);
     builder.begin(builder.gl.LINES);
 
-    builder.color(1.0, 0.0, 0.0).size(5).vertex(0.0, 0.0, 0.0);
-    builder.color(1.0, 0.0, 0.0).size(5).vertex(len, 0, 0);
+    builder.color(1.0, 0.0, 0.0).vertex(0.0, 0.0, 0.0);
+    builder.color(1.0, 0.0, 0.0).vertex(len, 0, 0);
 
-    builder.color(0.0, 1.0, 0.0).size(5).vertex(0.0, 0.0, 0.0);
-    builder.color(0.0, 1.0, 0.0).size(5).vertex(0.0, len, 0.0);
+    builder.color(0.0, 1.0, 0.0).vertex(0.0, 0.0, 0.0);
+    builder.color(0.0, 1.0, 0.0).vertex(0.0, len, 0.0);
 
-    builder.color(0.0, 0.0, 1.0).size(5).vertex(0.0, 0.0, 0.0);
-    builder.color(0.0, 0.0, 1.0).size(5).vertex(0.0, 0.0, len);
+    builder.color(0.0, 0.0, 1.0).vertex(0.0, 0.0, 0.0);
+    builder.color(0.0, 0.0, 1.0).vertex(0.0, 0.0, len);
 
     builder.end(mat);
     builder.gl.lineWidth(1);

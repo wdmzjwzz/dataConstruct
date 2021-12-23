@@ -1,6 +1,6 @@
 import { GLAttribStateManager } from "./WebGLAttribState";
 import { vec2, vec3, vec4, mat4, quat } from "../common/math/TSM";
-import { GLShaderSource } from "./WebGLShaderSource";
+import { GLShaderSource, GLShaderType } from "./WebGLShaderSource";
 import {
   GLHelper,
   EShaderType,
@@ -283,28 +283,17 @@ export class GLProgram {
     return this.setSampler(GLProgram.Sampler, unit);
   }
 
-  public static createDefaultTextureProgram(
+  
+  public static createProgram(
+    type: GLShaderType,
     gl: WebGLRenderingContext,
     bit: GLAttribBits
   ): GLProgram {
     let pro: GLProgram = new GLProgram(
       gl,
       bit,
-      GLShaderSource.textureShader.vs,
-      GLShaderSource.textureShader.fs
-    );
-    return pro;
-  }
-
-  public static createDefaultColorProgram(
-    gl: WebGLRenderingContext,
-    bit: GLAttribBits
-  ): GLProgram {
-    let pro: GLProgram = new GLProgram(
-      gl,
-      bit,
-      GLShaderSource.colorShader.vs,
-      GLShaderSource.colorShader.fs
+      GLShaderSource[type].vs,
+      GLShaderSource[type].fs
     );
     return pro;
   }

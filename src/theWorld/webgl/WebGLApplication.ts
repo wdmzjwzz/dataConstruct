@@ -1,10 +1,8 @@
 import { Application } from "../common/Application";
 import { GLWorldMatrixStack } from "./WebGLMatrixStack";
-import { GLProgram } from "./WebGLProgram";
 import { GLMeshBuilder } from "./WebGLMesh";
 import { GLHelper } from "./WebGLHepler";
-import { GLAttribStateManager } from "./WebGLAttribState";
-import { GLAttribName } from "../type";
+import { GLShaderType } from "./WebGLShaderSource";
 
 export class WebGLApplication extends Application {
   // 可以直接操作WebGL相关内容
@@ -67,17 +65,8 @@ export class WebGLApplication extends Application {
 
     // 由于Canvas是左手系，而webGL是右手系，需要FilpYCoord
     this.isFlipYCoord = true;
-    const bit = GLAttribStateManager.makeVertexAttribs([
-      GLAttribName.POSITION,
-      GLAttribName.COLOR,
-      GLAttribName.SIZE,
-    ]);
-    const defaultColorProgram = GLProgram.createDefaultColorProgram(
-      this.gl,
-      bit
-    );
     // 初始化时，创建颜色GLMeshBuilder对象
-    this.builder = new GLMeshBuilder(this.gl, bit, defaultColorProgram);
+    this.builder = GLHelper.createBuilder(this.gl, GLShaderType.COLOR);
   }
 
   protected getMouseCanvas(): HTMLCanvasElement {

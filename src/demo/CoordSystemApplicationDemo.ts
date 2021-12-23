@@ -1,7 +1,7 @@
 import { CameraApplication } from "../theWorld/lib/CameraApplication";
 import { MathHelper, EAxisType } from "../theWorld/common/math/MathHelper";
 import { DrawHelper, CoordSystem } from "../theWorld/lib/DrawHelper";
-import { mat4, vec3, vec4 } from "../theWorld/common/math/TSM";
+import { mat4, vec3 } from "../theWorld/common/math/TSM";
 import { CanvasKeyBoardEvent } from "../theWorld/common/Application";
 import { GLCoordSystem } from "../theWorld/webgl/WebGLCoordSystem";
 
@@ -226,12 +226,12 @@ export class CoordSystemApplication extends CameraApplication {
         this.mvp
       );
       // 使用mvp矩阵绘制六轴坐标系，调用的是DrawHelper.drawFullCoordSystem的静态辅助方法
-      DrawHelper.drawFullCoordSystem(
-        this.builder,
-        this.mvp,
-        1,
-        s.isDrawAxis ? s.axis : null
-      );
+      // DrawHelper.drawFullCoordSystem(
+      //   this.builder,
+      //   this.mvp,
+      //   1,
+      //   s.isDrawAxis ? s.axis : null
+      // );
       this.matStack.popMatrix(); // 矩阵出栈
     }
 
@@ -268,12 +268,12 @@ export class CoordSystemApplication extends CameraApplication {
         this.mvp
       );
       // 绘制坐标系
-      DrawHelper.drawFullCoordSystem(
-        this.builder,
-        this.mvp,
-        1,
-        s.isDrawAxis ? s.axis : null
-      );
+      // DrawHelper.drawFullCoordSystem(
+      //   this.builder,
+      //   this.mvp,
+      //   1,
+      //   s.isDrawAxis ? s.axis : null
+      // );
 
       // 第二步：绘制绕x轴旋转的线框立方体
       this.matStack.pushMatrix();
@@ -286,7 +286,7 @@ export class CoordSystemApplication extends CameraApplication {
           this.matStack.modelViewMatrix,
           this.cubeMVP
         );
-        DrawHelper.drawWireFrameCubeBox(this.builder, this.cubeMVP, 0.1);
+        // DrawHelper.drawWireFrameCubeBox(this.builder, this.cubeMVP, 0.1);
         this.matStack.popMatrix();
       }
 
@@ -301,12 +301,12 @@ export class CoordSystemApplication extends CameraApplication {
           this.matStack.modelViewMatrix,
           this.cubeMVP
         );
-        DrawHelper.drawWireFrameCubeBox(
-          this.builder,
-          this.cubeMVP,
-          0.1,
-          vec4.green
-        );
+        // DrawHelper.drawWireFrameCubeBox(
+        //   this.builder,
+        //   this.cubeMVP,
+        //   0.1,
+        //   vec4.green
+        // );
         this.matStack.popMatrix();
       }
 
@@ -320,12 +320,12 @@ export class CoordSystemApplication extends CameraApplication {
           this.matStack.modelViewMatrix,
           this.cubeMVP
         );
-        DrawHelper.drawWireFrameCubeBox(
-          this.builder,
-          this.cubeMVP,
-          0.1,
-          vec4.blue
-        );
+        // DrawHelper.drawWireFrameCubeBox(
+        //   this.builder,
+        //   this.cubeMVP,
+        //   0.1,
+        //   vec4.blue
+        // );
         this.matStack.popMatrix();
       }
 
@@ -341,12 +341,12 @@ export class CoordSystemApplication extends CameraApplication {
           this.matStack.modelViewMatrix,
           this.cubeMVP
         );
-        DrawHelper.drawWireFrameCubeBox(
-          this.builder,
-          this.cubeMVP,
-          0.1,
-          new vec4()
-        );
+        // DrawHelper.drawWireFrameCubeBox(
+        //   this.builder,
+        //   this.cubeMVP,
+        //   0.1,
+        //   new vec4()
+        // );
         this.matStack.popMatrix();
       }
       this.matStack.popMatrix();

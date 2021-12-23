@@ -1,3 +1,9 @@
+import { GLProgram } from "..";
+import { GLAttribName } from "../type";
+import { GLAttribStateManager } from "./WebGLAttribState";
+import { GLMeshBuilder } from "./WebGLMesh";
+import { GLShaderType } from "./WebGLShaderSource";
+
 // 枚举类
 export enum EShaderType {
   VS_SHADER,
@@ -303,5 +309,16 @@ export class GLHelper {
       pixels
     );
     return pixels;
+  }
+
+  public static createBuilder(
+    gl: WebGLRenderingContext,
+    type: GLShaderType,
+    vertexAttribs: GLAttribName[] = [GLAttribName.POSITION, GLAttribName.COLOR]
+  ) {
+    const bit = GLAttribStateManager.makeVertexAttribs(vertexAttribs);
+    const program = GLProgram.createProgram(type, gl, bit);
+
+    return new GLMeshBuilder(gl, bit, program);
   }
 }
