@@ -21,9 +21,40 @@ export class MeshApplication extends CameraApplication {
     super.update(elapsedMsec, intervalSec);
     this.camera.setViewport(0, 0, this.canvas.width, this.canvas.height);
   }
-
+  public drawCoordSystem(): void {
+    this.matStack.pushMatrix(); // 矩阵堆栈进栈
+    this.matStack.rotate(-this.angle, new vec3([0, 1, 0]).normalize());
+    mat4.product(
+      this.camera.viewProjectionMatrix,
+      this.matStack.modelViewMatrix,
+      mat4.m0
+    );
+    DrawHelper.drawCoordSystem(this.builder, mat4.m0, 5);
+    this.matStack.popMatrix();
+  }
   public drawByMatrixWithColorShader(): void {
-   
+    this.matStack.pushMatrix(); // 矩阵堆栈进栈
+
+    this.matStack.rotate(-this.angle, new vec3([0, 1, 0]).normalize());
+
+    mat4.product(
+      this.camera.viewProjectionMatrix,
+      this.matStack.modelViewMatrix,
+      mat4.m0
+    );
+    DrawHelper.drawSolidCubeBox(
+      this.builder,
+      mat4.m0,
+      new Point(0, 0, 2),
+      0.5,
+      vec4.red
+    );
+
+    DrawHelper.drawSolidCubeBox(this.builder, mat4.m0);
+    this.matStack.popMatrix();
+  }
+
+  public render(): void {
     // 使用cleartColor方法设置当前颜色缓冲区背景色是什么颜色
     this.gl.clearColor(0, 0, 0, 1);
     // 调用clear清屏操作
@@ -32,37 +63,10 @@ export class MeshApplication extends CameraApplication {
     this.gl.disable(this.gl.CULL_FACE);
 
     this.gl.enable(this.gl.DEPTH_TEST);
-
-    this.matStack.pushMatrix(); // 矩阵堆栈进栈
-
-    {
-      this.matStack.rotate(-this.angle, new vec3([0, 1, 0]).normalize());
-
-      mat4.product(
-        this.camera.viewProjectionMatrix,
-        this.matStack.modelViewMatrix,
-        mat4.m0
-      );
-
-      DrawHelper.drawCoordSystem(this.builder, mat4.m0, 1);
-
-      DrawHelper.drawSolidCubeBox(
-        this.builder,
-        mat4.m0,
-        new Point(0, 0, 2),
-        0.5,
-        vec4.red
-      );
-
-      DrawHelper.drawSolidCubeBox(this.builder, mat4.m0);
-      this.matStack.popMatrix();
-    }
+    this.drawCoordSystem();
+    this.drawByMatrixWithColorShader();
     // 恢复三角形背面剔除功能
     this.gl.enable(this.gl.CULL_FACE);
-  }
-
-  public render(): void {
-    this.drawByMatrixWithColorShader();
   }
 
   public onKeyPress(evt: CanvasKeyBoardEvent): void {
