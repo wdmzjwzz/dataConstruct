@@ -37,8 +37,11 @@ export class MeshApplication extends CameraApplication {
 
     this.gl.disable(this.gl.CULL_FACE);
 
-    this.matStack.pushMatrix(); // 矩阵堆栈进栈
     this.gl.enable(this.gl.DEPTH_TEST);
+    // this.gl.enable(this.gl.BLEND);
+    // this.gl.blendFunc(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA);
+    this.matStack.pushMatrix(); // 矩阵堆栈进栈
+
     {
       // this.matStack.translate(new vec3([1, 1, 0]));
       // this.matStack.rotate(-90, new vec3([1, 0, 0]).normalize());
@@ -54,17 +57,15 @@ export class MeshApplication extends CameraApplication {
 
       DrawHelper.drawCoordSystem(this.builder, mat4.m0, 1);
 
-      // DrawHelper.drawSolidCubeBox(this.builder, mat4.m0); 
-
       DrawHelper.drawSolidCubeBox(
         this.builder,
         mat4.m0,
-        new Point(0, 0, 1),
+        new Point(0, 0, 2),
         0.5,
         vec4.red
       );
-      
-      DrawHelper.drawSolidCubeBox(this.builder, mat4.m0); 
+
+      DrawHelper.drawSolidCubeBox(this.builder, mat4.m0);
       this.matStack.popMatrix();
     }
     // 恢复三角形背面剔除功能
