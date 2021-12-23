@@ -11,6 +11,7 @@ export class MeshApplication extends CameraApplication {
 
   public constructor(canvas: HTMLCanvasElement) {
     super(canvas, { premultipliedAlpha: false }, true);
+    this.camera.setViewport(0, 0, this.canvas.width, this.canvas.height);
     this.textureBuilder = GLHelper.createBuilder(this.gl, GLShaderType.TEXTURE);
   }
 
@@ -19,7 +20,7 @@ export class MeshApplication extends CameraApplication {
     this.angle += 1;
     // 调用基类方法，这样就能让摄像机进行更新
     super.update(elapsedMsec, intervalSec);
-    this.camera.setViewport(0, 0, this.canvas.width, this.canvas.height);
+   
   }
   public drawCoordSystem(): void {
     this.matStack.pushMatrix(); // 矩阵堆栈进栈
