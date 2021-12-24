@@ -1,5 +1,5 @@
 import { Application } from "../theWorld/common/Application";
-import { mat4, vec3 } from "../theWorld/common/math/TSM";
+import { Matrix4, Vector3 } from "../theWorld/common/math/TSM";
 import { MathHelper } from "../theWorld/common/math/MathHelper";
 import {
   GLHelper,
@@ -17,9 +17,9 @@ export class BasicWebGLApplication extends Application {
   public coordSystem4s: GLCoordSystem[];
 
   // 增加视矩阵和投影矩阵
-  public projectMatrix: mat4;
-  public viewMatrix: mat4;
-  public viewProjectMatrix: mat4;
+  public projectMatrix: Matrix4;
+  public viewMatrix: Matrix4;
+  public viewProjectMatrix: Matrix4;
 
   public colorShader_vs: string = `
         // 1、 attribute顶点属性声明
@@ -27,7 +27,7 @@ export class BasicWebGLApplication extends Application {
         attribute vec4 aColor;
     
         // 2、 uniform变量声明
-        uniform mat4 uMVPMatrix;
+        uniform Matrix4 uMVPMatrix;
 
         // 3、 varying变量声明
         varying vec4 vColor;
@@ -56,7 +56,7 @@ export class BasicWebGLApplication extends Application {
        attribute mediump vec3 aPosition;
        attribute mediump vec4 aColor;
    
-       uniform mediump mat4 uMVPMatrix;
+       uniform mediump Matrix4 uMVPMatrix;
 
        varying lowp vec4 vColor;
    
@@ -131,16 +131,16 @@ export class BasicWebGLApplication extends Application {
 
     // 在构造函数中增加如下代码:
     // 构造投影矩阵
-    this.projectMatrix = mat4.perspective(
+    this.projectMatrix = Matrix4.perspective(
       MathHelper.toRadian(45),
       this.canvas.width / this.canvas.height,
       0.1,
       100
     );
     // 构造视矩阵
-    this.viewMatrix = mat4.lookAt(new vec3([0, 0, 5]), new vec3());
+    this.viewMatrix = Matrix4.lookAt(new Vector3([0, 0, 5]), new Vector3());
     // 构造viewprojectMatrix
-    this.viewProjectMatrix = mat4.product(this.projectMatrix, this.viewMatrix);
+    this.viewProjectMatrix = Matrix4.product(this.projectMatrix, this.viewMatrix);
 
     // 设置视口区域
     this.gl.viewport(0, 0, this.canvas.width, this.canvas.height);
@@ -427,8 +427,8 @@ export class BasicWebGLApplication extends Application {
     // 绘制阶段
     this.gl.useProgram(this.program); // 设置要使用的WebGLProgram对象
 
-    let mat: mat4 = new mat4().scale(new vec3([2, 2, 2]));
-    mat4.product(this.viewProjectMatrix, mat, mat);
+    let mat: Matrix4 = new Matrix4().scale(new Vector3([2, 2, 2]));
+    Matrix4.product(this.viewProjectMatrix, mat, mat);
     // 将vMVPMatrix uniform变量上传（upload）到着色器重
     this.gl.uniformMatrix4fv(
       this.uniformMap["uMVPMatrix"].location,
@@ -539,8 +539,8 @@ export class BasicWebGLApplication extends Application {
     );
 
     this.gl.useProgram(this.program);
-    let mat: mat4 = new mat4().scale(new vec3([2, 2, 2]));
-    mat4.product(this.viewProjectMatrix, mat, mat);
+    let mat: Matrix4 = new Matrix4().scale(new Vector3([2, 2, 2]));
+    Matrix4.product(this.viewProjectMatrix, mat, mat);
     this.gl.uniformMatrix4fv(
       this.uniformMap["uMVPMatrix"].location,
       false,

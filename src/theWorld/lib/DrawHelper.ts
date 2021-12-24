@@ -1,4 +1,4 @@
-import { vec3, mat4, vec4 } from "../common/math/TSM";
+import { Vector3, Matrix4, Vector4 } from "../common/math/TSM";
 import { TypedArrayList } from "../common/container/TypedArrayList";
 import { GLMeshBuilder } from "../webgl/WebGLMesh";
 import { Point } from "../Geometry/Point";
@@ -6,16 +6,16 @@ import { getIndices } from "../common/utils/tools";
 import { defaultCollor } from "../constants";
 export class CoordSystem {
   public viewport: number[] = []; // 当前坐标系被绘制在哪个视口中
-  public axis: vec3; // 当前坐标系绕哪个轴旋转
+  public axis: Vector3; // 当前坐标系绕哪个轴旋转
   public angle: number; // 当前坐标系的旋转的角度(不是弧度！)
-  public pos: vec3; // 当前坐标系的位置，如果是多视口渲染的话，就为[0,0,0]
+  public pos: Vector3; // 当前坐标系的位置，如果是多视口渲染的话，就为[0,0,0]
   public isDrawAxis: boolean; // 是否绘制旋转轴
   public isD3D: boolean; // 是否绘制D3D左手系
 
   public constructor(
     viewport: number[],
-    pos: vec3 = vec3.zero,
-    axis: vec3 = vec3.up,
+    pos: Vector3 = Vector3.zero,
+    axis: Vector3 = Vector3.up,
     angle: number = 0,
     isDrawAxis: boolean = false,
     isD3D: boolean = false
@@ -47,7 +47,7 @@ export class DrawHelper {
   }
   public static drawCoordSystem(
     builder: GLMeshBuilder,
-    mat: mat4,
+    mat: Matrix4,
     len: number = 5
   ): void {
     builder.gl.lineWidth(5);
@@ -80,17 +80,17 @@ export class DrawHelper {
 
   public static drawSolidCubeBox(
     builder: GLMeshBuilder,
-    mat: mat4,
+    mat: Matrix4,
     center: Point = new Point(0, 0, 0),
     halfLen: number = 0.2,
-    color: vec4 = vec4.green
+    color: Vector4 = Vector4.green
   ): void {
-    let mins: vec3 = new vec3([
+    let mins: Vector3 = new Vector3([
       center.x - halfLen,
       center.y - halfLen,
       center.z - halfLen,
     ]);
-    let maxs: vec3 = new vec3([
+    let maxs: Vector3 = new Vector3([
       center.x + halfLen,
       center.y + halfLen,
       center.z + halfLen,
@@ -131,7 +131,7 @@ export class DrawHelper {
    */
   public static drawTextureCubeBox(
     builder: GLMeshBuilder,
-    mat: mat4,
+    mat: Matrix4,
     halfLen: number = 0.2,
     tc: number[] = [
       0,
@@ -230,7 +230,7 @@ export class DrawHelper {
 
   public static drawFace(
     builder: GLMeshBuilder,
-    mat: mat4,
+    mat: Matrix4,
     points: Point[],
     color = defaultCollor
   ) {

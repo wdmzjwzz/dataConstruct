@@ -1,5 +1,5 @@
 import { GLAttribStateManager } from "./WebGLAttribState";
-import { vec2, vec3, vec4, mat4, quat } from "../common/math/TSM";
+import { Vector2, Vector3, Vector4, Matrix4, quat } from "../common/math/TSM";
 import { GLShaderSource, GLShaderType } from "./WebGLShaderSource";
 import {
   GLHelper,
@@ -212,7 +212,7 @@ export class GLProgram {
     return false;
   }
 
-  public setVector2(name: string, v2: vec2): boolean {
+  public setVector2(name: string, v2: Vector2): boolean {
     let loc: WebGLUniformLocation | null = this.getUniformLocation(name);
     if (loc) {
       this.gl.uniform2fv(loc, v2.values);
@@ -221,7 +221,7 @@ export class GLProgram {
     return false;
   }
 
-  public setVector3(name: string, v3: vec3): boolean {
+  public setVector3(name: string, v3: Vector3): boolean {
     let loc: WebGLUniformLocation | null = this.getUniformLocation(name);
     if (loc) {
       this.gl.uniform3fv(loc, v3.values);
@@ -230,7 +230,7 @@ export class GLProgram {
     return false;
   }
 
-  public setVector4(name: string, v4: vec4): boolean {
+  public setVector4(name: string, v4: Vector4): boolean {
     let loc: WebGLUniformLocation | null = this.getUniformLocation(name);
     if (loc) {
       this.gl.uniform4fv(loc, v4.values);
@@ -248,7 +248,7 @@ export class GLProgram {
     return false;
   }
 
-  public setMatrix3(name: string, mat: mat4): boolean {
+  public setMatrix3(name: string, mat: Matrix4): boolean {
     let loc: WebGLUniformLocation | null = this.getUniformLocation(name);
     if (loc) {
       this.gl.uniformMatrix3fv(loc, false, mat.values);
@@ -257,7 +257,7 @@ export class GLProgram {
     return false;
   }
 
-  public setMatrix4(name: string, mat: mat4): boolean {
+  public setMatrix4(name: string, mat: Matrix4): boolean {
     let loc: WebGLUniformLocation | null = this.getUniformLocation(name);
     if (loc) {
       this.gl.uniformMatrix4fv(loc, false, mat.values);
@@ -275,7 +275,7 @@ export class GLProgram {
     return false;
   }
 
-  public loadModeViewMatrix(mat: mat4): boolean {
+  public loadModeViewMatrix(mat: Matrix4): boolean {
     return this.setMatrix4(GLProgram.MVMatrix, mat);
   }
 

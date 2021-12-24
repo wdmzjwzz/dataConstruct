@@ -1,4 +1,4 @@
-import { vec3 } from "../common/math/TSM";
+import { Vector3 } from "../common/math/TSM";
 
 export class Point {
     public x: number;
@@ -13,18 +13,18 @@ export class Point {
         const dx = this.x - point.x;
         const dy = this.y - point.y;
         const dz = this.z - point.z;
-        return new vec3([dx, dy, dz])
+        return new Vector3([dx, dy, dz])
     }
     public add(point: Point) {
         const dx = this.x + point.x;
         const dy = this.y + point.y;
         const dz = this.z + point.z;
-        return new vec3([dx, dy, dz])
+        return new Vector3([dx, dy, dz])
     }
     public multiplied(num: number) {
         const dx = this.x * num;
         const dy = this.y * num;
         const dz = this.z * num;
-        return new vec3([dx, dy, dz])
+        return new Vector3([dx, dy, dz])
     }
 }

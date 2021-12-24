@@ -1,5 +1,5 @@
 import { GLAttribStateManager } from "./WebGLAttribState";
-import { mat4 } from "../common/math/TSM";
+import { Matrix4 } from "../common/math/TSM";
 import { TypedArrayList } from "../common/container/TypedArrayList";
 import { GLProgram } from "./WebGLProgram";
 import { GLTexture } from "./WebGLTexture";
@@ -244,7 +244,7 @@ export class GLMeshBuilder extends GLMeshBase {
     };
   }
   // end方法用于渲染操作
-  public end(mvp: mat4): void {
+  public end(mvp: Matrix4): void {
     this.program.bind(); // 绑定GLProgram
     this.program.setMatrix4(GLProgram.MVPMatrix, mvp); // 载入MVPMatrix uniform变量
     if (this.texture !== null) {

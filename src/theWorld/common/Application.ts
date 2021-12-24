@@ -1,4 +1,4 @@
-import { vec2 } from "./math/TSM";
+import { Vector2 } from "./math/TSM";
 
 export enum EInputEventType {
   MOUSEEVENT, //总类，表示鼠标事件
@@ -69,11 +69,11 @@ export class CanvasMouseEvent extends CanvasInputEvent {
   public button: number;
 
   // 基于canvas坐标系的表示
-  public canvasPosition: vec2;
+  public canvasPosition: Vector2;
 
   public constructor(
     type: EInputEventType,
-    canvasPos: vec2,
+    canvasPos: Vector2,
     button: number,
     altKey: boolean = false,
     ctrlKey: boolean = false,
@@ -82,7 +82,7 @@ export class CanvasMouseEvent extends CanvasInputEvent {
     super(type, altKey, ctrlKey, shiftKey);
     this.canvasPosition = canvasPos;
     this.button = button;
-    console.log(this.button);
+   
   }
 }
 
@@ -289,7 +289,7 @@ export class Application implements EventListenerObject {
         this.onMouseUp(this._toCanvasMouseEvent(evt, EInputEventType.MOUSEUP));
         break;
       case "mousemove":
-        // 如果isSupportMouseMove为true，才会每次鼠标移动触发mouseMove事件
+     
         if (this.isSupportMouseMove) {
           this.onMouseMove(
             this._toCanvasMouseEvent(evt, EInputEventType.MOUSEMOVE)
@@ -359,7 +359,7 @@ export class Application implements EventListenerObject {
   // 这是一个私有方法，意味着只能在本类中使用,子类和其他类都无法调用本方法
   // 只要是鼠标事件（down / up / move / drag .....）都需要调用本方法
   // 将相对于浏览器viewport表示的点变换到相对于canvas表示的点
-  private viewportToCanvasCoordinate(evt: MouseEvent): vec2 {
+  private viewportToCanvasCoordinate(evt: MouseEvent): Vector2 {
     // 切记，很重要一点：
     // getBoundingClientRect方法返回的ClientRect
     let rect: ClientRect = this.getMouseCanvas().getBoundingClientRect();
@@ -373,11 +373,10 @@ export class Application implements EventListenerObject {
         y = this.getMouseCanvas().height - y;
       }
       // 变成矢量表示
-      let pos: vec2 = new vec2([x, y]);
+      let pos: Vector2 = new Vector2([x, y]);
       return pos;
     }
 
-    alert("evt . target为null");
     throw new Error("evt . target为null");
   }
 
@@ -401,7 +400,7 @@ export class Application implements EventListenerObject {
     }
 
     // 将客户区的鼠标pos变换到Canvas坐标系中表示
-    let mousePosition: vec2 = this.viewportToCanvasCoordinate(event);
+    let mousePosition: Vector2 = this.viewportToCanvasCoordinate(event);
     // 将Event一些要用到的信息传递给CanvasMouseEvent并返回
     let canvasMouseEvent: CanvasMouseEvent = new CanvasMouseEvent(
       type,

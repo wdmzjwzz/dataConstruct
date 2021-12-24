@@ -1,6 +1,6 @@
-import { vec4 } from "./common/math/TSM";
+import { Vector4 } from "./common/math/TSM";
 import { GLAttribInfo, GLAttribName } from "./type";
-export const defaultCollor = new vec4([0, 1, 0,1]);
+export const defaultCollor = new Vector4([0, 1, 0,1]);
 export const FLOAT32_SIZE = Float32Array.BYTES_PER_ELEMENT;
 export const UINT16_SIZE = Uint16Array.BYTES_PER_ELEMENT;
 export const ATTRIBSTRIDE = "STRIDE";

@@ -1,6 +1,6 @@
 export let EPSILON: number = 0.0001;
 
-export class vec2 {
+export class Vector2 {
   public values = new Float32Array(2);
 
   public get x(): number {
@@ -28,15 +28,15 @@ export class vec2 {
     }
   }
 
-  copy(dest: vec2 | null = null): vec2 {
-    if (!dest) dest = new vec2();
+  copy(dest: Vector2 | null = null): Vector2 {
+    if (!dest) dest = new Vector2();
     dest.x = this.x;
     dest.y = this.y;
     return dest;
   }
 }
 
-export class vec3 {
+export class Vector3 {
   public values = new Float32Array(3);
 
   public get x(): number {
@@ -83,8 +83,8 @@ export class vec3 {
     this.z = z;
   }
 
-  public copy(dest: vec3 | null = null): vec3 {
-    if (!dest) dest = new vec3();
+  public copy(dest: Vector3 | null = null): Vector3 {
+    if (!dest) dest = new Vector3();
 
     dest.x = this.x;
     dest.y = this.y;
@@ -93,7 +93,7 @@ export class vec3 {
     return dest;
   }
 
-  public negate(dest: vec3 | null = null): vec3 {
+  public negate(dest: Vector3 | null = null): Vector3 {
     if (!dest) dest = this;
 
     dest.x = -this.x;
@@ -103,7 +103,7 @@ export class vec3 {
     return dest;
   }
 
-  public equals(vector: vec3, threshold = EPSILON): boolean {
+  public equals(vector: Vector3, threshold = EPSILON): boolean {
     if (Math.abs(this.x - vector.x) > threshold) return false;
 
     if (Math.abs(this.y - vector.y) > threshold) return false;
@@ -125,7 +125,7 @@ export class vec3 {
     return x * x + y * y + z * z;
   }
 
-  add(vector: vec3): vec3 {
+  add(vector: Vector3): Vector3 {
     this.x += vector.x;
     this.y += vector.y;
     this.z += vector.z;
@@ -133,7 +133,7 @@ export class vec3 {
     return this;
   }
 
-  subtract(vector: vec3): vec3 {
+  subtract(vector: Vector3): Vector3 {
     this.x -= vector.x;
     this.y -= vector.y;
     this.z -= vector.z;
@@ -141,7 +141,7 @@ export class vec3 {
     return this;
   }
 
-  public scale(value: number, dest: vec3 | null = null): vec3 {
+  public scale(value: number, dest: Vector3 | null = null): Vector3 {
     if (!dest) {
       dest = this;
     } else {
@@ -155,7 +155,7 @@ export class vec3 {
     return dest;
   }
 
-  public normalize(dest: vec3 | null = null): vec3 {
+  public normalize(dest: Vector3 | null = null): Vector3 {
     if (!dest) dest = this;
 
     let length = this.length;
@@ -191,11 +191,11 @@ export class vec3 {
   }
 
   public static multiplyScalar(
-    vector: vec3,
+    vector: Vector3,
     value: number,
-    dest: vec3 | null = null
-  ): vec3 {
-    if (!dest) dest = new vec3();
+    dest: Vector3 | null = null
+  ): Vector3 {
+    if (!dest) dest = new Vector3();
     dest.x *= value;
     dest.y *= value;
     dest.z *= value;
@@ -203,11 +203,11 @@ export class vec3 {
   }
 
   public static cross(
-    vector: vec3,
-    vector2: vec3,
-    dest: vec3 | null = null
-  ): vec3 {
-    if (!dest) dest = new vec3();
+    vector: Vector3,
+    vector2: Vector3,
+    dest: Vector3 | null = null
+  ): Vector3 {
+    if (!dest) dest = new Vector3();
 
     let x = vector.x,
       y = vector.y,
@@ -224,7 +224,7 @@ export class vec3 {
     return dest;
   }
 
-  public static dot(vector: vec3, vector2: vec3): number {
+  public static dot(vector: Vector3, vector2: Vector3): number {
     let x = vector.x,
       y = vector.y,
       z = vector.z;
@@ -237,11 +237,11 @@ export class vec3 {
   }
 
   public static sum(
-    vector: vec3,
-    vector2: vec3,
-    dest: vec3 | null = null
-  ): vec3 {
-    if (!dest) dest = new vec3();
+    vector: Vector3,
+    vector2: Vector3,
+    dest: Vector3 | null = null
+  ): Vector3 {
+    if (!dest) dest = new Vector3();
 
     dest.x = vector.x + vector2.x;
     dest.y = vector.y + vector2.y;
@@ -251,11 +251,11 @@ export class vec3 {
   }
 
   public static difference(
-    vector: vec3,
-    vector2: vec3,
-    dest: vec3 | null = null
-  ): vec3 {
-    if (!dest) dest = new vec3();
+    vector: Vector3,
+    vector2: Vector3,
+    dest: Vector3 | null = null
+  ): Vector3 {
+    if (!dest) dest = new Vector3();
 
     dest.x = vector.x - vector2.x;
     dest.y = vector.y - vector2.y;
@@ -264,21 +264,21 @@ export class vec3 {
     return dest;
   }
 
-  static readonly up = new vec3([0, 1, 0]);
-  static readonly down = new vec3([0, -1, 0]);
-  static readonly right = new vec3([1, 0, 0]);
-  static readonly left = new vec3([-1, 0, 0]);
-  static readonly forward = new vec3([0, 0, 1]);
-  static readonly backward = new vec3([0, 0, -1]);
+  static readonly up = new Vector3([0, 1, 0]);
+  static readonly down = new Vector3([0, -1, 0]);
+  static readonly right = new Vector3([1, 0, 0]);
+  static readonly left = new Vector3([-1, 0, 0]);
+  static readonly forward = new Vector3([0, 0, 1]);
+  static readonly backward = new Vector3([0, 0, -1]);
 
-  static readonly zero = new vec3([0, 0, 0]);
+  static readonly zero = new Vector3([0, 0, 0]);
 
-  static v0 = new vec3([0, 0, 0]);
-  static v1 = new vec3([0, 0, 0]);
-  static v2 = new vec3([0, 0, 0]);
+  static v0 = new Vector3([0, 0, 0]);
+  static v1 = new Vector3([0, 0, 0]);
+  static v2 = new Vector3([0, 0, 0]);
 }
 
-export class vec4 {
+export class Vector4 {
   public values = new Float32Array(4);
 
   public get x(): number {
@@ -313,8 +313,8 @@ export class vec4 {
     this.values[3] = value;
   }
 
-  public get vec3(): vec3 {
-    return new vec3([this.x, this.y, this.z]);
+  public get Vector3(): Vector3 {
+    return new Vector3([this.x, this.y, this.z]);
   }
 
   public get r(): number {
@@ -371,8 +371,8 @@ export class vec4 {
     this.w = 0;
   }
 
-  public copy(dest: vec4 | null = null): vec4 {
-    if (!dest) dest = new vec4();
+  public copy(dest: Vector4 | null = null): Vector4 {
+    if (!dest) dest = new Vector4();
 
     dest.x = this.x;
     dest.y = this.y;
@@ -382,7 +382,7 @@ export class vec4 {
     return dest;
   }
 
-  public equals(vector: vec4, threshold = EPSILON): boolean {
+  public equals(vector: Vector4, threshold = EPSILON): boolean {
     if (Math.abs(this.x - vector.x) > threshold) return false;
 
     if (Math.abs(this.y - vector.y) > threshold) return false;
@@ -394,17 +394,17 @@ export class vec4 {
     return true;
   }
 
-  static red: vec4 = new vec4([1.0, 0.0, 0.0, 1.0]);
-  static green: vec4 = new vec4([0.0, 1.0, 0.0, 1.0]);
-  static blue: vec4 = new vec4([0.0, 0.0, 1.0, 1.0]);
-  static black: vec4 = new vec4([0, 0, 0, 0]);
+  static red: Vector4 = new Vector4([1.0, 0.0, 0.0, 1.0]);
+  static green: Vector4 = new Vector4([0.0, 1.0, 0.0, 1.0]);
+  static blue: Vector4 = new Vector4([0.0, 0.0, 1.0, 1.0]);
+  static black: Vector4 = new Vector4([0, 0, 0, 0]);
 
-  static v0: vec4 = new vec4();
-  static v1: vec4 = new vec4();
-  static v2: vec4 = new vec4();
+  static v0: Vector4 = new Vector4();
+  static v1: Vector4 = new Vector4();
+  static v2: Vector4 = new Vector4();
 }
 
-export class mat4 {
+export class Matrix4 {
   public values = new Float32Array(16);
 
   public constructor(values: number[] | null = null) {
@@ -415,7 +415,7 @@ export class mat4 {
     }
   }
 
-  public set(values: number[]): mat4 {
+  public set(values: number[]): Matrix4 {
     for (let i = 0; i < 16; i++) {
       this.values[i] = values[i];
     }
@@ -427,8 +427,8 @@ export class mat4 {
     return this.values[index];
   }
 
-  public copy(dest: mat4 | null = null): mat4 {
-    if (!dest) dest = new mat4();
+  public copy(dest: Matrix4 | null = null): Matrix4 {
+    if (!dest) dest = new Matrix4();
 
     for (let i = 0; i < 16; i++) {
       dest.values[i] = this.values[i];
@@ -437,7 +437,7 @@ export class mat4 {
     return dest;
   }
 
-  public equals(matrix: mat4, threshold = EPSILON): boolean {
+  public equals(matrix: Matrix4, threshold = EPSILON): boolean {
     for (let i = 0; i < 16; i++) {
       if (Math.abs(this.values[i] - matrix.at(i)) > threshold) return false;
     }
@@ -445,9 +445,9 @@ export class mat4 {
     return true;
   }
 
-  public getRow(index: number, dest: vec4 | null = null): vec4 {
+  public getRow(index: number, dest: Vector4 | null = null): Vector4 {
     if (dest === null) {
-      dest = new vec4();
+      dest = new Vector4();
     }
     (dest.x = this.values[index * 4 + 0]),
       (dest.y = this.values[index * 4 + 1]),
@@ -456,9 +456,9 @@ export class mat4 {
     return dest;
   }
 
-  public getColumn(index: number, dest: vec4 | null = null): vec4 {
+  public getColumn(index: number, dest: Vector4 | null = null): Vector4 {
     if (dest === null) {
-      dest = new vec4();
+      dest = new Vector4();
     }
     dest.x = this.values[index];
     dest.y = this.values[index + 4];
@@ -467,9 +467,9 @@ export class mat4 {
     return dest;
   }
 
-  public getPosition(dest: vec3 | null = null): vec3 {
+  public getPosition(dest: Vector3 | null = null): Vector3 {
     if (dest === null) {
-      dest = new vec3();
+      dest = new Vector3();
     }
     dest.x = this.values[12];
     dest.y = this.values[13];
@@ -477,9 +477,9 @@ export class mat4 {
     return dest;
   }
 
-  public getXAxis(dest: vec3 | null = null): vec3 {
+  public getXAxis(dest: Vector3 | null = null): Vector3 {
     if (dest === null) {
-      dest = new vec3();
+      dest = new Vector3();
     }
     dest.x = this.values[0];
     dest.y = this.values[1];
@@ -487,9 +487,9 @@ export class mat4 {
     return dest;
   }
 
-  public getYAxis(dest: vec3 | null = null): vec3 {
+  public getYAxis(dest: Vector3 | null = null): Vector3 {
     if (dest === null) {
-      dest = new vec3();
+      dest = new Vector3();
     }
     dest.x = this.values[4];
     dest.y = this.values[5];
@@ -497,9 +497,9 @@ export class mat4 {
     return dest;
   }
 
-  public getZAxis(dest: vec3 | null = null): vec3 {
+  public getZAxis(dest: Vector3 | null = null): Vector3 {
     if (dest === null) {
-      dest = new vec3();
+      dest = new Vector3();
     }
     dest.x = this.values[8];
     dest.y = this.values[9];
@@ -507,7 +507,7 @@ export class mat4 {
     return dest;
   }
 
-  public getAxis(idx: number, dest: vec3 | null = null): vec3 {
+  public getAxis(idx: number, dest: Vector3 | null = null): Vector3 {
     if (idx === 0) {
       return this.getXAxis(dest);
     } else if (idx === 1) {
@@ -517,7 +517,7 @@ export class mat4 {
     }
   }
 
-  public setIdentity(): mat4 {
+  public setIdentity(): Matrix4 {
     this.values[0] = 1;
     this.values[1] = 0;
     this.values[2] = 0;
@@ -538,7 +538,7 @@ export class mat4 {
     return this;
   }
 
-  public transpose(): mat4 {
+  public transpose(): Matrix4 {
     let temp01 = this.values[1],
       temp02 = this.values[2],
       temp03 = this.values[3],
@@ -604,7 +604,7 @@ export class mat4 {
     );
   }
 
-  public inverse(out: mat4): boolean {
+  public inverse(out: Matrix4): boolean {
     this.copy(out);
     let a00 = out.values[0],
       a01 = out.values[1],
@@ -668,7 +668,7 @@ export class mat4 {
     return true;
   }
 
-  public multiply(matrix: mat4): mat4 {
+  public multiply(matrix: Matrix4): Matrix4 {
     let a00 = this.values[0],
       a01 = this.values[1],
       a02 = this.values[2],
@@ -729,8 +729,8 @@ export class mat4 {
     return this;
   }
 
-  public multiplyVec3(vector: vec3, dest: vec3 | null = null): vec3 {
-    if (!dest) dest = new vec3();
+  public multiplyVector3(vector: Vector3, dest: Vector3 | null = null): Vector3 {
+    if (!dest) dest = new Vector3();
     let x = vector.x,
       y = vector.y,
       z = vector.z;
@@ -754,8 +754,8 @@ export class mat4 {
     return dest;
   }
 
-  public multiplyVec4(vector: vec4, dest: vec4 | null = null): vec4 {
-    if (!dest) dest = new vec4();
+  public multiplyVector4(vector: Vector4, dest: Vector4 | null = null): Vector4 {
+    if (!dest) dest = new Vector4();
 
     let x = vector.x,
       y = vector.y,
@@ -787,7 +787,7 @@ export class mat4 {
   }
 
   // 矩阵变换
-  public translate(vector: vec3): mat4 {
+  public translate(vector: Vector3): Matrix4 {
     let x = vector.x,
       y = vector.y,
       z = vector.z;
@@ -804,7 +804,7 @@ export class mat4 {
     return this;
   }
 
-  public scale(vector: vec3): mat4 {
+  public scale(vector: Vector3): Matrix4 {
     let x = vector.x,
       y = vector.y,
       z = vector.z;
@@ -827,7 +827,7 @@ export class mat4 {
     return this;
   }
 
-  public rotate(angle: number, axis: vec3): mat4 | null {
+  public rotate(angle: number, axis: Vector3): Matrix4 | null {
     let x = axis.x,
       y = axis.y,
       z = axis.z;
@@ -897,12 +897,12 @@ export class mat4 {
     top: number,
     near: number,
     far: number
-  ): mat4 {
+  ): Matrix4 {
     let rl = right - left,
       tb = top - bottom,
       fn = far - near;
 
-    return new mat4([
+    return new Matrix4([
       (near * 2) / rl,
       0,
       0,
@@ -930,11 +930,11 @@ export class mat4 {
     aspect: number,
     near: number,
     far: number
-  ): mat4 {
+  ): Matrix4 {
     let top = near * Math.tan(fov * 0.5),
       right = top * aspect;
 
-    return mat4.frustum(-right, right, -top, top, near, far);
+    return Matrix4.frustum(-right, right, -top, top, near, far);
   }
 
   public static orthographic(
@@ -944,12 +944,12 @@ export class mat4 {
     top: number,
     near: number,
     far: number
-  ): mat4 {
+  ): Matrix4 {
     let rl = right - left,
       tb = top - bottom,
       fn = far - near;
 
-    return new mat4([
+    return new Matrix4([
       2 / rl,
       0,
       0,
@@ -972,16 +972,16 @@ export class mat4 {
     ]);
   }
 
-  public static lookAt(position: vec3, target: vec3, up: vec3 = vec3.up): mat4 {
+  public static lookAt(position: Vector3, target: Vector3, up: Vector3 = Vector3.up): Matrix4 {
     if (position.equals(target)) {
       return this.identity;
     }
 
-    let z = vec3.difference(position, target).normalize();
-    let x = vec3.cross(up, z).normalize();
-    let y = vec3.cross(z, x).normalize();
+    let z = Vector3.difference(position, target).normalize();
+    let x = Vector3.cross(up, z).normalize();
+    let y = Vector3.cross(z, x).normalize();
 
-    return new mat4([
+    return new Matrix4([
       x.x,
       y.x,
       z.x,
@@ -997,14 +997,14 @@ export class mat4 {
       z.z,
       0,
 
-      -vec3.dot(x, position),
-      -vec3.dot(y, position),
-      -vec3.dot(z, position),
+      -Vector3.dot(x, position),
+      -Vector3.dot(y, position),
+      -Vector3.dot(z, position),
       1,
     ]);
   }
 
-  public static product(m1: mat4, m2: mat4, result: mat4 | null = null): mat4 {
+  public static product(m1: Matrix4, m2: Matrix4, result: Matrix4 | null = null): Matrix4 {
     let a00 = m1.at(0),
       a01 = m1.at(1),
       a02 = m1.at(2),
@@ -1064,7 +1064,7 @@ export class mat4 {
 
       return result;
     } else {
-      return new mat4([
+      return new Matrix4([
         b00 * a00 + b01 * a10 + b02 * a20 + b03 * a30,
         b00 * a01 + b01 * a11 + b02 * a21 + b03 * a31,
         b00 * a02 + b01 * a12 + b02 * a22 + b03 * a32,
@@ -1088,9 +1088,9 @@ export class mat4 {
     }
   }
 
-  public static identity = new mat4().setIdentity();
-  public static m0 = new mat4();
-  public static m1 = new mat4();
+  public static identity = new Matrix4().setIdentity();
+  public static m0 = new Matrix4();
+  public static m1 = new Matrix4();
 }
 
 export class quat {
@@ -1297,8 +1297,8 @@ export class quat {
     return this;
   }
 
-  public multiplyVec3(vector: vec3, dest: vec3 | null = null): vec3 {
-    if (!dest) dest = new vec3();
+  public multiplyVector3(vector: Vector3, dest: Vector3 | null = null): Vector3 {
+    if (!dest) dest = new Vector3();
 
     let x = vector.x,
       y = vector.y,
@@ -1322,8 +1322,8 @@ export class quat {
     return dest;
   }
 
-  public toMat4(dest: mat4 | null = null): mat4 {
-    if (!dest) dest = new mat4();
+  public toMatrix4(dest: Matrix4 | null = null): Matrix4 {
+    if (!dest) dest = new Matrix4();
 
     let x = this.x,
       y = this.y,
@@ -1505,7 +1505,7 @@ export class quat {
     return dest;
   }
 
-  static fromAxis(axis: vec3, angle: number, dest: quat | null = null): quat {
+  static fromAxis(axis: Vector3, angle: number, dest: quat | null = null): quat {
     if (!dest) dest = new quat();
 
     angle *= 0.5;

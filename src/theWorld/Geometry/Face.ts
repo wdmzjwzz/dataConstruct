@@ -1,4 +1,4 @@
-import { vec3 } from "..";
+import { Vector3 } from "..";
 import { HalfEdge } from "./HalfEdge";
 import { Point } from "./Point";
 export class Face {
@@ -16,8 +16,8 @@ export class Face {
         this._linkEdges(this._halfedges)
         const vector1 = this.points[0].subtract(this.points[1])
         const vector2 = this.points[1].subtract(this.points[2])
-        const normal = vec3.cross(vector1, vector2).normalize()
-        const valid = this._halfedges.some(edge => Math.abs(vec3.dot(edge.normal, normal)) > 1e-6)
+        const normal = Vector3.cross(vector1, vector2).normalize()
+        const valid = this._halfedges.some(edge => Math.abs(Vector3.dot(edge.normal, normal)) > 1e-6)
         if (valid) {
             throw new Error("顶点不在同一个平面内");
         }
@@ -37,7 +37,7 @@ export class Face {
     public get normal() {
         const vector1 = this.points[1].subtract(this.points[0])
         const vector2 = this.points[2].subtract(this.points[1])
-        const normal = vec3.cross(vector1, vector2).normalize()
+        const normal = Vector3.cross(vector1, vector2).normalize()
         return normal
     }
 

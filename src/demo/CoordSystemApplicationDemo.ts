@@ -1,7 +1,7 @@
 import { CameraApplication } from "../theWorld/lib/CameraApplication";
 import { MathHelper, EAxisType } from "../theWorld/common/math/MathHelper";
 import { DrawHelper, CoordSystem } from "../theWorld/lib/DrawHelper";
-import { mat4, vec3 } from "../theWorld/common/math/TSM";
+import { Matrix4, Vector3 } from "../theWorld/common/math/TSM";
 import { CanvasKeyBoardEvent } from "../theWorld/common/Application";
 import { GLCoordSystem } from "../theWorld/webgl/WebGLCoordSystem";
 
@@ -9,8 +9,8 @@ export class CoordSystemApplication extends CameraApplication {
   // 存储当前使用的坐标系、视口以及旋转轴、旋转角度等信息的数组
   // 可以使用makeOneGLCoorSystem和makeFourGLCoordSystems方法来切换
   public coordSystems: CoordSystem[] = [];
-  public mvp: mat4 = new mat4(); // 当前要绘制的坐标系的model-view-project矩阵
-  public cubeMVP: mat4 = new mat4(); // 当前要绘制的绕坐标系某个轴的立方体的model-view-project矩阵
+  public mvp: Matrix4 = new Matrix4(); // 当前要绘制的坐标系的model-view-project矩阵
+  public cubeMVP: Matrix4 = new Matrix4(); // 当前要绘制的绕坐标系某个轴的立方体的model-view-project矩阵
 
   // 下面两个成员变量排列组合后，形成6种不同的绘制方式
   public currentDrawMethod: (s: GLCoordSystem) => void; // 用于切换三种不同的绘制方法
@@ -31,8 +31,8 @@ export class CoordSystemApplication extends CameraApplication {
     this.coordSystems.push(
       new CoordSystem(
         [0, 0, this.canvas.width, this.canvas.height],
-        vec3.zero,
-        new vec3([1, 1, 0]).normalize(),
+        Vector3.zero,
+        new Vector3([1, 1, 0]).normalize(),
         45,
         true
       )
@@ -44,19 +44,19 @@ export class CoordSystemApplication extends CameraApplication {
     this.coordSystems = []; // 清空坐标系数组内容，用于按需重新生成
     let hw: number = this.canvas.width * 0.5;
     let hh: number = this.canvas.height * 0.5;
-    let dir: vec3 = new vec3([1, 1, 1]).normalize();
+    let dir: Vector3 = new Vector3([1, 1, 1]).normalize();
     // 对于四视口渲染来说，将整个窗口平分成2*2四个视口表示
     this.coordSystems.push(
-      new CoordSystem([0, hh, hw, hh], vec3.zero, vec3.up, 0)
+      new CoordSystem([0, hh, hw, hh], Vector3.zero, Vector3.up, 0)
     ); // 左上，旋转轴为y轴
     this.coordSystems.push(
-      new CoordSystem([hw, hh, hw, hh], vec3.zero, vec3.right, 0)
+      new CoordSystem([hw, hh, hw, hh], Vector3.zero, Vector3.right, 0)
     ); // 右上，旋转轴为x轴
     this.coordSystems.push(
-      new CoordSystem([0, 0, hw, hh], vec3.zero, vec3.forward, 0)
+      new CoordSystem([0, 0, hw, hh], Vector3.zero, Vector3.forward, 0)
     ); // 左下，旋转轴为z轴
     this.coordSystems.push(
-      new CoordSystem([hw, 0, hw, hh], vec3.zero, dir, 0, true)
+      new CoordSystem([hw, 0, hw, hh], Vector3.zero, dir, 0, true)
     ); // 右下，旋转轴为[ 1 , 1 , 1 ]
     this.isD3dMode = false;
   }
@@ -115,16 +115,16 @@ export class CoordSystemApplication extends CameraApplication {
   }
 
   public drawText(
-    pos: vec3,
+    pos: Vector3,
     axis: EAxisType,
-    mvp: mat4,
+    mvp: Matrix4,
     inverse: boolean = false
   ): void {
     if (this.ctx2D === null) {
       return;
     }
 
-    let out: vec3 = new vec3();
+    let out: Vector3 = new Vector3();
     // 调用 MathHelper.obj2ScreenSpace这个核心函数，将局部坐标系标示的一个点变换到屏幕坐标系上
     if (
       MathHelper.obj2GLViewportSpace(pos, mvp, this.camera.getViewport(), out)
@@ -184,7 +184,7 @@ export class CoordSystemApplication extends CameraApplication {
     {
       this.matStack.translate(s.pos); // 将坐标系平移到s.pos位置
       this.matStack.rotate(s.angle, s.axis, false); // 绕着s.axis轴旋转s.angle度
-      mat4.product(
+      Matrix4.product(
         this.camera.viewProjectionMatrix,
         this.matStack.modelViewMatrix,
         this.mvp
@@ -198,10 +198,10 @@ export class CoordSystemApplication extends CameraApplication {
     this.matStack.popMatrix();
 
     // 绘制坐标系的标示文字，调用drawText方法
-    this.drawText(vec3.right, EAxisType.XAXIS, this.mvp, false); // X
-    this.drawText(vec3.up, EAxisType.YAXIS, this.mvp, false); // Y
+    this.drawText(Vector3.right, EAxisType.XAXIS, this.mvp, false); // X
+    this.drawText(Vector3.up, EAxisType.YAXIS, this.mvp, false); // Y
     if (this.isD3dMode === false) {
-      this.drawText(vec3.forward, EAxisType.ZAXIS, this.mvp, false); // Z
+      this.drawText(Vector3.forward, EAxisType.ZAXIS, this.mvp, false); // Z
     }
   }
 
@@ -220,7 +220,7 @@ export class CoordSystemApplication extends CameraApplication {
       this.matStack.translate(s.pos); // 将坐标系平移到s.pos位置
       this.matStack.rotate(s.angle, s.axis, false); // 坐标系绕着s.axis轴旋转s.angle度
       // 合成model-view-project矩阵
-      mat4.product(
+      Matrix4.product(
         this.camera.viewProjectionMatrix,
         this.matStack.modelViewMatrix,
         this.mvp
@@ -236,15 +236,15 @@ export class CoordSystemApplication extends CameraApplication {
     }
 
     // 绘制坐标系的标示文字,调用的是本类的drawText方法
-    this.drawText(vec3.right, EAxisType.XAXIS, this.mvp, false); // X
-    this.drawText(new vec3([-1, 0, 0]), EAxisType.XAXIS, this.mvp, true); // -X
+    this.drawText(Vector3.right, EAxisType.XAXIS, this.mvp, false); // X
+    this.drawText(new Vector3([-1, 0, 0]), EAxisType.XAXIS, this.mvp, true); // -X
 
-    this.drawText(vec3.up, EAxisType.YAXIS, this.mvp, false); // Y
-    this.drawText(new vec3([0, -1, 0]), EAxisType.YAXIS, this.mvp, true); // -Y
+    this.drawText(Vector3.up, EAxisType.YAXIS, this.mvp, false); // Y
+    this.drawText(new Vector3([0, -1, 0]), EAxisType.YAXIS, this.mvp, true); // -Y
 
     if (this.isD3dMode === false) {
-      this.drawText(vec3.forward, EAxisType.ZAXIS, this.mvp, false); // Z
-      this.drawText(new vec3([0, 0, -1]), EAxisType.ZAXIS, this.mvp, true); // -Z
+      this.drawText(Vector3.forward, EAxisType.ZAXIS, this.mvp, false); // Z
+      this.drawText(new Vector3([0, 0, -1]), EAxisType.ZAXIS, this.mvp, true); // -Z
     }
   }
 
@@ -262,7 +262,7 @@ export class CoordSystemApplication extends CameraApplication {
       this.matStack.translate(s.pos); // 平移到当前坐标系的原点
       this.matStack.rotate(s.angle, s.axis, false); // 绕着当前坐标系的轴旋转angle度
       // 合成坐标系的model-view-project矩阵
-      mat4.product(
+      Matrix4.product(
         this.camera.viewProjectionMatrix,
         this.matStack.modelViewMatrix,
         this.mvp
@@ -278,10 +278,10 @@ export class CoordSystemApplication extends CameraApplication {
       // 第二步：绘制绕x轴旋转的线框立方体
       this.matStack.pushMatrix();
       {
-        this.matStack.rotate(s.angle, vec3.right, false);
-        this.matStack.translate(new vec3([0.8, 0.4, 0]));
-        this.matStack.rotate(s.angle * 2, vec3.right, false);
-        mat4.product(
+        this.matStack.rotate(s.angle, Vector3.right, false);
+        this.matStack.translate(new Vector3([0.8, 0.4, 0]));
+        this.matStack.rotate(s.angle * 2, Vector3.right, false);
+        Matrix4.product(
           this.camera.viewProjectionMatrix,
           this.matStack.modelViewMatrix,
           this.cubeMVP
@@ -293,10 +293,10 @@ export class CoordSystemApplication extends CameraApplication {
       // 第三步：绘制绕y轴旋转的线框立方体
       this.matStack.pushMatrix();
       {
-        this.matStack.rotate(s.angle, vec3.up, false);
-        this.matStack.translate(new vec3([0.2, 0.8, 0]));
-        this.matStack.rotate(s.angle * 2, vec3.up, false);
-        mat4.product(
+        this.matStack.rotate(s.angle, Vector3.up, false);
+        this.matStack.translate(new Vector3([0.2, 0.8, 0]));
+        this.matStack.rotate(s.angle * 2, Vector3.up, false);
+        Matrix4.product(
           this.camera.viewProjectionMatrix,
           this.matStack.modelViewMatrix,
           this.cubeMVP
@@ -305,7 +305,7 @@ export class CoordSystemApplication extends CameraApplication {
         //   this.builder,
         //   this.cubeMVP,
         //   0.1,
-        //   vec4.green
+        //   Vector4.green
         // );
         this.matStack.popMatrix();
       }
@@ -313,9 +313,9 @@ export class CoordSystemApplication extends CameraApplication {
       // 第四步：绘制绕z轴旋转的线框立方体
       this.matStack.pushMatrix();
       {
-        this.matStack.translate(new vec3([0.0, 0.0, 0.8]));
-        this.matStack.rotate(s.angle * 2, vec3.forward, false);
-        mat4.product(
+        this.matStack.translate(new Vector3([0.0, 0.0, 0.8]));
+        this.matStack.rotate(s.angle * 2, Vector3.forward, false);
+        Matrix4.product(
           this.camera.viewProjectionMatrix,
           this.matStack.modelViewMatrix,
           this.cubeMVP
@@ -324,7 +324,7 @@ export class CoordSystemApplication extends CameraApplication {
         //   this.builder,
         //   this.cubeMVP,
         //   0.1,
-        //   vec4.blue
+        //   Vector4.blue
         // );
         this.matStack.popMatrix();
       }
@@ -332,11 +332,11 @@ export class CoordSystemApplication extends CameraApplication {
       // 第五步：绘制绕坐标系旋转轴（s.axis）旋转的线框立方体
       this.matStack.pushMatrix();
       {
-        let len: vec3 = new vec3();
+        let len: Vector3 = new Vector3();
         this.matStack.translate(s.axis.scale(0.8, len));
-        this.matStack.translate(new vec3([0, 0.3, 0]));
+        this.matStack.translate(new Vector3([0, 0.3, 0]));
         this.matStack.rotate(s.angle, s.axis, false);
-        mat4.product(
+        Matrix4.product(
           this.camera.viewProjectionMatrix,
           this.matStack.modelViewMatrix,
           this.cubeMVP
@@ -345,7 +345,7 @@ export class CoordSystemApplication extends CameraApplication {
         //   this.builder,
         //   this.cubeMVP,
         //   0.1,
-        //   new vec4()
+        //   new Vector4()
         // );
         this.matStack.popMatrix();
       }
@@ -353,15 +353,15 @@ export class CoordSystemApplication extends CameraApplication {
     }
 
     // 第六步：绘制坐标系的标示文字
-    this.drawText(vec3.right, EAxisType.XAXIS, this.mvp, false); // X
-    this.drawText(new vec3([-1, 0, 0]), EAxisType.XAXIS, this.mvp, true); // -X
+    this.drawText(Vector3.right, EAxisType.XAXIS, this.mvp, false); // X
+    this.drawText(new Vector3([-1, 0, 0]), EAxisType.XAXIS, this.mvp, true); // -X
 
-    this.drawText(vec3.up, EAxisType.YAXIS, this.mvp, false); // Y
-    this.drawText(new vec3([0, -1, 0]), EAxisType.YAXIS, this.mvp, true); // -Y
+    this.drawText(Vector3.up, EAxisType.YAXIS, this.mvp, false); // Y
+    this.drawText(new Vector3([0, -1, 0]), EAxisType.YAXIS, this.mvp, true); // -Y
 
     if (this.isD3dMode === false) {
-      this.drawText(vec3.forward, EAxisType.ZAXIS, this.mvp, false); // Z
-      this.drawText(new vec3([0, 0, -1]), EAxisType.ZAXIS, this.mvp, true); // -Z
+      this.drawText(Vector3.forward, EAxisType.ZAXIS, this.mvp, false); // Z
+      this.drawText(new Vector3([0, 0, -1]), EAxisType.ZAXIS, this.mvp, true); // -Z
     }
   }
 }

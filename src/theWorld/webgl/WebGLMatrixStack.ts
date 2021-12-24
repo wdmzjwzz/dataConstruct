@@ -1,4 +1,4 @@
-import { vec3, mat4 } from "../common/math/TSM";
+import { Vector3, Matrix4 } from "../common/math/TSM";
 import { MathHelper } from "../common/math/MathHelper";
 export enum EMatrixMode {
   MODELVIEW,
@@ -7,55 +7,55 @@ export enum EMatrixMode {
 }
 
 export class GLMatrixStack {
-  private _mvStack: mat4[];
-  private _projStack: mat4[];
-  private _texStack: mat4[];
+  private _mvStack: Matrix4[];
+  private _projStack: Matrix4[];
+  private _texStack: Matrix4[];
   public matrixMode: EMatrixMode;
 
   public constructor() {
     //初始化时每个矩阵栈都先添加一个正交归一化后的矩阵
     this._mvStack = [];
-    this._mvStack.push(new mat4());
+    this._mvStack.push(new Matrix4());
 
     this._projStack = [];
-    this._projStack.push(new mat4());
+    this._projStack.push(new Matrix4());
 
     this._texStack = [];
-    this._texStack.push(new mat4());
+    this._texStack.push(new Matrix4());
 
     this.matrixMode = EMatrixMode.MODELVIEW;
   }
 
-  public get modelViewMatrix(): mat4 {
+  public get modelViewMatrix(): Matrix4 {
     if (this._mvStack.length <= 0) {
       throw new Error("model view matrix stack为空！");
     }
     return this._mvStack[this._mvStack.length - 1];
   }
 
-  public get projectionMatrix(): mat4 {
+  public get projectionMatrix(): Matrix4 {
     if (this._projStack.length <= 0) {
       throw new Error("projection matrix stack为空！");
     }
     return this._projStack[this._projStack.length - 1];
   }
 
-  public get modelViewProjectionMatrix(): mat4 {
-    let ret: mat4 = new mat4();
+  public get modelViewProjectionMatrix(): Matrix4 {
+    let ret: Matrix4 = new Matrix4();
     this.projectionMatrix.copy(ret);
     ret.multiply(this.modelViewMatrix);
     return ret;
   }
 
-  public get normalMatrix(): mat4 {
-    let ret: mat4 = new mat4();
+  public get normalMatrix(): Matrix4 {
+    let ret: Matrix4 = new Matrix4();
     this.modelViewMatrix.copy(ret);
     this.modelViewMatrix.inverse(ret);
     ret.transpose();
     return ret;
   }
 
-  public get textureMatrix(): mat4 {
+  public get textureMatrix(): Matrix4 {
     if (this._texStack.length <= 0) {
       throw new Error("projection matrix stack为空！");
     }
@@ -65,17 +65,17 @@ export class GLMatrixStack {
   public pushMatrix(): GLMatrixStack {
     switch (this.matrixMode) {
       case EMatrixMode.MODELVIEW:
-        let mv: mat4 = new mat4();
+        let mv: Matrix4 = new Matrix4();
         this.modelViewMatrix.copy(mv);
         this._mvStack.push(mv);
         break;
       case EMatrixMode.PROJECTION:
-        let proj = new mat4();
+        let proj = new Matrix4();
         this.projectionMatrix.copy(proj);
         this._projStack.push(proj);
         break;
       case EMatrixMode.TEXTURE:
-        let tex: mat4 = new mat4();
+        let tex: Matrix4 = new Matrix4();
         this.textureMatrix.copy(tex);
         this._texStack.push(tex);
         break;
@@ -113,7 +113,7 @@ export class GLMatrixStack {
     return this;
   }
 
-  public loadMatrix(mat: mat4): GLMatrixStack {
+  public loadMatrix(mat: Matrix4): GLMatrixStack {
     switch (this.matrixMode) {
       case EMatrixMode.MODELVIEW:
         mat.copy(this.modelViewMatrix);
@@ -139,7 +139,7 @@ export class GLMatrixStack {
     if (isRadians == false) {
       fov = MathHelper.toRadian(fov);
     }
-    let mat: mat4 = mat4.perspective(fov, aspect, near, far);
+    let mat: Matrix4 = Matrix4.perspective(fov, aspect, near, far);
     this.loadMatrix(mat);
     this.matrixMode = EMatrixMode.MODELVIEW;
     // 是否要调用loadIdentity方法???
@@ -156,7 +156,7 @@ export class GLMatrixStack {
     far: number
   ): GLMatrixStack {
     this.matrixMode = EMatrixMode.PROJECTION;
-    let mat: mat4 = mat4.frustum(left, right, bottom, top, near, far);
+    let mat: Matrix4 = Matrix4.frustum(left, right, bottom, top, near, far);
     this.loadMatrix(mat);
     this.matrixMode = EMatrixMode.MODELVIEW;
     // 是否要调用loadIdentity方法???
@@ -173,7 +173,7 @@ export class GLMatrixStack {
     far: number
   ): GLMatrixStack {
     this.matrixMode = EMatrixMode.PROJECTION;
-    let mat: mat4 = mat4.orthographic(left, right, bottom, top, near, far);
+    let mat: Matrix4 = Matrix4.orthographic(left, right, bottom, top, near, far);
     this.loadMatrix(mat);
     this.matrixMode = EMatrixMode.MODELVIEW;
     // 是否要调用loadIdentity方法???
@@ -181,34 +181,34 @@ export class GLMatrixStack {
     return this;
   }
 
-  public lookAt(pos: vec3, target: vec3, up: vec3 = vec3.up): GLMatrixStack {
+  public lookAt(pos: Vector3, target: Vector3, up: Vector3 = Vector3.up): GLMatrixStack {
     this.matrixMode = EMatrixMode.MODELVIEW;
-    let mat: mat4 = mat4.lookAt(pos, target, up);
+    let mat: Matrix4 = Matrix4.lookAt(pos, target, up);
     this.loadMatrix(mat);
     return this;
   }
 
   public makeView(
-    pos: vec3,
-    xAxis: vec3,
-    yAxis: vec3,
-    zAxis: vec3
+    pos: Vector3,
+    xAxis: Vector3,
+    yAxis: Vector3,
+    zAxis: Vector3
   ): GLMatrixStack {
     zAxis.normalize();
 
     //forward cross right = up
-    vec3.cross(zAxis, xAxis, yAxis);
+    Vector3.cross(zAxis, xAxis, yAxis);
     yAxis.normalize();
 
     //up cross forward = right
-    vec3.cross(yAxis, zAxis, xAxis);
+    Vector3.cross(yAxis, zAxis, xAxis);
     xAxis.normalize();
 
-    let x: number = -vec3.dot(xAxis, pos);
-    let y: number = -vec3.dot(yAxis, pos);
-    let z: number = -vec3.dot(zAxis, pos);
+    let x: number = -Vector3.dot(xAxis, pos);
+    let y: number = -Vector3.dot(yAxis, pos);
+    let z: number = -Vector3.dot(zAxis, pos);
 
-    let mat: mat4 = this._mvStack[this._mvStack.length - 1];
+    let mat: Matrix4 = this._mvStack[this._mvStack.length - 1];
     mat.values[0] = xAxis.x;
     mat.values[1] = yAxis.x;
     mat.values[2] = zAxis.x;
@@ -232,7 +232,7 @@ export class GLMatrixStack {
     return this;
   }
 
-  public multMatrix(mat: mat4): GLMatrixStack {
+  public multMatrix(mat: Matrix4): GLMatrixStack {
     switch (this.matrixMode) {
       case EMatrixMode.MODELVIEW:
         this.modelViewMatrix.multiply(mat);
@@ -247,7 +247,7 @@ export class GLMatrixStack {
     return this;
   }
 
-  public translate(pos: vec3): GLMatrixStack {
+  public translate(pos: Vector3): GLMatrixStack {
     switch (this.matrixMode) {
       case EMatrixMode.MODELVIEW:
         this.modelViewMatrix.translate(pos);
@@ -264,7 +264,7 @@ export class GLMatrixStack {
 
   public rotate(
     angle: number,
-    axis: vec3,
+    axis: Vector3,
     isRadians: boolean = false
   ): GLMatrixStack {
     if (isRadians === false) {
@@ -284,7 +284,7 @@ export class GLMatrixStack {
     return this;
   }
 
-  public scale(s: vec3): GLMatrixStack {
+  public scale(s: Vector3): GLMatrixStack {
     switch (this.matrixMode) {
       case EMatrixMode.MODELVIEW:
         this.modelViewMatrix.scale(s);
@@ -301,15 +301,15 @@ export class GLMatrixStack {
 }
 
 export class GLWorldMatrixStack {
-  private _worldMatrixStack: mat4[];
+  private _worldMatrixStack: Matrix4[];
 
   public constructor() {
     //初始化时每个矩阵栈都先添加一个正交归一化后的矩阵
     this._worldMatrixStack = [];
-    this._worldMatrixStack.push(new mat4());
+    this._worldMatrixStack.push(new Matrix4());
   }
 
-  public get modelViewMatrix(): mat4 {
+  public get modelViewMatrix(): Matrix4 {
     if (this._worldMatrixStack.length <= 0) {
       throw new Error(" model matrix stack为空！");
     }
@@ -317,7 +317,7 @@ export class GLWorldMatrixStack {
   }
 
   public pushMatrix(): GLWorldMatrixStack {
-    let mv: mat4 = new mat4();
+    let mv: Matrix4 = new Matrix4();
     this.modelViewMatrix.copy(mv);
     this._worldMatrixStack.push(mv);
     return this;
@@ -333,24 +333,24 @@ export class GLWorldMatrixStack {
     return this;
   }
 
-  public loadMatrix(mat: mat4): GLWorldMatrixStack {
+  public loadMatrix(mat: Matrix4): GLWorldMatrixStack {
     mat.copy(this.modelViewMatrix);
     return this;
   }
 
-  public multMatrix(mat: mat4): GLWorldMatrixStack {
+  public multMatrix(mat: Matrix4): GLWorldMatrixStack {
     this.modelViewMatrix.multiply(mat);
     return this;
   }
 
-  public translate(pos: vec3): GLWorldMatrixStack {
+  public translate(pos: Vector3): GLWorldMatrixStack {
     this.modelViewMatrix.translate(pos);
     return this;
   }
 
   public rotate(
     angle: number,
-    axis: vec3,
+    axis: Vector3,
     isRadians: boolean = false
   ): GLWorldMatrixStack {
     if (isRadians === false) {
@@ -360,7 +360,7 @@ export class GLWorldMatrixStack {
     return this;
   }
 
-  public scale(s: vec3): GLWorldMatrixStack {
+  public scale(s: Vector3): GLWorldMatrixStack {
     this.modelViewMatrix.scale(s);
     return this;
   }

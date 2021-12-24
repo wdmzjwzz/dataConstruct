@@ -1,4 +1,4 @@
-import { EPSILON, vec2, vec3, vec4, mat4, quat } from "./TSM";
+import { EPSILON, Vector2, Vector3, Vector4, Matrix4, quat } from "./TSM";
 
 export enum EAxisType {
   NONE = -1,
@@ -42,13 +42,13 @@ export class MathHelper {
   }
 
   public static obj2GLViewportSpace(
-    localPt: vec3,
-    mvp: mat4,
+    localPt: Vector3,
+    mvp: Matrix4,
     viewport: Int32Array | Float32Array,
-    viewportPt: vec3
+    viewportPt: Vector3
   ): boolean {
-    let v: vec4 = new vec4([localPt.x, localPt.y, localPt.z, 1.0]);
-    mvp.multiplyVec4(v, v); // 将顶点从local坐标系变换到投影坐标系，或裁剪坐标系
+    let v: Vector4 = new Vector4([localPt.x, localPt.y, localPt.z, 1.0]);
+    mvp.multiplyVector4(v, v); // 将顶点从local坐标系变换到投影坐标系，或裁剪坐标系
     if (v.w === 0.0) {
       // 如果变换后的w为0，则返回false
       return false;
@@ -70,17 +70,17 @@ export class MathHelper {
 
   // 计算三角形的法向量
   public static computeNormal(
-    a: vec3,
-    b: vec3,
-    c: vec3,
-    result: vec3 | null
-  ): vec3 {
-    if (!result) result = new vec3();
-    let l0: vec3 = new vec3();
-    let l1: vec3 = new vec3();
-    vec3.difference(b, a, l0);
-    vec3.difference(c, a, l1);
-    vec3.cross(l0, l1, result);
+    a: Vector3,
+    b: Vector3,
+    c: Vector3,
+    result: Vector3 | null
+  ): Vector3 {
+    if (!result) result = new Vector3();
+    let l0: Vector3 = new Vector3();
+    let l1: Vector3 = new Vector3();
+    Vector3.difference(b, a, l0);
+    Vector3.difference(c, a, l1);
+    Vector3.cross(l0, l1, result);
     result.normalize();
     return result;
   }
@@ -88,15 +88,15 @@ export class MathHelper {
   // 下面四个函数是平面相关函数
   //ax+by+cz-d=0
   public static planeFromPoints(
-    a: vec3,
-    b: vec3,
-    c: vec3,
-    result: vec4 | null = null
-  ): vec4 {
-    if (!result) result = new vec4();
-    let normal: vec3 = new vec3();
+    a: Vector3,
+    b: Vector3,
+    c: Vector3,
+    result: Vector4 | null = null
+  ): Vector4 {
+    if (!result) result = new Vector4();
+    let normal: Vector3 = new Vector3();
     this.computeNormal(a, b, c, normal);
-    let d: number = -vec3.dot(normal, a);
+    let d: number = -Vector3.dot(normal, a);
     result.x = normal.x;
     result.y = normal.y;
     result.z = normal.z;
@@ -105,19 +105,19 @@ export class MathHelper {
   }
 
   public static planeFromPointNormal(
-    point: vec3,
-    normal: vec3,
-    result: vec4 | null = null
-  ): vec4 {
-    if (!result) result = new vec4();
+    point: Vector3,
+    normal: Vector3,
+    result: Vector4 | null = null
+  ): Vector4 {
+    if (!result) result = new Vector4();
     result.x = normal.x;
     result.y = normal.y;
     result.z = normal.z;
-    result.w = -vec3.dot(normal, point);
+    result.w = -Vector3.dot(normal, point);
     return result;
   }
 
-  public static planeFromPolygon(polygon: vec3[]): vec4 {
+  public static planeFromPolygon(polygon: Vector3[]): Vector4 {
     if (polygon.length < 3) {
       throw new Error("多变形的顶点数必须大于或等于3!!!");
     }
@@ -125,11 +125,11 @@ export class MathHelper {
     return MathHelper.planeFromPoints(polygon[0], polygon[1], polygon[2]);
   }
 
-  public static planeDistanceFromPoint(plane: vec4, point: vec3): number {
+  public static planeDistanceFromPoint(plane: Vector4, point: Vector3): number {
     return point.x * plane.x + point.y * plane.y + point.z * plane.z + plane.w;
   }
 
-  public static planeTestPoint(plane: vec4, point: vec3): EPlaneLoc {
+  public static planeTestPoint(plane: Vector4, point: Vector3): EPlaneLoc {
     let num: number = MathHelper.planeDistanceFromPoint(plane, point);
     if (num > EPSILON) {
       return EPlaneLoc.FRONT;
@@ -140,7 +140,7 @@ export class MathHelper {
     }
   }
 
-  public static planeNormalize(plane: vec4): number {
+  public static planeNormalize(plane: Vector4): number {
     let length: number, ilength: number;
 
     length = Math.sqrt(
@@ -160,7 +160,7 @@ export class MathHelper {
     return length;
   }
 
-  public static boundBoxAddPoint(v: vec3, mins: vec3, maxs: vec3): void {
+  public static boundBoxAddPoint(v: Vector3, mins: Vector3, maxs: Vector3): void {
     if (v.x < mins.x) {
       mins.x = v.x;
     }
@@ -184,8 +184,8 @@ export class MathHelper {
   }
 
   public static boundBoxClear(
-    mins: vec3,
-    maxs: vec3,
+    mins: Vector3,
+    maxs: Vector3,
     value: number = Infinity
   ): void {
     mins.x = mins.y = mins.z = value; // 初始化时，让mins表示浮点数的最大范围
@@ -194,20 +194,20 @@ export class MathHelper {
 
   // 获得AABB包围盒的中心点坐标
   public static boundBoxGetCenter(
-    mins: vec3,
-    maxs: vec3,
-    out: vec3 | null = null
-  ): vec3 {
+    mins: Vector3,
+    maxs: Vector3,
+    out: Vector3 | null = null
+  ): Vector3 {
     if (out === null) {
-      out = new vec3();
+      out = new Vector3();
     }
     // (maxs + mins) * 0.5
-    vec3.sum(mins, maxs, out);
+    Vector3.sum(mins, maxs, out);
     out.scale(0.5);
     return out;
   }
 
-  public static boundBoxGet8Points(mins: vec3, maxs: vec3, pts8: vec3[]): void {
+  public static boundBoxGet8Points(mins: Vector3, maxs: Vector3, pts8: Vector3[]): void {
     /*
         /3--------/7  |
         / |       /   |
@@ -218,18 +218,18 @@ export class MathHelper {
         |/        | /
         0---------4/
         */
-    let center: vec3 = MathHelper.boundBoxGetCenter(mins, maxs); // 获取中心点
-    let maxs2center: vec3 = vec3.difference(center, maxs); // 获取最大点到中心点之间的距离向量
+    let center: Vector3 = MathHelper.boundBoxGetCenter(mins, maxs); // 获取中心点
+    let maxs2center: Vector3 = Vector3.difference(center, maxs); // 获取最大点到中心点之间的距离向量
 
     pts8.push(
-      new vec3([
+      new Vector3([
         center.x + maxs2center.x,
         center.y + maxs2center.y,
         center.z + maxs2center.z,
       ])
     ); // 0
     pts8.push(
-      new vec3([
+      new Vector3([
         center.x + maxs2center.x,
         center.y - maxs2center.y,
         center.z + maxs2center.z,
@@ -237,14 +237,14 @@ export class MathHelper {
     ); // 1
 
     pts8.push(
-      new vec3([
+      new Vector3([
         center.x + maxs2center.x,
         center.y + maxs2center.y,
         center.z - maxs2center.z,
       ])
     ); // 2
     pts8.push(
-      new vec3([
+      new Vector3([
         center.x + maxs2center.x,
         center.y - maxs2center.y,
         center.z - maxs2center.z,
@@ -252,14 +252,14 @@ export class MathHelper {
     ); // 3
 
     pts8.push(
-      new vec3([
+      new Vector3([
         center.x - maxs2center.x,
         center.y + maxs2center.y,
         center.z + maxs2center.z,
       ])
     ); // 4
     pts8.push(
-      new vec3([
+      new Vector3([
         center.x - maxs2center.x,
         center.y - maxs2center.y,
         center.z + maxs2center.z,
@@ -267,14 +267,14 @@ export class MathHelper {
     ); // 5
 
     pts8.push(
-      new vec3([
+      new Vector3([
         center.x - maxs2center.x,
         center.y + maxs2center.y,
         center.z - maxs2center.z,
       ])
     ); // 6
     pts8.push(
-      new vec3([
+      new Vector3([
         center.x - maxs2center.x,
         center.y - maxs2center.y,
         center.z - maxs2center.z,
@@ -282,23 +282,23 @@ export class MathHelper {
     ); // 7
   }
 
-  public static boundBoxTransform(mat: mat4, mins: vec3, maxs: vec3): void {
-    let pts: vec3[] = []; // 分配数组内存，类型为vec3
+  public static boundBoxTransform(mat: Matrix4, mins: Vector3, maxs: Vector3): void {
+    let pts: Vector3[] = []; // 分配数组内存，类型为Vector3
     MathHelper.boundBoxGet8Points(mins, maxs, pts); // 获得局部坐标系表示的AABB的8个顶点坐标
-    let out: vec3 = new vec3(); // 变换后的顶点
+    let out: Vector3 = new Vector3(); // 变换后的顶点
     // 遍历局部坐标系的8个AABB包围盒的顶点坐标
     for (let i: number = 0; i < pts.length; i++) {
       // 将局部坐标表示的顶点变换到mat坐标空间中去，变换后的结果放在out变量中
-      mat.multiplyVec3(pts[i], out);
+      mat.multiplyVector3(pts[i], out);
       // 重新构造新的，与世界坐标系轴对称的AABB包围盒
       this.boundBoxAddPoint(out, mins, maxs);
     }
   }
 
   public static boundBoxContainsPoint(
-    point: vec3,
-    mins: vec3,
-    maxs: vec3
+    point: Vector3,
+    mins: Vector3,
+    maxs: Vector3
   ): boolean {
     return (
       point.x >= mins.x &&
@@ -311,10 +311,10 @@ export class MathHelper {
   }
 
   public static boundBoxBoundBoxOverlap(
-    min1: vec3,
-    max1: vec3,
-    min2: vec3,
-    max2: vec3
+    min1: Vector3,
+    max1: Vector3,
+    min2: Vector3,
+    max2: Vector3
   ): boolean {
     if (min1.x > max2.x) return false;
     if (max1.x < min2.x) return false;
@@ -328,8 +328,8 @@ export class MathHelper {
     return true;
   }
 
-  public static convertVec3IDCoord2GLCoord(
-    v: vec3,
+  public static convertVector3IDCoord2GLCoord(
+    v: Vector3,
     scale: number = 10.0
   ): void {
     let f: number = v.y; // opengl right = dooom3 x
@@ -345,15 +345,15 @@ export class MathHelper {
     }
   }
 
-  public static convertVec2IDCoord2GLCoord(v: vec2): void {
+  public static convertVector2IDCoord2GLCoord(v: Vector2): void {
     v.y = 1.0 - v.y;
   }
 
-  public static matrixFrom(pos: vec3, q: quat, dest: mat4 | null = null): mat4 {
+  public static matrixFrom(pos: Vector3, q: quat, dest: Matrix4 | null = null): Matrix4 {
     if (dest === null) {
-      dest = new mat4();
+      dest = new Matrix4();
     }
-    q.toMat4(dest);
+    q.toMatrix4(dest);
     dest.values[12] = pos.x;
     dest.values[13] = pos.y;
     dest.values[14] = pos.z;
