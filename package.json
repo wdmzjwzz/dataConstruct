@@ -4,6 +4,7 @@
   "description": "ts-webgl",
   "main": "main.js",
   "scripts": {
+    "build":"webpack  --config build/webpack.config.production.js",
     "dev": "webpack serve --config build/webpack.config.dev.js"
   },
   "repository": {
