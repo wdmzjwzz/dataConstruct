@@ -1,14 +1,10 @@
 import { GLAttribStateManager } from "./WebGLAttribState";
 import { Vector2, Vector3, Vector4, Matrix4, quat } from "../common/math/TSM";
-import { GLShaderSource, GLShaderType } from "./WebGLShaderSource";
-import {
-  GLHelper,
-  EShaderType,
-  GLUniformInfoMap,
-  GLAttribInfoMap,
-} from "./WebGLHepler";
+ 
+import { GLHelper } from "./WebGLHepler";
 import { GLAttribBits } from "../type";
 import { attribNames, GLAttribMap } from "../constants";
+import { GLShaderSource, GLShaderType } from "./glsl";
 /*
 比较特别的是Texture Unit
 glActiveTexture 激活某个TextureUnit
@@ -49,18 +45,6 @@ export class GLProgram {
   public vsShader: WebGLShader; // vertex shader编译器
   public fsShader: WebGLShader; // fragment shader编译器
 
-  // 主要用于信息输出
-  public attribInfoMap: GLAttribInfoMap = {};
-  public uniformInfoMap: GLUniformInfoMap = {};
-
-  // 当调用gl.useProgram(this.program)后触发bindCallback回调
-  public bindCallback: ((program: GLProgram) => void) | null = null;
-  // 当调用gl.useProgram(null)前触发unbindCallback回调函数
-  public unbindCallback: ((program: GLProgram) => void) | null = null;
-
-  private _vsShaderDefineStrings: string[] = [];
-  private _fsShaderDefineStrings: string[] = [];
-
   public get attribState(): GLAttribBits {
     return this._attribState;
   }
@@ -80,21 +64,6 @@ export class GLProgram {
     });
   }
 
-  // 链接后的回调函数实际上在本类中是多余的
-  // 因为我们已经固定了attribue的索引号以及getUniformLocation方法获取某个uniform变量
-  // 这里只是为了输出当前Program相关的uniform和attribute变量的信息
-  private progromAfterLink(
-    gl: WebGLRenderingContext,
-    program: WebGLProgram
-  ): void {
-    //获取当前active状态的attribute和uniform的数量
-    //很重要一点，active_attributes/uniforms必须在link后才能获得
-    GLHelper.getProgramActiveAttribs(gl, program, this.attribInfoMap);
-    GLHelper.getProgramAtciveUniforms(gl, program, this.uniformInfoMap);
-    console.log(JSON.stringify(this.attribInfoMap));
-    console.log(JSON.stringify(this.uniformInfoMap));
-  }
-
   public constructor(
     context: WebGLRenderingContext,
     attribState: GLAttribBits,
@@ -105,80 +74,38 @@ export class GLProgram {
     this.gl = context;
     this._attribState = attribState; //最好从shader中抽取
 
-    this.vsShader = GLHelper.createShader(this.gl, EShaderType.VS_SHADER);
+    this.vsShader = this.gl.createShader(this.gl.VERTEX_SHADER);
 
-    this.fsShader = GLHelper.createShader(this.gl, EShaderType.FS_SHADER);
+    this.fsShader = this.gl.createShader(this.gl.FRAGMENT_SHADER);
 
-    this.program = GLHelper.createProgram(this.gl);
+    this.program = this.gl.createProgram();
 
     this.loadShaders(vsShader, fsShader);
 
     this.name = name;
   }
-
-  // 在Vertex Shader中动态添加宏
-  public addVSShaderMacro(str: string): void {
-    if (str.indexOf("#define ") === -1) {
-      str = "#define " + str;
-    }
-    this._vsShaderDefineStrings.push(str);
-  }
-
-  // 在Fragment Shader中动态添加宏
-  public addFSShaderMacro(str: string): void {
-    if (str.indexOf("#define ") === -1) {
-      str = "#define " + str;
-    }
-    this._fsShaderDefineStrings.push(str);
-  }
-
-  // vs fs都要添加的宏，例如在VS / FS中添加如下宏：
-  // #ifdef GL_ES
-  //   precision highp float;
-  // #endif
-  public addShaderMacro(str: string): void {
-    this.addVSShaderMacro(str);
-    this.addFSShaderMacro(str);
-  }
-
   public loadShaders(vs: string, fs: string): void {
-    if (this._vsShaderDefineStrings.length > 0) {
-      let join: string = this._vsShaderDefineStrings.join("\n");
-      vs = join + vs;
-    }
-
-    if (this._fsShaderDefineStrings.length > 0) {
-      let join: string = this._fsShaderDefineStrings.join("\n");
-      fs = join + fs;
-    }
-    const compileVS = GLHelper.compileShader(this.gl, vs, this.vsShader);
-    const compileFS = GLHelper.compileShader(this.gl, fs, this.fsShader);
-    const linkProgram = GLHelper.linkProgram(
+    GLHelper.compileShader(this.gl, vs, this.vsShader);
+    GLHelper.compileShader(this.gl, fs, this.fsShader);
+    GLHelper.linkProgram(
       this.gl,
       this.program,
       this.vsShader,
       this.fsShader,
-      this.progromBeforeLink.bind(this),
-      this.progromAfterLink.bind(this)
+      this.progromBeforeLink.bind(this)
     );
-    if (!compileVS || !compileFS || !linkProgram) {
-      throw new Error(" loadShaders失败! ");
-    }
 
-    console.log(JSON.stringify(this.attribInfoMap));
+    //获取当前active状态的attribute和uniform的数量
+    //很重要一点，active_attributes/uniforms必须在link后才能获得
+    GLHelper.logProgramActiveAttribs(this.gl, this.program);
+    GLHelper.logProgramAtciveUniforms(this.gl, this.program);
   }
 
   public bind(): void {
     this.gl.useProgram(this.program);
-    if (this.bindCallback !== null) {
-      this.bindCallback(this);
-    }
   }
 
   public unbind(): void {
-    if (this.unbindCallback !== null) {
-      this.unbindCallback(this);
-    }
     this.gl.useProgram(null);
   }
 
@@ -283,7 +210,6 @@ export class GLProgram {
     return this.setSampler(GLProgram.Sampler, unit);
   }
 
-  
   public static createProgram(
     type: GLShaderType,
     gl: WebGLRenderingContext,

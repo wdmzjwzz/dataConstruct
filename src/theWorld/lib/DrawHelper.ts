@@ -50,7 +50,6 @@ export class DrawHelper {
     mat: Matrix4,
     len: number = 5
   ): void {
-    builder.gl.lineWidth(5);
     builder.begin(builder.gl.LINES);
 
     builder.color(1.0, 0.0, 0.0).vertex(0.0, 0.0, 0.0);
@@ -63,7 +62,6 @@ export class DrawHelper {
     builder.color(0.0, 0.0, 1.0).vertex(0.0, 0.0, len);
 
     builder.end(mat);
-    builder.gl.lineWidth(1);
   }
 
   /*
@@ -76,7 +74,6 @@ export class DrawHelper {
         |/        | /
         0---------4/
     */
-
 
   public static drawSolidCubeBox(
     builder: GLMeshBuilder,
@@ -117,7 +114,6 @@ export class DrawHelper {
     faces.forEach((face) => {
       DrawHelper.drawFace(builder, mat, face, color);
     });
-   
   }
   /*
        /3--------/7  |
@@ -227,7 +223,7 @@ export class DrawHelper {
     builder.texcoord(tc[46], tc[47]).vertex(halfLen, -halfLen, halfLen); // 4  + - +
     builder.end(mat);
   }
-
+ 
   public static drawFace(
     builder: GLMeshBuilder,
     mat: Matrix4,

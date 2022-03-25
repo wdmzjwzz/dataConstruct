@@ -1,14 +1,9 @@
 import { GLProgram } from "..";
 import { GLAttribName } from "../type";
+import { GLShaderType } from "./glsl";
 import { GLAttribStateManager } from "./WebGLAttribState";
 import { GLMeshBuilder } from "./WebGLMesh";
-import { GLShaderType } from "./WebGLShaderSource";
-
-// 枚举类
-export enum EShaderType {
-  VS_SHADER,
-  FS_SHADER,
-}
+ 
 
 export enum EGLSLESDataType {
   FLOAT_Vector2 = 0x8b50,
@@ -31,31 +26,22 @@ export enum EGLSLESDataType {
   INT = 0x1404,
 }
 
-export class GLUniformInfo {
-  public size: number; // size 是指type的个数，切记
-  public type: EGLSLESDataType; // type 是Uniform Type，而不是DataType
-  public location: WebGLUniformLocation;
-
-  public constructor(size: number, type: number, loc: WebGLUniformLocation) {
-    this.size = size;
-    this.type = type;
-    this.location = loc;
-  }
-}
-
 export class GLAttribInfo {
   public size: number; // size 是指type的个数，切记
   public type: EGLSLESDataType; // type 是Uniform Type，而不是DataType
-  public location: number;
+  public location: WebGLUniformLocation | number;
 
-  public constructor(size: number, type: number, loc: number) {
+  public constructor(
+    size: number,
+    type: number,
+    loc: WebGLUniformLocation | number
+  ) {
     this.size = size;
     this.type = type;
     this.location = loc;
   }
 }
 
-export type GLUniformInfoMap = { [key: string]: GLUniformInfo };
 export type GLAttribInfoMap = { [key: string]: GLAttribInfo };
 
 export class GLHelper {
@@ -134,23 +120,6 @@ export class GLHelper {
     gl.viewport(v[0], v[1], v[2], v[3]);
   }
 
-  public static createShader(
-    gl: WebGLRenderingContext,
-    type: EShaderType
-  ): WebGLShader {
-    let shader: WebGLShader | null = null;
-    if (type === EShaderType.VS_SHADER) {
-      shader = gl.createShader(gl.VERTEX_SHADER);
-    } else {
-      shader = gl.createShader(gl.FRAGMENT_SHADER);
-    }
-    if (shader === null) {
-      // 如果创建WebGLShader对象失败，我们采取抛错错误的处理方式
-      throw new Error("WebGLShader创建失败！");
-    }
-    return shader;
-  }
-
   public static compileShader(
     gl: WebGLRenderingContext,
     code: string,
@@ -171,27 +140,16 @@ export class GLHelper {
     return true;
   }
 
-  public static createProgram(gl: WebGLRenderingContext): WebGLProgram {
-    let program: WebGLProgram | null = gl.createProgram();
-    if (program === null) {
-      // 直接抛出错误
-      throw new Error("WebGLProgram创建失败！");
-    }
-    return program;
-  }
-
   public static linkProgram(
     gl: WebGLRenderingContext, // 渲染上下文对象
     program: WebGLProgram, // 链接器对象
     vsShader: WebGLShader, // 要链接的顶点着色器
     fsShader: WebGLShader, // 要链接的片段着色器
-    beforeProgramLink:
-      | ((gl: WebGLRenderingContext, program: WebGLProgram) => void)
-      | null = null,
-    afterProgramLink:
-      | ((gl: WebGLRenderingContext, program: WebGLProgram) => void)
-      | null = null
-  ): boolean {
+    beforeProgramLink?: (
+      gl: WebGLRenderingContext,
+      program: WebGLProgram
+    ) => void
+  ) {
     // 1、使用attachShader方法将顶点和片段着色器与当前的连接器相关联
     gl.attachShader(program, vsShader);
     gl.attachShader(program, fsShader);
@@ -203,53 +161,29 @@ export class GLHelper {
 
     // 3、调用linkProgram进行链接操作
     gl.linkProgram(program);
-    // 4、使用带gl.LINK_STATUS参数的getProgramParameter方法，进行链接状态检查
-    if (gl.getProgramParameter(program, gl.LINK_STATUS) === false) {
-      // 4.1 如果链接出错，调用getProgramInfoLog方法将错误信息以弹框方式通知调用者
-      alert(gl.getProgramInfoLog(program));
-      // 4.2 删除掉相关资源，防止内存泄漏
-      gl.deleteShader(vsShader);
-      gl.deleteShader(fsShader);
-      gl.deleteProgram(program);
-      // 4.3 返回链接失败状态
-      return false;
-    }
 
     // 5、使用validateProgram进行链接验证
     gl.validateProgram(program);
     // 6、使用带gl.VALIDATE_STATUS参数的getProgramParameter方法，进行验证状态检查
-    if (gl.getProgramParameter(program, gl.VALIDATE_STATUS) === false) {
-      // 6.1 如果验证出错，调用getProgramInfoLog方法将错误信息以弹框方式通知调用者
-      alert(gl.getProgramInfoLog(program));
-      // 6.2 删除掉相关资源，防止内存泄漏
-      gl.deleteShader(vsShader);
-      gl.deleteShader(fsShader);
-      gl.deleteProgram(program);
-      // 6.3 返回链接失败状态
-      return false;
+    if (
+      !gl.getProgramParameter(program, gl.VALIDATE_STATUS) ||
+      !gl.getProgramParameter(program, gl.LINK_STATUS)
+    ) {
+      throw new Error("linkProgram failed");
     }
-
-    // 7、全部正确，按需调用afterProgramLink回调函数
-    if (afterProgramLink !== null) {
-      afterProgramLink(gl, program);
-    }
-
-    // 8、返回链接正确表示
-    return true;
   }
 
-  public static getProgramActiveAttribs(
+  public static logProgramActiveAttribs(
     gl: WebGLRenderingContext,
-    program: WebGLProgram,
-    out: GLAttribInfoMap
-  ): void {
+    program: WebGLProgram
+  ) {
     //获取当前active状态的attribute和uniform的数量
     //很重要一点，active_attributes/uniforms必须在link后才能获得
     let attributsCount: number = gl.getProgramParameter(
       program,
       gl.ACTIVE_ATTRIBUTES
     );
-
+    const out: GLAttribInfoMap = {};
     //很重要一点，所谓active是指uniform已经被使用的，否则不属于uniform,uniform在shader中必须是读取，不能赋值
     //很重要一点，attribute在shader中只能读取，不能赋值,如果没有被使用的话，也是不算入activeAttrib中去的
     for (let i = 0; i < attributsCount; i++) {
@@ -262,17 +196,18 @@ export class GLHelper {
         );
       }
     }
+    console.log(JSON.stringify(out));
   }
 
-  public static getProgramAtciveUniforms(
+  public static logProgramAtciveUniforms(
     gl: WebGLRenderingContext,
-    program: WebGLProgram,
-    out: GLUniformInfoMap
-  ): void {
+    program: WebGLProgram
+  ) {
     let uniformsCount: number = gl.getProgramParameter(
       program,
       gl.ACTIVE_UNIFORMS
     );
+    const out: GLAttribInfoMap = {};
     for (let i = 0; i < uniformsCount; i++) {
       let info: WebGLActiveInfo | null = gl.getActiveUniform(program, i);
       if (info) {
@@ -281,18 +216,11 @@ export class GLHelper {
           info.name
         );
         if (loc !== null) {
-          out[info.name] = new GLUniformInfo(info.size, info.type, loc);
+          out[info.name] = new GLAttribInfo(info.size, info.type, loc);
         }
       }
     }
-  }
-
-  public static createBuffer(gl: WebGLRenderingContext): WebGLBuffer {
-    let buffer: WebGLBuffer | null = gl.createBuffer();
-    if (buffer === null) {
-      throw new Error("WebGLBuffer创建失败！");
-    }
-    return buffer;
+    console.log(JSON.stringify(out));
   }
 
   public static getColorBufferData(gl: WebGLRenderingContext): Uint8Array {

@@ -1,8 +1,9 @@
-import { Application } from "../common/Application";
+import { Application } from "../lib/Application";
 import { GLWorldMatrixStack } from "./WebGLMatrixStack";
 import { GLMeshBuilder } from "./WebGLMesh";
 import { GLHelper } from "./WebGLHepler";
-import { GLShaderType } from "./WebGLShaderSource";
+import { GLShaderType } from "./glsl";
+ 
 
 export class WebGLApplication extends Application {
   // 可以直接操作WebGL相关内容
@@ -23,41 +24,10 @@ export class WebGLApplication extends Application {
   public constructor(
     canvas: HTMLCanvasElement,
     contextAttributes: WebGLContextAttributes = { premultipliedAlpha: false },
-    need2D: boolean = false
   ) {
     super(canvas);
     this.gl = this.canvas.getContext("webgl", contextAttributes);
 
-    if (need2D === true) {
-      let canvasElem: HTMLCanvasElement = document.createElement(
-        "canvas"
-      ) as HTMLCanvasElement;
-      canvasElem.width = this.canvas.width;
-      canvasElem.height = this.canvas.height;
-      canvasElem.style.backgroundColor = "transparent";
-      canvasElem.style.position = "absolute";
-      canvasElem.style.left = "0px";
-      canvasElem.style.top = "0px";
-
-      let parent: HTMLElement | null = this.canvas.parentElement;
-      if (parent === null) {
-        throw new Error("canvas元素必须要有父亲!!");
-      }
-
-      parent.appendChild(canvasElem);
-
-      this.ctx2D = canvasElem.getContext("2d");
-
-      canvasElem.addEventListener("mousedown", this, false);
-      canvasElem.addEventListener("mouseup", this, false);
-      canvasElem.addEventListener("mousemove", this, false);
-
-      this.canvas.removeEventListener("mousedown", this);
-      this.canvas.removeEventListener("mouseup", this);
-      this.canvas.removeEventListener("mousemove", this);
-
-      this.canvas2D = canvasElem;
-    }
 
     this.matStack = new GLWorldMatrixStack();
     // 初始化渲染状态

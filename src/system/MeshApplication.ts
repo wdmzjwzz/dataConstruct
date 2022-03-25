@@ -1,24 +1,26 @@
 import { CameraApplication } from "../theWorld/lib/CameraApplication";
 import { GLMeshBuilder } from "../theWorld/webgl/WebGLMesh";
 import { Matrix4, Vector3, Vector4 } from "../theWorld/common/math/TSM";
-import { CanvasKeyBoardEvent, CanvasMouseEvent } from "../theWorld/common/Application";
+import {
+  CanvasKeyBoardEvent,
+  CanvasMouseEvent,
+} from "../theWorld/lib/Application";
 import { DrawHelper } from "../theWorld";
 import { Point } from "../theWorld/Geometry/Point";
 import { GLHelper } from "../theWorld/webgl/WebGLHepler";
-import { GLShaderType } from "../theWorld/webgl/WebGLShaderSource";
+import { GLShaderType } from "../theWorld/webgl/glsl";
 export class MeshApplication extends CameraApplication {
   public textureBuilder: GLMeshBuilder;
 
   public constructor(canvas: HTMLCanvasElement) {
-    super(canvas, { premultipliedAlpha: false }, true);
+    super(canvas, { premultipliedAlpha: false });
     this.camera.setViewport(0, 0, this.canvas.width, this.canvas.height);
     this.textureBuilder = GLHelper.createBuilder(this.gl, GLShaderType.TEXTURE);
-    this.isSupportMouseMove = true
+    this.isSupportMouseMove = true;
   }
   public onMouseMove(evt: CanvasMouseEvent): void {
-
     if (this._isMouseDown) {
-      console.log(evt, 1111, this._isMouseDown)
+      console.log(evt, 1111, this._isMouseDown);
     }
     return;
   }
@@ -27,7 +29,6 @@ export class MeshApplication extends CameraApplication {
     this.angle += 1;
     // 调用基类方法，这样就能让摄像机进行更新
     super.update(elapsedMsec, intervalSec);
-
   }
   public drawCoordSystem(): void {
     this.matStack.pushMatrix(); // 矩阵堆栈进栈
@@ -59,6 +60,7 @@ export class MeshApplication extends CameraApplication {
     );
 
     DrawHelper.drawSolidCubeBox(this.builder, Matrix4.m0);
+ 
     this.matStack.popMatrix();
   }
 

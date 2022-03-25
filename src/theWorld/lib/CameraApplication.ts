@@ -1,5 +1,5 @@
 import { WebGLApplication } from "../webgl/WebGLApplication";
-import { CanvasKeyBoardEvent } from "../common/Application";
+import { CanvasKeyBoardEvent } from "./Application";
 import { Camera } from "./Camera";
 
 export class CameraApplication extends WebGLApplication {
@@ -7,10 +7,9 @@ export class CameraApplication extends WebGLApplication {
   public angle: number = 0; // 用来更新旋转角度
   public constructor(
     canvas: HTMLCanvasElement,
-    contextAttributes: WebGLContextAttributes = { premultipliedAlpha: false },
-    need2d: boolean = false
+    contextAttributes: WebGLContextAttributes = { premultipliedAlpha: false }
   ) {
-    super(canvas, contextAttributes, need2d);
+    super(canvas, contextAttributes);
     this.camera = new Camera(this.gl, canvas.width, canvas.height, 75, 0.1, 1000);
     this.camera.z = 10;
   }

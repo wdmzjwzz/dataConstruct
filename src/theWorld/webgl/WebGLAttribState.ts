@@ -1,4 +1,10 @@
-import { ATTRIBBYTELENGTH, attribNames, ATTRIBSTRIDE, FLOAT32_SIZE, GLAttribMap } from "../constants";
+import {
+  ATTRIBBYTELENGTH,
+  attribNames,
+  ATTRIBSTRIDE,
+  FLOAT32_SIZE,
+  GLAttribMap,
+} from "../constants";
 import { GLAttribBits, GLAttribName, GLAttribOffsetMap } from "../type";
 
 class GLAttribState {
@@ -47,20 +53,26 @@ class GLAttribState {
       );
     }
   }
-  public setAttribVertexArrayState(
+  public enableVertexAttribArray(
     gl: WebGLRenderingContext,
-    attribBits: number,
-    enable: boolean = true
+    attribBits: number
   ): void {
     attribNames.forEach((name) => {
-      if (this.hasAttrib(name, attribBits) && enable) {
+      if (this.hasAttrib(name, attribBits)) {
         gl.enableVertexAttribArray(GLAttribMap[name].location);
-      } else {
+      }
+    });
+  }
+  public disableVertexAttribArray(
+    gl: WebGLRenderingContext,
+    attribBits: number
+  ): void {
+    attribNames.forEach((name) => {
+      if (this.hasAttrib(name, attribBits)) {
         gl.disableVertexAttribArray(GLAttribMap[name].location);
       }
     });
   }
-
   public getVertexByteStride(attribBits: GLAttribBits): number {
     let byteOffset: number = 0;
     attribNames.forEach((name) => {

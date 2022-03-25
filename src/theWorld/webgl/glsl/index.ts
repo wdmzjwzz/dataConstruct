@@ -1,7 +1,7 @@
-import colorShader_vs from "./glsl/colorShader_vs.vert";
-import colorShader_fs from "./glsl/colorShader_fs.frag";
-import textureShader_fs from "./glsl/textureShader_fs.frag";
-import textureShader_vs from "./glsl/textureShader_vs.vert";
+import colorShader_vs from "./colorShader_vs.vert";
+import colorShader_fs from "./colorShader_fs.frag";
+import textureShader_fs from "./textureShader_fs.frag";
+import textureShader_vs from "./textureShader_vs.vert";
 export enum GLShaderType {
   COLOR = "colorShader",
   TEXTURE = "textureShader",

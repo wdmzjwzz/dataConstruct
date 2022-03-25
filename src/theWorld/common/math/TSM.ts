@@ -729,7 +729,10 @@ export class Matrix4 {
     return this;
   }
 
-  public multiplyVector3(vector: Vector3, dest: Vector3 | null = null): Vector3 {
+  public multiplyVector3(
+    vector: Vector3,
+    dest: Vector3 | null = null
+  ): Vector3 {
     if (!dest) dest = new Vector3();
     let x = vector.x,
       y = vector.y,
@@ -754,7 +757,10 @@ export class Matrix4 {
     return dest;
   }
 
-  public multiplyVector4(vector: Vector4, dest: Vector4 | null = null): Vector4 {
+  public multiplyVector4(
+    vector: Vector4,
+    dest: Vector4 | null = null
+  ): Vector4 {
     if (!dest) dest = new Vector4();
 
     let x = vector.x,
@@ -972,7 +978,11 @@ export class Matrix4 {
     ]);
   }
 
-  public static lookAt(position: Vector3, target: Vector3, up: Vector3 = Vector3.up): Matrix4 {
+  public static lookAt(
+    position: Vector3,
+    target: Vector3,
+    up: Vector3 = Vector3.up
+  ): Matrix4 {
     if (position.equals(target)) {
       return this.identity;
     }
@@ -1004,7 +1014,11 @@ export class Matrix4 {
     ]);
   }
 
-  public static product(m1: Matrix4, m2: Matrix4, result: Matrix4 | null = null): Matrix4 {
+  public static product(
+    m1: Matrix4,
+    m2: Matrix4,
+    result: Matrix4 | null = null
+  ): Matrix4 {
     let a00 = m1.at(0),
       a01 = m1.at(1),
       a02 = m1.at(2),
@@ -1038,53 +1052,32 @@ export class Matrix4 {
       b31 = m2.at(13),
       b32 = m2.at(14),
       b33 = m2.at(15);
+    const arr = [
+      b00 * a00 + b01 * a10 + b02 * a20 + b03 * a30,
+      b00 * a01 + b01 * a11 + b02 * a21 + b03 * a31,
+      b00 * a02 + b01 * a12 + b02 * a22 + b03 * a32,
+      b00 * a03 + b01 * a13 + b02 * a23 + b03 * a33,
 
+      b10 * a00 + b11 * a10 + b12 * a20 + b13 * a30,
+      b10 * a01 + b11 * a11 + b12 * a21 + b13 * a31,
+      b10 * a02 + b11 * a12 + b12 * a22 + b13 * a32,
+      b10 * a03 + b11 * a13 + b12 * a23 + b13 * a33,
+
+      b20 * a00 + b21 * a10 + b22 * a20 + b23 * a30,
+      b20 * a01 + b21 * a11 + b22 * a21 + b23 * a31,
+      b20 * a02 + b21 * a12 + b22 * a22 + b23 * a32,
+      b20 * a03 + b21 * a13 + b22 * a23 + b23 * a33,
+
+      b30 * a00 + b31 * a10 + b32 * a20 + b33 * a30,
+      b30 * a01 + b31 * a11 + b32 * a21 + b33 * a31,
+      b30 * a02 + b31 * a12 + b32 * a22 + b33 * a32,
+      b30 * a03 + b31 * a13 + b32 * a23 + b33 * a33,
+    ];
     if (result) {
-      result.set([
-        b00 * a00 + b01 * a10 + b02 * a20 + b03 * a30,
-        b00 * a01 + b01 * a11 + b02 * a21 + b03 * a31,
-        b00 * a02 + b01 * a12 + b02 * a22 + b03 * a32,
-        b00 * a03 + b01 * a13 + b02 * a23 + b03 * a33,
-
-        b10 * a00 + b11 * a10 + b12 * a20 + b13 * a30,
-        b10 * a01 + b11 * a11 + b12 * a21 + b13 * a31,
-        b10 * a02 + b11 * a12 + b12 * a22 + b13 * a32,
-        b10 * a03 + b11 * a13 + b12 * a23 + b13 * a33,
-
-        b20 * a00 + b21 * a10 + b22 * a20 + b23 * a30,
-        b20 * a01 + b21 * a11 + b22 * a21 + b23 * a31,
-        b20 * a02 + b21 * a12 + b22 * a22 + b23 * a32,
-        b20 * a03 + b21 * a13 + b22 * a23 + b23 * a33,
-
-        b30 * a00 + b31 * a10 + b32 * a20 + b33 * a30,
-        b30 * a01 + b31 * a11 + b32 * a21 + b33 * a31,
-        b30 * a02 + b31 * a12 + b32 * a22 + b33 * a32,
-        b30 * a03 + b31 * a13 + b32 * a23 + b33 * a33,
-      ]);
-
+      result.set(arr);
       return result;
     } else {
-      return new Matrix4([
-        b00 * a00 + b01 * a10 + b02 * a20 + b03 * a30,
-        b00 * a01 + b01 * a11 + b02 * a21 + b03 * a31,
-        b00 * a02 + b01 * a12 + b02 * a22 + b03 * a32,
-        b00 * a03 + b01 * a13 + b02 * a23 + b03 * a33,
-
-        b10 * a00 + b11 * a10 + b12 * a20 + b13 * a30,
-        b10 * a01 + b11 * a11 + b12 * a21 + b13 * a31,
-        b10 * a02 + b11 * a12 + b12 * a22 + b13 * a32,
-        b10 * a03 + b11 * a13 + b12 * a23 + b13 * a33,
-
-        b20 * a00 + b21 * a10 + b22 * a20 + b23 * a30,
-        b20 * a01 + b21 * a11 + b22 * a21 + b23 * a31,
-        b20 * a02 + b21 * a12 + b22 * a22 + b23 * a32,
-        b20 * a03 + b21 * a13 + b22 * a23 + b23 * a33,
-
-        b30 * a00 + b31 * a10 + b32 * a20 + b33 * a30,
-        b30 * a01 + b31 * a11 + b32 * a21 + b33 * a31,
-        b30 * a02 + b31 * a12 + b32 * a22 + b33 * a32,
-        b30 * a03 + b31 * a13 + b32 * a23 + b33 * a33,
-      ]);
+      return new Matrix4(arr);
     }
   }
 
@@ -1297,7 +1290,10 @@ export class quat {
     return this;
   }
 
-  public multiplyVector3(vector: Vector3, dest: Vector3 | null = null): Vector3 {
+  public multiplyVector3(
+    vector: Vector3,
+    dest: Vector3 | null = null
+  ): Vector3 {
     if (!dest) dest = new Vector3();
 
     let x = vector.x,
@@ -1505,7 +1501,11 @@ export class quat {
     return dest;
   }
 
-  static fromAxis(axis: Vector3, angle: number, dest: quat | null = null): quat {
+  static fromAxis(
+    axis: Vector3,
+    angle: number,
+    dest: quat | null = null
+  ): quat {
     if (!dest) dest = new quat();
 
     angle *= 0.5;

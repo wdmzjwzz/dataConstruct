@@ -10,12 +10,10 @@ export const GLAttribMap: { [key: string]: GLAttribInfo } = {
   [GLAttribName.TEXCOORD]: { bit: 1 << 1, component: 2, location: 1 },
   [GLAttribName.NORMAL]: { bit: 1 << 2, component: 3, location: 2 },
   [GLAttribName.COLOR]: { bit: 1 << 3, component: 4, location: 3 },
-  [GLAttribName.SIZE]: { bit: 1 << 4, component: 1, location: 4 },
 };
 export const attribNames = [
   GLAttribName.POSITION,
   GLAttribName.TEXCOORD,
   GLAttribName.NORMAL,
   GLAttribName.COLOR,
-  GLAttribName.SIZE,
 ];

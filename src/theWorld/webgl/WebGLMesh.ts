@@ -3,8 +3,14 @@ import { Matrix4 } from "../common/math/TSM";
 import { TypedArrayList } from "../common/container/TypedArrayList";
 import { GLProgram } from "./WebGLProgram";
 import { GLTexture } from "./WebGLTexture";
-import { GLAttribBits, GLAttribName, GLAttribOffsetMap } from "../type";
+import {
+  GLAttribBits,
+  GLAttribName,
+  GLAttribOffsetMap,
+  SegmentInfo,
+} from "../type";
 import { attribNames, defaultCollor } from "../constants";
+import { Point } from "../Geometry/Point";
 
 // 使用abstract声明抽象类
 export abstract class GLMeshBase {
@@ -30,21 +36,12 @@ export abstract class GLMeshBase {
 
     // 获取VAO的步骤：
     // 1、使用gl.getExtension( "OES_vertex_array_object" )方式获取VAO扩展
-    let vao: OES_vertex_array_object | null = this.gl.getExtension(
-      "OES_vertex_array_object"
-    );
-    if (vao === null) {
-      throw new Error("Not Support OES_vertex_array_object");
-    }
-    this._vao = vao;
+
+    this._vao = this.gl.getExtension("OES_vertex_array_object");
 
     // 2、调用createVertexArrayOES获取VAO对象
-    let vaoTarget: WebGLVertexArrayObjectOES | null =
-      this._vao.createVertexArrayOES();
-    if (vaoTarget === null) {
-      throw new Error("Not Support WebGLVertexArrayObjectOES");
-    }
-    this._vaoTarget = vaoTarget;
+
+    this._vaoTarget = this._vao.createVertexArrayOES();
 
     // 顶点属性格式，和绘制当前网格时使用的GLProgram具有一致的attribBits
     this._attribState = attribState;
@@ -88,7 +85,6 @@ export class GLMeshBuilder extends GLMeshBase {
     ],
     [GLAttribName.TEXCOORD]: [0, 0],
     [GLAttribName.NORMAL]: [0, 0, 1],
-    [GLAttribName.SIZE]: [1],
   };
 
   // 渲染的数据源
@@ -113,9 +109,7 @@ export class GLMeshBuilder extends GLMeshBase {
   public setIBO(data: number[]): void {
     // 创建ibo
     this._ibo = this.gl.createBuffer();
-    if (!this._ibo) {
-      throw new Error("IBO creation fail");
-    }
+
     this.indices.clear();
     this.indices.pushArray(data);
     // 绑定ibo
@@ -157,7 +151,7 @@ export class GLMeshBuilder extends GLMeshBase {
       );
     // 调用如下两个方法
     GLAttribStateManager.setAttribVertexArrayPointer(this.gl, map);
-    GLAttribStateManager.setAttribVertexArrayState(this.gl, this._attribState);
+    GLAttribStateManager.enableVertexAttribArray(this.gl, this._attribState);
     this.unbind();
   }
 
@@ -168,22 +162,10 @@ export class GLMeshBuilder extends GLMeshBase {
     b: number,
     a: number = 1.0
   ): GLMeshBuilder {
-    if (
-      !GLAttribStateManager.hasAttrib(GLAttribName.COLOR, this._attribState)
-    ) {
-      throw new Error("GLAttribBits is not include COLOR");
-    }
     this.attribValue[GLAttribName.COLOR] = [r, g, b, a];
     return this;
   }
-  // 输入点的大小,返回this,都是链式操作
-  public size(size: number): GLMeshBuilder {
-    if (!GLAttribStateManager.hasAttrib(GLAttribName.SIZE, this._attribState)) {
-      throw new Error("GLAttribBits is not include SIZE");
-    }
-    this.attribValue[GLAttribName.SIZE] = [size];
-    return this;
-  }
+
   // 输入uv纹理坐标值，返回this,都是链式操作
   public texcoord(u: number, v: number): GLMeshBuilder {
     if (
@@ -240,7 +222,6 @@ export class GLMeshBuilder extends GLMeshBase {
       ],
       [GLAttribName.TEXCOORD]: [0, 0],
       [GLAttribName.NORMAL]: [0, 0, 1],
-      [GLAttribName.SIZE]: [1],
     };
   }
   // end方法用于渲染操作
@@ -282,5 +263,31 @@ export class GLMeshBuilder extends GLMeshBase {
     this._ibo = null;
     this.unbind(); // 解绑VAO
     this.program.unbind(); // 解绑GLProgram
+  }
+  public drawSegment(info: SegmentInfo) {
+    const { points, color } = info;
+    if (color) {
+      const { r, g, b, a } = info.color;
+      this.attribValue[GLAttribName.COLOR] = [r, g, b, a];
+    }
+    points.forEach((point) => {
+      const { x, y, z } = point;
+      this.attribValue[GLAttribName.POSITION] = [x, y, z];
+      attribNames.forEach((name) => {
+        if (GLAttribStateManager.hasAttrib(name, this._attribState)) {
+          this._lists.pushArray([...this.attribValue[name]]);
+        }
+      });
+      // 记录更新后的顶点数量
+      this._vertCount++;
+    });
+  }
+  moveTo(point: Point) {
+    this.drawMode = this.gl.LINES;
+    this.lineTo(point);
+  }
+  lineTo(point: Point) {
+    const { x, y, z } = point;
+    this.vertex(x, y, z);
   }
 }

@@ -2,7 +2,7 @@ import { CameraApplication } from "../theWorld/lib/CameraApplication";
 import { MathHelper, EAxisType } from "../theWorld/common/math/MathHelper";
 import { DrawHelper, CoordSystem } from "../theWorld/lib/DrawHelper";
 import { Matrix4, Vector3 } from "../theWorld/common/math/TSM";
-import { CanvasKeyBoardEvent } from "../theWorld/common/Application";
+import { CanvasKeyBoardEvent } from "../theWorld/lib/Application";
 import { GLCoordSystem } from "../theWorld/webgl/WebGLCoordSystem";
 
 export class CoordSystemApplication extends CameraApplication {
@@ -20,7 +20,7 @@ export class CoordSystemApplication extends CameraApplication {
   public isD3dMode: boolean = false; // 用来标记是D3D坐标系
 
   public constructor(canvas: HTMLCanvasElement) {
-    super(canvas, { preserveDrawingBuffer: false }, true); // 调用基类构造函数
+    super(canvas, { preserveDrawingBuffer: false }); // 调用基类构造函数
     this.makeFourGLCoordSystems();
     this.currentDrawMethod = this.drawCoordSystem;
   }
