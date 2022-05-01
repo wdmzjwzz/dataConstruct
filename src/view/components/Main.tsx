@@ -1,9 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
 import "./main.less";
 import "../assets/font/iconfont.css";
-// import { MeshBuilderApplication } from "../../demo/MeshBuilderApplication";
-import { MeshApplication } from "../../system/MeshApplication";
-import { Point } from "../../theWorld/Geometry/Point";
+// import { MeshBuilderApplication } from "../../demo/MeshBuilderApplication";  
+import { RotatingCubeApplication } from "../../demo/RotatingCubeApplication";
 
 export default () => {
   const [fps, setFps] = useState<number>(0);
@@ -15,15 +14,14 @@ export default () => {
       document.body.clientHeight.toString()
     );
   };
-  let app: MeshApplication;
+  let app: RotatingCubeApplication;
   const frameCallback = () => {
     setFps(Math.ceil(app.fps));
   };
   const init = () => {
-    app = new MeshApplication(canvas.current);
+    app = new RotatingCubeApplication(canvas.current);
     app.addTimer(frameCallback, 1);
-    app.run();
-    app.createPoints([new Point(0, 0, 0)])
+    app.run(); 
   };
   useEffect(() => {
     resizeFun();
