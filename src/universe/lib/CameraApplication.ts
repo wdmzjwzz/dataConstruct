@@ -10,7 +10,7 @@ export class CameraApplication extends WebGLApplication {
     contextAttributes: WebGLContextAttributes = { premultipliedAlpha: false }
   ) {
     super(canvas, contextAttributes);
-    this.camera = new Camera(this.gl, canvas.width, canvas.height, 75, 0.1, 1000);
+    this.camera = new Camera(this.gl, canvas.width, canvas.height, 10, 0.1, 1000);
     this.camera.z = 10;
   }
 

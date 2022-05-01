@@ -10,7 +10,6 @@ import { Point } from "./Geometry/Point";
 import { GLHelper } from "./webgl/WebGLHepler";
 import { GLShaderType } from "./webgl/glsl";
 import { GLAttribName } from "./type";
-import { GLAttribStateManager } from "./webgl/WebGLAttribState";
 export class MeshApplication extends CameraApplication {
   public textureBuilder: GLMeshBuilder;
   public textures: GLTexture[] = []; // 纹理着色器所使用的纹理对象
@@ -21,8 +20,7 @@ export class MeshApplication extends CameraApplication {
     this.camera.setViewport(0, 0, this.canvas.width, this.canvas.height);
     this.textureBuilder = GLHelper.createBuilder(this.gl, GLShaderType.TEXTURE, [GLAttribName.POSITION, GLAttribName.COLOR, GLAttribName.TEXCOORD]);
     this.isSupportMouseMove = true;
-    const bit = GLAttribStateManager.makeVertexAttribs([GLAttribName.POSITION, GLAttribName.COLOR, GLAttribName.TEXCOORD]);
-    this.textureProgram = GLProgram.createProgram(GLShaderType.TEXTURE, this.gl, bit)
+
   }
   public onMouseMove(evt: CanvasMouseEvent): void {
     if (this._isMouseDown) {
@@ -73,33 +71,30 @@ export class MeshApplication extends CameraApplication {
     super.run(); // 调用基类的run方法，基类run方法内部调用了start方法
   }
   public cubeTimeCallback(id: number, data: any): void {
-    this.currTexIdx++; // 定时让计数器+1
-    // 取模操作，让currTexIdx的取值范围为[ 0, 2 ]之间（当前有3个纹理）
+    this.currTexIdx++;
     this.currTexIdx %= this.textures.length;
   }
   public drawByMatrixWithColorShader(): void {
-    this.textures[this.currTexIdx].bind();
-    this.textureProgram.bind();
-    this.textureProgram.loadSampler();
+    // this.textures[this.currTexIdx].bind();
     this.matStack.pushMatrix(); // 矩阵堆栈进栈
 
-    this.matStack.rotate(-this.angle, new Vector3([0, 1, 0]).normalize());
+    this.matStack.rotate(-50, new Vector3([0, 1, 0.5]).normalize());
 
     Matrix4.product(
       this.camera.viewProjectionMatrix,
       this.matStack.modelViewMatrix,
       Matrix4.m0
     );
-    DrawHelper.drawSolidCubeBox(
-      this.builder,
-      Matrix4.m0,
-      new Point(0, 0, 2),
-      0.5,
-      Vector4.red
-    );
+    // DrawHelper.drawSolidCubeBox(
+    //   this.builder,
+    //   Matrix4.m0,
+    //   new Point(0, 0, 2),
+    //   0.5,
+    //   Vector4.red
+    // );
 
-    DrawHelper.drawSolidCubeBox(this.builder, Matrix4.m0);
-
+    DrawHelper.drawTextureCubeBox(this.textureBuilder, Matrix4.m0);
+    // this.textures[this.currTexIdx].unbind()
     this.matStack.popMatrix();
   }
 

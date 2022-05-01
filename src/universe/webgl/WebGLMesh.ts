@@ -102,26 +102,6 @@ export class GLMeshBuilder extends GLMeshBase {
   private _ibo: WebGLBuffer | null;
   private _indexCount: number = -1;
   public indices: TypedArrayList<Uint16Array> = new TypedArrayList(Uint16Array); // 索引缓存的数据
-  public setTexture(tex: GLTexture): void {
-    this.texture = tex.texture;
-  }
-
-  public setIBO(data: number[]): void {
-    // 创建ibo
-    this._ibo = this.gl.createBuffer();
-
-    this.indices.clear();
-    this.indices.pushArray(data);
-    // 绑定ibo
-    this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this._ibo);
-    // 将索引数据上传到ibo中
-    this.gl.bufferData(
-      this.gl.ELEMENT_ARRAY_BUFFER,
-      this.indices.subArray(),
-      this.gl.STATIC_DRAW
-    );
-    this._indexCount = data.length;
-  }
 
   public constructor(
     gl: WebGLRenderingContext,
@@ -153,6 +133,26 @@ export class GLMeshBuilder extends GLMeshBase {
     GLAttribStateManager.setAttribVertexArrayPointer(this.gl, map);
     GLAttribStateManager.enableVertexAttribArray(this.gl, this._attribState);
     this.unbind();
+  }
+  public setTexture(tex: GLTexture): void {
+    this.texture = tex.texture;
+  }
+
+  public setIBO(data: number[]): void {
+    // 创建ibo
+    this._ibo = this.gl.createBuffer();
+
+    this.indices.clear();
+    this.indices.pushArray(data);
+    // 绑定ibo
+    this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this._ibo);
+    // 将索引数据上传到ibo中
+    this.gl.bufferData(
+      this.gl.ELEMENT_ARRAY_BUFFER,
+      this.indices.subArray(),
+      this.gl.STATIC_DRAW
+    );
+    this._indexCount = data.length;
   }
 
   // 输入rgba颜色值，取值范围为[ 0 , 1 ]之间,返回this,都是链式操作
