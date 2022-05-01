@@ -187,14 +187,14 @@ export class GLHelper {
     //很重要一点，所谓active是指uniform已经被使用的，否则不属于uniform,uniform在shader中必须是读取，不能赋值
     //很重要一点，attribute在shader中只能读取，不能赋值,如果没有被使用的话，也是不算入activeAttrib中去的
     for (let i = 0; i < attributsCount; i++) {
-      let info: WebGLActiveInfo | null = gl.getActiveAttrib(program, i);
-      if (info) {
+      let info: WebGLActiveInfo = gl.getActiveAttrib(program, i);
+      
         out[info.name] = new GLAttribInfo(
           info.size,
           info.type,
           gl.getAttribLocation(program, info.name)
         );
-      }
+      
     }
     console.log(JSON.stringify(out));
   }

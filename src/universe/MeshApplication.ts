@@ -1,14 +1,14 @@
-import { CameraApplication } from "../theWorld/lib/CameraApplication";
-import { GLMeshBuilder } from "../theWorld/webgl/WebGLMesh";
-import { Matrix4, Vector3, Vector4 } from "../theWorld/common/math/TSM";
+import { CameraApplication } from "./lib/CameraApplication";
+import { GLMeshBuilder } from "./webgl/WebGLMesh";
+import { Matrix4, Vector3, Vector4 } from "./common/math/TSM";
 import {
   CanvasKeyBoardEvent,
   CanvasMouseEvent,
-} from "../theWorld/lib/Application";
-import { DrawHelper } from "../theWorld";
-import { Point } from "../theWorld/Geometry/Point";
-import { GLHelper } from "../theWorld/webgl/WebGLHepler";
-import { GLShaderType } from "../theWorld/webgl/glsl";
+} from "./lib/Application";
+import { DrawHelper } from ".";
+import { Point } from "./Geometry/Point";
+import { GLHelper } from "./webgl/WebGLHepler";
+import { GLShaderType } from "./webgl/glsl";
 export class MeshApplication extends CameraApplication {
   public textureBuilder: GLMeshBuilder;
 
@@ -32,7 +32,7 @@ export class MeshApplication extends CameraApplication {
   }
   public drawCoordSystem(): void {
     this.matStack.pushMatrix(); // 矩阵堆栈进栈
-    this.matStack.rotate(-this.angle, new Vector3([0, 1, 0]).normalize());
+    this.matStack.rotate(-10, new Vector3([0, 1, 0]).normalize());
     Matrix4.product(
       this.camera.viewProjectionMatrix,
       this.matStack.modelViewMatrix,

@@ -49,7 +49,7 @@ export class DrawHelper {
     builder: GLMeshBuilder,
     mat: Matrix4,
     len: number = 5
-  ): void {
+  ) {
     builder.begin(builder.gl.LINES);
 
     builder.color(1.0, 0.0, 0.0).vertex(0.0, 0.0, 0.0);
@@ -179,7 +179,7 @@ export class DrawHelper {
       0,
       1, // 下面
     ]
-  ): void {
+  ) {
     // 前面
     builder.begin(builder.gl.TRIANGLE_FAN);
     builder.texcoord(tc[0], tc[1]).vertex(-halfLen, -halfLen, halfLen); // 0  - - +
@@ -223,7 +223,7 @@ export class DrawHelper {
     builder.texcoord(tc[46], tc[47]).vertex(halfLen, -halfLen, halfLen); // 4  + - +
     builder.end(mat);
   }
- 
+
   public static drawFace(
     builder: GLMeshBuilder,
     mat: Matrix4,
