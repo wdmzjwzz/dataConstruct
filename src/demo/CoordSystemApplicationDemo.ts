@@ -1,9 +1,9 @@
-import { CameraApplication } from "../theWorld/lib/CameraApplication";
-import { MathHelper, EAxisType } from "../theWorld/common/math/MathHelper";
-import { DrawHelper, CoordSystem } from "../theWorld/lib/DrawHelper";
-import { Matrix4, Vector3 } from "../theWorld/common/math/TSM";
-import { CanvasKeyBoardEvent } from "../theWorld/lib/Application";
-import { GLCoordSystem } from "../theWorld/webgl/WebGLCoordSystem";
+import { CameraApplication } from "../universe/lib/CameraApplication";
+import { MathHelper, EAxisType } from "../universe/common/math/MathHelper";
+import { DrawHelper, CoordSystem } from "../universe/lib/DrawHelper";
+import { Matrix4, Vector3 } from "../universe/common/math/TSM";
+import { CanvasKeyBoardEvent } from "../universe/lib/Application";
+import { GLCoordSystem } from "../universe/webgl/WebGLCoordSystem";
 
 export class CoordSystemApplication extends CameraApplication {
   // 存储当前使用的坐标系、视口以及旋转轴、旋转角度等信息的数组
