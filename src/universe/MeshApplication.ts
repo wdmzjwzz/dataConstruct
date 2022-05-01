@@ -5,17 +5,20 @@ import {
   CanvasKeyBoardEvent,
   CanvasMouseEvent,
 } from "./lib/Application";
-import { DrawHelper } from ".";
+import { DrawHelper, GLProgram, GLTexture } from ".";
 import { Point } from "./Geometry/Point";
 import { GLHelper } from "./webgl/WebGLHepler";
 import { GLShaderType } from "./webgl/glsl";
+import { GLAttribName } from "./type";
 export class MeshApplication extends CameraApplication {
   public textureBuilder: GLMeshBuilder;
+  public textureShader: GLProgram; // 纹理着色器
+  public texture: GLTexture; // 纹理着色器所使用的纹理对象
 
   public constructor(canvas: HTMLCanvasElement) {
     super(canvas, { premultipliedAlpha: false });
     this.camera.setViewport(0, 0, this.canvas.width, this.canvas.height);
-    this.textureBuilder = GLHelper.createBuilder(this.gl, GLShaderType.TEXTURE);
+    this.textureBuilder = GLHelper.createBuilder(this.gl, GLShaderType.TEXTURE,[GLAttribName.POSITION, GLAttribName.COLOR,GLAttribName.TEXCOORD]);
     this.isSupportMouseMove = true;
   }
   public onMouseMove(evt: CanvasMouseEvent): void {
