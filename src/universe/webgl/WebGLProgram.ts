@@ -36,7 +36,7 @@ export class GLProgram {
   public static readonly SpecularSampler: string = "uSpecularSampler"; // 高光取样器
   public static readonly DepthSampler: string = "uDepthSampler"; // 深度取样器
 
-  public gl: WebGLRenderingContext; // WebGL上下文渲染对象
+  public gl: WebGL2RenderingContext; // WebGL上下文渲染对象
   public name: string; // program名
 
   private _attribState: GLAttribBits; // 当前的Program使用的顶点属性bits值
@@ -50,7 +50,7 @@ export class GLProgram {
   }
 
   private progromBeforeLink(
-    gl: WebGLRenderingContext,
+    gl: WebGL2RenderingContext,
     program: WebGLProgram
   ): void {
     //链接前才能使用bindAttribLocation函数
@@ -65,7 +65,7 @@ export class GLProgram {
   }
 
   public constructor(
-    context: WebGLRenderingContext,
+    context: WebGL2RenderingContext,
     attribState: GLAttribBits,
     vsShader: string,
     fsShader: string,
@@ -212,7 +212,7 @@ export class GLProgram {
 
   public static createProgram(
     type: GLShaderType,
-    gl: WebGLRenderingContext,
+    gl: WebGL2RenderingContext,
     bit: GLAttribBits
   ): GLProgram {
     let pro: GLProgram = new GLProgram(

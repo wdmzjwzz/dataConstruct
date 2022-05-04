@@ -1,5 +1,4 @@
-import { GLHelper } from "./WebGLHepler";
-
+ 
 export enum EGLTexWrapType {
   GL_REPEAT, //设置为gl对应的常量
   GL_MIRRORED_REPEAT,
@@ -7,7 +6,7 @@ export enum EGLTexWrapType {
 }
 
 export class GLTexture {
-  public gl: WebGLRenderingContext;
+  public gl: WebGL2RenderingContext;
   public isMipmap: boolean; // 是否使用mipmap生成纹理对象
   public width: number; // 当前纹理对象的像素宽度
   public height: number; // 当前纹理对象的像素高度
@@ -17,7 +16,7 @@ export class GLTexture {
   public target: number; // 为gl.TEXTURE_2D
   public name: string; // 纹理的名称
 
-  public constructor(gl: WebGLRenderingContext, name: string = "") {
+  public constructor(gl: WebGL2RenderingContext, name: string = "") {
     this.gl = gl;
     this.isMipmap = false;
     this.width = this.height = 0;
@@ -56,35 +55,9 @@ export class GLTexture {
     }
     return x + 1;
   }
-
-  // 3、将非2的n次方的srcImage转换成2的n次方的CanvasRenderingContext2D对象
-  // 然后后续用来生成mipmap纹理
-  public static createPowerOfTwoCanvas(
-    srcImage: HTMLImageElement | HTMLCanvasElement
-  ): HTMLCanvasElement {
-    let canvas: HTMLCanvasElement = document.createElement("canvas");
-    canvas.width = GLTexture.getNextPowerOfTwo(srcImage.width);
-    canvas.height = GLTexture.getNextPowerOfTwo(srcImage.height);
-    let ctx: CanvasRenderingContext2D | null = canvas.getContext("2d");
-    if (ctx === null) {
-      throw new Error("未能成功创建CanvasRenderingContext2D对象");
-    }
-    ctx.drawImage(
-      srcImage,
-      0,
-      0,
-      srcImage.width,
-      srcImage.height,
-      0,
-      0,
-      canvas.width,
-      canvas.height
-    );
-    return canvas;
-  }
-
-  // 下面的静态方法和成员变量用来创建默认的2的n方的纹理对象
-  public static createDefaultTexture(gl: WebGLRenderingContext): GLTexture {
+ 
+ 
+  public static createDefaultTexture(gl: WebGL2RenderingContext): GLTexture {
     let step: number = 4;
     let canvas: HTMLCanvasElement = document.createElement(
       "canvas"
@@ -151,27 +124,32 @@ export class GLTexture {
   public filter(minLinear: boolean = true, magLinear: boolean = true): void {
     // 在设置filter时先要绑定当前的纹理目标
     this.gl.bindTexture(this.target, this.texture);
-    if (this.isMipmap) {
-      this.gl.texParameteri(
-        this.target,
-        this.gl.TEXTURE_MIN_FILTER,
-        minLinear
-          ? this.gl.LINEAR_MIPMAP_LINEAR
-          : this.gl.NEAREST_MIPMAP_NEAREST
-      );
-    } else {
-      this.gl.texParameteri(
-        this.target,
-        this.gl.TEXTURE_MIN_FILTER,
-        minLinear ? this.gl.LINEAR : this.gl.NEAREST
-      );
-    }
+    // console.log(this.isMipmap,minLinear,222);
+    
+    // if (this.isMipmap) {
+    //   this.gl.texParameteri(
+    //     this.target,
+    //     this.gl.TEXTURE_MIN_FILTER,
+    //     minLinear
+    //       ? this.gl.LINEAR_MIPMAP_LINEAR
+    //       : this.gl.NEAREST_MIPMAP_NEAREST
+    //   );
+    // } else {
+    //   this.gl.texParameteri(
+    //     this.target,
+    //     this.gl.TEXTURE_MIN_FILTER,
+    //     minLinear ? this.gl.LINEAR : this.gl.NEAREST
+    //   );
+    // }
 
-    this.gl.texParameteri(
-      this.target,
-      this.gl.TEXTURE_MIN_FILTER,
-      magLinear ? this.gl.LINEAR : this.gl.NEAREST
-    );
+    // this.gl.texParameteri(
+    //   this.target,
+    //   this.gl.TEXTURE_MIN_FILTER,
+    //   magLinear ? this.gl.LINEAR : this.gl.NEAREST
+    // );
+    this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.NEAREST);
+    this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_S, this.gl.REPEAT);
+    this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_T, this.gl.REPEAT);
   }
 
   public wrap(mode: EGLTexWrapType = EGLTexWrapType.GL_REPEAT): void {
@@ -229,38 +207,15 @@ export class GLTexture {
     this.height = source.height;
 
     if (mipmap === true) {
-      // 使用mipmap生成纹理
-      let isWidthPowerOfTwo: boolean = GLTexture.isPowerOfTwo(this.width);
-      let isHeightPowerOfTwo: boolean = GLTexture.isPowerOfTwo(this.height);
-      // 如果源图像的宽度和高度都是2的n次方格式的，则直接载入像素数据然后调用generateMipmap方法
-      if (isWidthPowerOfTwo === true && isHeightPowerOfTwo === true) {
-        this.gl.texImage2D(
-          this.target,
-          0,
-          this.format,
-          this.format,
-          this.type,
-          source
-        );
-        this.gl.generateMipmap(this.target);
-      } // 否则说明至少有一个不是2的n次方的，需要特别处理
-      else {
-        let canvas: HTMLCanvasElement =
-          GLTexture.createPowerOfTwoCanvas(source);
-        this.gl.texImage2D(
-          this.target,
-          0,
-          this.format,
-          this.format,
-          this.type,
-          canvas
-        );
-        GLHelper.checkGLError(this.gl);
-        this.gl.generateMipmap(this.target);
-        GLHelper.checkGLError(this.gl);
-        this.width = canvas.width;
-        this.height = canvas.height;
-      }
+      this.gl.texImage2D(
+        this.target,
+        0,
+        this.format,
+        this.format,
+        this.type,
+        source
+      );
+      this.gl.generateMipmap(this.target);
       this.isMipmap = true;
     } else {
       this.isMipmap = false;

@@ -6,16 +6,14 @@ import { GLTexture } from "./WebGLTexture";
 import {
   GLAttribBits,
   GLAttribName,
-  GLAttribOffsetMap,
-  SegmentInfo,
+  GLAttribOffsetMap, 
 } from "../type";
-import { attribNames, defaultCollor } from "../constants";
-import { Point } from "../Geometry/Point";
+import { attribNames, defaultCollor } from "../constants"; 
 
 // 使用abstract声明抽象类
 export abstract class GLMeshBase {
   // WebGL渲染上下文
-  public gl: WebGLRenderingContext;
+  public gl: WebGL2RenderingContext;
   // gl.TRIANGLES 等7种基本几何图元之一
   public drawMode: number;
   // 顶点属性格式，和绘制当前网格时使用的GLProgram具有一致的attribBits
@@ -24,11 +22,11 @@ export abstract class GLMeshBase {
   protected _attribStride: number;
 
   // 我们使用VAO（顶点数组对象）来管理VBO和EBO
-  protected _vao: OES_vertex_array_object;
+  protected _vao: WebGLVertexArrayObject;
   protected _vaoTarget: WebGLVertexArrayObjectOES;
 
   public constructor(
-    gl: WebGLRenderingContext,
+    gl: WebGL2RenderingContext,
     attribState: GLAttribBits,
     drawMode: number = gl.TRIANGLES
   ) {
@@ -37,11 +35,8 @@ export abstract class GLMeshBase {
     // 获取VAO的步骤：
     // 1、使用gl.getExtension( "OES_vertex_array_object" )方式获取VAO扩展
 
-    this._vao = this.gl.getExtension("OES_vertex_array_object");
+    this._vao = this.gl.createVertexArray()
 
-    // 2、调用createVertexArrayOES获取VAO对象
-
-    this._vaoTarget = this._vao.createVertexArrayOES();
 
     // 顶点属性格式，和绘制当前网格时使用的GLProgram具有一致的attribBits
     this._attribState = attribState;
@@ -54,13 +49,13 @@ export abstract class GLMeshBase {
   }
 
   public bind(): void {
-    // 绑定VAO对象
-    this._vao.bindVertexArrayOES(this._vaoTarget);
+    // 绑定VAO对象 
+    this.gl.bindVertexArray(this._vao)
   }
 
   public unbind(): void {
     // 解绑VAO
-    this._vao.bindVertexArrayOES(null);
+    this.gl.bindVertexArray(null);
   }
 
   public get vertexStride(): number {
@@ -104,7 +99,7 @@ export class GLMeshBuilder extends GLMeshBase {
   public indices: TypedArrayList<Uint16Array> = new TypedArrayList(Uint16Array); // 索引缓存的数据
 
   public constructor(
-    gl: WebGLRenderingContext,
+    gl: WebGL2RenderingContext,
     state: GLAttribBits,
     program: GLProgram,
     texture: WebGLTexture | null = null
@@ -264,30 +259,5 @@ export class GLMeshBuilder extends GLMeshBase {
     this.unbind(); // 解绑VAO
     this.program.unbind(); // 解绑GLProgram
   }
-  public drawSegment(info: SegmentInfo) {
-    const { points, color } = info;
-    if (color) {
-      const { r, g, b, a } = info.color;
-      this.attribValue[GLAttribName.COLOR] = [r, g, b, a];
-    }
-    points.forEach((point) => {
-      const { x, y, z } = point;
-      this.attribValue[GLAttribName.POSITION] = [x, y, z];
-      attribNames.forEach((name) => {
-        if (GLAttribStateManager.hasAttrib(name, this._attribState)) {
-          this._lists.pushArray([...this.attribValue[name]]);
-        }
-      });
-      // 记录更新后的顶点数量
-      this._vertCount++;
-    });
-  }
-  moveTo(point: Point) {
-    this.drawMode = this.gl.LINES;
-    this.lineTo(point);
-  }
-  lineTo(point: Point) {
-    const { x, y, z } = point;
-    this.vertex(x, y, z);
-  }
+  
 }

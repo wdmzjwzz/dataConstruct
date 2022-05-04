@@ -7,7 +7,7 @@ import { GLShaderType } from "./glsl";
 
 export class WebGLApplication extends Application {
   // 可以直接操作WebGL相关内容
-  public gl: WebGLRenderingContext;
+  public gl: WebGL2RenderingContext;
 
   // 模拟OpenGL1.1中矩阵堆栈
   // 封装在GLWorldMatrixStatc中
@@ -26,7 +26,7 @@ export class WebGLApplication extends Application {
     contextAttributes: WebGLContextAttributes = { premultipliedAlpha: false },
   ) {
     super(canvas);
-    this.gl = this.canvas.getContext("webgl", contextAttributes);
+    this.gl = this.canvas.getContext("webgl2", contextAttributes);
 
 
     this.matStack = new GLWorldMatrixStack();

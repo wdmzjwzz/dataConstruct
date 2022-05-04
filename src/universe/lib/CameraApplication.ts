@@ -10,8 +10,8 @@ export class CameraApplication extends WebGLApplication {
     contextAttributes: WebGLContextAttributes = { premultipliedAlpha: false }
   ) {
     super(canvas, contextAttributes);
-    this.camera = new Camera(this.gl, canvas.width, canvas.height, 10, 0.1, 1000);
-    this.camera.z = 10;
+    this.camera = new Camera(this.gl, canvas.width, canvas.height, 45, 0.1, 1000);
+    this.camera.z = 500;
   }
 
   //子类override update函数时必须要调用基类本方法
@@ -27,23 +27,23 @@ export class CameraApplication extends WebGLApplication {
   // 覆写（）
   public onKeyPress(evt: CanvasKeyBoardEvent): void {
     if (evt.key === "w") {
-      this.camera.moveForward(-0.1); // 摄像机向前运行
+      this.camera.moveForward(-10); // 摄像机向前运行
     } else if (evt.key === "s") {
-      this.camera.moveForward(0.1); // 摄像机向后运行
+      this.camera.moveForward(10); // 摄像机向后运行
     } else if (evt.key === "a") {
-      this.camera.moveRightward(0.1); // 摄像机向右运行
+      this.camera.moveRightward(10); // 摄像机向右运行
     } else if (evt.key === "d") {
-      this.camera.moveRightward(-0.1); // 摄像机向左运行
+      this.camera.moveRightward(-10); // 摄像机向左运行
     } else if (evt.key === "z") {
-      this.camera.moveUpward(0.1); // 摄像机向上运行
+      this.camera.moveUpward(10); // 摄像机向上运行
     } else if (evt.key === "x") {
-      this.camera.moveUpward(-0.1); // 摄像机向下运行
+      this.camera.moveUpward(-10); // 摄像机向下运行
     } else if (evt.key === "y") {
-      this.camera.yaw(0.1); // 摄像机绕本身的Y轴旋转
+      this.camera.yaw(10); // 摄像机绕本身的Y轴旋转
     } else if (evt.key === "r") {
-      this.camera.roll(0.1); // 摄像机绕本身的Z轴旋转
+      this.camera.roll(10); // 摄像机绕本身的Z轴旋转
     } else if (evt.key == "p") {
-      this.camera.pitch(0.1); // 摄像机绕本身的X轴旋转
+      this.camera.pitch(10); // 摄像机绕本身的X轴旋转
     }
   }
 }

@@ -1,20 +1,20 @@
 import { CameraApplication } from "./lib/CameraApplication";
 import { GLMeshBuilder } from "./webgl/WebGLMesh";
-import { Matrix4, Vector3, Vector4 } from "./common/math/TSM";
+import { Matrix4, Vector2, Vector3 } from "./common/math/TSM";
 import {
   CanvasKeyBoardEvent,
   CanvasMouseEvent,
 } from "./lib/Application";
 import { DrawHelper, GLProgram, GLTexture, HttpRequest } from ".";
-import { Point } from "./Geometry/Point";
 import { GLHelper } from "./webgl/WebGLHepler";
 import { GLShaderType } from "./webgl/glsl";
 import { GLAttribName } from "./type";
 export class MeshApplication extends CameraApplication {
   public textureBuilder: GLMeshBuilder;
-  public textures: GLTexture[] = []; // 纹理着色器所使用的纹理对象
+  public textures: GLTexture; // 纹理着色器所使用的纹理对象
   public currTexIdx: number = 0
   public textureProgram: GLProgram; // 使用颜色GPU Program对象
+  public lastPos: Vector2
   public constructor(canvas: HTMLCanvasElement) {
     super(canvas, { premultipliedAlpha: false });
     this.camera.setViewport(0, 0, this.canvas.width, this.canvas.height);
@@ -24,9 +24,27 @@ export class MeshApplication extends CameraApplication {
   }
   public onMouseMove(evt: CanvasMouseEvent): void {
     if (this._isMouseDown) {
-      console.log(evt, 1111, this._isMouseDown);
+      // let pos = evt.canvasPosition.copy()
+      // const v1 = new Vector3([pos.x, pos.y, this.camera.position.z])
+      // const v2 = new Vector3([this.lastPos.x, this.lastPos.y, this.camera.position.z])
+      // const normal = Vector3.cross(v1, v2)
+      // const angle = Math.acos(Vector3.dot(v1.normalize(), v2.normalize()));
+      // if (!normal || !angle) {
+      //   return
+      // }
+      // const m = new Matrix4().rotate(angle, normal)
+      // console.log(m, angle);
+      // if (!m) {
+      //   return
+      // } 
+   
+      // Matrix4.product(m, this.camera.viewProjectionMatrix, this.camera.viewProjectionMatrix)
+      // this.lastPos = pos
     }
     return;
+  }
+  protected onMouseDown(evt: CanvasMouseEvent): void {
+    this.lastPos = evt.canvasPosition.copy()
   }
   public update(elapsedMsec: number, intervalSec: number): void {
     // 每帧旋转1度
@@ -42,58 +60,36 @@ export class MeshApplication extends CameraApplication {
       this.matStack.modelViewMatrix,
       Matrix4.m0
     );
-    DrawHelper.drawCoordSystem(this.builder, Matrix4.m0, 5);
+    DrawHelper.drawCoordSystem(this.builder, Matrix4.m0, 100);
     this.matStack.popMatrix();
   }
   public async run(): Promise<void> {
-    // await必须要用于async声明的函数中
-    let img: HTMLImageElement = await HttpRequest.loadImageAsync(
-      "data/pic0.png"
-    );
-    let tex: GLTexture = new GLTexture(this.gl);
-    tex.upload(img, 0, true);
-    tex.filter();
-    this.textures.push(tex);
-    console.log("1、第一个纹理载入成功！");
 
     // await必须要用于async声明的函数中
-    img = await HttpRequest.loadImageAsync("data/pic1.jpg");
-    tex = new GLTexture(this.gl);
+    let img = await HttpRequest.loadImageAsync("data/pic1.png");
+    let tex = new GLTexture(this.gl);
     tex.upload(img, 0, true);
     tex.filter();
-    this.textures.push(tex);
-    console.log("2、第二个纹理载入成功！");
+    this.textures = tex
+    console.log(tex);
 
-    // 在资源同步加载完成后，直接启动换肤的定时器，每隔2秒，将立方体的皮肤进行周而复始的替换
-    this.addTimer(this.cubeTimeCallback.bind(this), 2, false);
-
-    console.log("3、启动Application程序");
     super.run(); // 调用基类的run方法，基类run方法内部调用了start方法
   }
-  public cubeTimeCallback(id: number, data: any): void {
-    this.currTexIdx++;
-    this.currTexIdx %= this.textures.length;
-  }
+
   public drawByMatrixWithColorShader(): void {
     // this.textures[this.currTexIdx].bind();
     this.matStack.pushMatrix(); // 矩阵堆栈进栈
 
-    this.matStack.rotate(-50, new Vector3([0, 1, 0.5]).normalize());
+    this.matStack.rotate(-this.angle, new Vector3([0, 1, 0.5]).normalize());
 
     Matrix4.product(
       this.camera.viewProjectionMatrix,
       this.matStack.modelViewMatrix,
       Matrix4.m0
     );
-    // DrawHelper.drawSolidCubeBox(
-    //   this.builder,
-    //   Matrix4.m0,
-    //   new Point(0, 0, 2),
-    //   0.5,
-    //   Vector4.red
-    // );
 
-    DrawHelper.drawTextureCubeBox(this.textureBuilder, Matrix4.m0);
+    DrawHelper.drawSphere(this.textureBuilder, Matrix4.m0, 50)
+    // DrawHelper.drawTextureCubeBox(this.textureBuilder, Matrix4.m0);
     // this.textures[this.currTexIdx].unbind()
     this.matStack.popMatrix();
   }

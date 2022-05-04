@@ -75,7 +75,7 @@ export class CoordSystemApplication extends CameraApplication {
   }
 
   public render(): void {
-    // 使用了 preserveDrawingBuffer: false 创建WebGLRenderingContext，因此可以不用每帧调用clear方法清屏
+    // 使用了 preserveDrawingBuffer: false 创建WebGL2RenderingContext，因此可以不用每帧调用clear方法清屏
     // this.gl.clear( this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT );
 
     // 由于要使用Canvs2D绘制文字，所以必须要有ctx2D对象

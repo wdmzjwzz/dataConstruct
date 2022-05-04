@@ -4,6 +4,7 @@ import { GLMeshBuilder } from "../webgl/WebGLMesh";
 import { Point } from "../Geometry/Point";
 import { getIndices } from "../common/utils/tools";
 import { defaultCollor } from "../constants";
+import { MathHelper } from "../common/math/MathHelper";
 export class CoordSystem {
   public viewport: number[] = []; // 当前坐标系被绘制在哪个视口中
   public axis: Vector3; // 当前坐标系绕哪个轴旋转
@@ -112,7 +113,7 @@ export class DrawHelper {
       [p0, p4, p5, p1],
     ];
     faces.forEach((face) => {
-      DrawHelper.drawFace(builder, mat, face, color);
+      DrawHelper.drawFace(builder, mat, face, [], color);
     });
   }
   /*
@@ -128,7 +129,7 @@ export class DrawHelper {
   public static drawTextureCubeBox(
     builder: GLMeshBuilder,
     mat: Matrix4,
-    halfLen: number = 0.2,
+    halfLen: number = 20,
     tc: number[] = [
       0, 0,
       1, 0,
@@ -179,22 +180,137 @@ export class DrawHelper {
     builder.texcoord(tc[6], tc[7]).vertex(halfLen, -halfLen, halfLen); // 4  + - +
     builder.end(mat);
   }
+  public static drawSphere(
+    builder: GLMeshBuilder,
+    mat: Matrix4,
+    radius: number = 80,
+    center: Point = new Point(0, 0, 0),
+    tc: number[] = [
+      0, 0,
+      1, 0,
+      1, 1,
+      0, 1, // 前面
+    ]
+  ) {
 
+    const number = 360 / 15;
+    const faces: Point[][] = [];
+
+    for (let index = 0; index < number; index++) {
+      const colums = 18
+      const angle2 = 180 / colums
+
+      let rotateMatrix4 = new Matrix4().rotate(MathHelper.toRadian(index * 15), new Vector3([0, 1, 0]))
+      const n = Vector3.cross(new Vector3([1, 0, 0]), new Vector3([0, 1, 0]))
+      const normal = rotateMatrix4.multiplyVector3(n).normalize()
+      faces[index] = [];
+      let p0 = center.add(new Point(0, radius, 0))
+
+      for (let c = 0; c < colums + 1; c++) {
+        let rotateMatrix4 = new Matrix4().rotate(MathHelper.toRadian(c * angle2), normal)
+        const v = rotateMatrix4.multiplyVector3(p0)
+        faces[index].push(new Point(v.x, v.y, v.z))
+      }
+    }
+    const faces2: Point[][] = [];
+    for (let index = 0; index < faces.length; index++) {
+      const face = faces[index];
+      faces2[index] = [];
+      for (let j = 0; j < face.length - 1; j++) {
+        const point = face[j];
+        if (j === 0) {
+          const f = [
+            face[0],
+            face[1],
+            faces[(index + 1) % faces.length][1]]
+          const vu = DrawHelper.getUVValues(f, 1000, 1000)
+
+          DrawHelper.drawFace(builder, mat, f, vu)
+          continue;
+        }
+        if (j === face.length - 2) {
+          const f = [
+            face[j],
+            face[j + 1],
+            faces[(index + 1) % faces.length][j + 1]]
+          const vu = DrawHelper.getUVValues(f, 1000, 1000)
+          DrawHelper.drawFace(builder, mat, f, vu)
+          continue;
+        }
+        const f = [point,
+          face[j + 1],
+          faces[(index + 1) % faces.length][j + 1],
+          faces[(index + 1) % faces.length][j]]
+        const vu = DrawHelper.getUVValues(f, 1000, 1000)
+        DrawHelper.drawFace(builder, mat, f, vu)
+      }
+    }
+  }
+  public static getUVValues(face: Point[], width: number, height: number) {
+    const v1 = face[1].subtract(face[0])
+    const v2 = face[2].subtract(face[1])
+    const normal = Vector3.cross(v1, v2).normalize()
+    const up = new Vector3([0, 1, 0]).normalize()
+
+    const cross = Vector3.cross(normal, up).normalize()
+    const angle = Math.acos(Vector3.dot(up, normal));
+    const mat = new Matrix4().rotate(angle, cross)
+    let mins = new Point(0, 0, 0)
+    let maxs = new Point(0, 0, 0)
+    let nPoints = face.map(point => {
+      const v = mat.multiplyVector3(new Vector3([point.x, point.y, point.z]))
+      if (v.x < mins.x) {
+        mins.x = v.x;
+      }
+      if (v.x > maxs.x) {
+        maxs.x = v.x;
+      }
+
+      if (v.y < mins.y) {
+        mins.y = v.y;
+      }
+      if (v.y > maxs.y) {
+        maxs.y = v.y;
+      }
+
+      if (v.z < mins.z) {
+        mins.z = v.z;
+      }
+      if (v.z > maxs.z) {
+        maxs.z = v.z;
+      }
+      return new Point(v.x, v.y, v.z)
+    })
+    let UVs: number[][] = []
+    let w = maxs.x - mins.x
+    let h = maxs.z - mins.z
+    const m = Math.min(w, h)
+    nPoints.forEach(point => {
+      let v = point.subtract(mins)
+
+      UVs.push([v.x / m, v.z / m])
+    })
+    return UVs
+
+  }
   public static drawFace(
     builder: GLMeshBuilder,
     mat: Matrix4,
     points: Point[],
+    uvs: number[][] = [],
     color = defaultCollor
   ) {
     const indices = getIndices(points);
-    builder.begin(builder.gl.TRIANGLE_STRIP);
+    builder.begin(builder.gl.TRIANGLE_FAN);
     builder.setIBO(indices);
-    points.forEach((point) => {
+
+    points.forEach((point, index: number) => {
       builder
         .color(color.r, color.g, color.b)
+        .texcoord(uvs[index][0], uvs[index][1])
         .vertex(point.x, point.y, point.z);
     });
     builder.end(mat);
   }
-  
+
 }

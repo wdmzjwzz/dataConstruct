@@ -125,12 +125,12 @@ export class Camera {
     return this._top;
   }
 
-  public gl: WebGLRenderingContext;
+  public gl: WebGL2RenderingContext;
 
   public controlByMouse: boolean;
 
   public constructor(
-    gl: WebGLRenderingContext,
+    gl: WebGL2RenderingContext,
     width: number,
     height: number,
     fovY: number = 45.0,
@@ -188,6 +188,8 @@ export class Camera {
       this._position.y += this._zAxis.y * speed;
       this._position.z += this._zAxis.z * speed;
     }
+    console.log(this._position);
+    
   }
 
   //局部坐标系下的左右运动

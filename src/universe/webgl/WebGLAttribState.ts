@@ -25,7 +25,7 @@ class GLAttribState {
   }
 
   public setAttribVertexArrayPointer(
-    gl: WebGLRenderingContext,
+    gl: WebGL2RenderingContext,
     offsetMap: GLAttribOffsetMap
   ): void {
     let stride: number = offsetMap[ATTRIBSTRIDE];
@@ -37,7 +37,7 @@ class GLAttribState {
     });
   }
   public vertexAttrib(
-    gl: WebGLRenderingContext,
+    gl: WebGL2RenderingContext,
     name: GLAttribName,
     stride: number,
     offset: number
@@ -54,7 +54,7 @@ class GLAttribState {
     }
   }
   public enableVertexAttribArray(
-    gl: WebGLRenderingContext,
+    gl: WebGL2RenderingContext,
     attribBits: number
   ): void {
     attribNames.forEach((name) => {
@@ -64,7 +64,7 @@ class GLAttribState {
     });
   }
   public disableVertexAttribArray(
-    gl: WebGLRenderingContext,
+    gl: WebGL2RenderingContext,
     attribBits: number
   ): void {
     attribNames.forEach((name) => {

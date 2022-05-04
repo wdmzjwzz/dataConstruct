@@ -45,7 +45,7 @@ export class GLAttribInfo {
 export type GLAttribInfoMap = { [key: string]: GLAttribInfo };
 
 export class GLHelper {
-  public static printStates(gl: WebGLRenderingContext): void {
+  public static printStates(gl: WebGL2RenderingContext): void {
     // 所有的boolean状态变量，共9个
     console.log("1. isBlendEnable = " + gl.isEnabled(gl.BLEND));
     console.log("2. isCullFaceEnable = " + gl.isEnabled(gl.CULL_FACE));
@@ -65,7 +65,7 @@ export class GLHelper {
     console.log("9. isStencilTestEnable = " + gl.isEnabled(gl.STENCIL_TEST));
   }
 
-  public static printWebGLInfo(gl: WebGLRenderingContext): void {
+  public static printWebGLInfo(gl: WebGL2RenderingContext): void {
     console.log("renderer = " + gl.getParameter(gl.RENDERER));
     console.log("version = " + gl.getParameter(gl.VERSION));
     console.log("vendor = " + gl.getParameter(gl.VENDOR));
@@ -74,7 +74,7 @@ export class GLHelper {
     );
   }
 
-  public static printWebGLTextureInfo(gl: WebGLRenderingContext): void {
+  public static printWebGLTextureInfo(gl: WebGL2RenderingContext): void {
     console.log(
       "MAX_COMBINED_TEXTURE_IMAGE_UNITS = ",
       gl.getParameter(gl.MAX_COMBINED_TEXTURE_IMAGE_UNITS)
@@ -90,14 +90,14 @@ export class GLHelper {
     );
   }
 
-  public static triggerContextLostEvent(gl: WebGLRenderingContext): void {
+  public static triggerContextLostEvent(gl: WebGL2RenderingContext): void {
     let ret: WEBGL_lose_context | null = gl.getExtension("WEBGL_lose_context");
     if (ret !== null) {
       ret.loseContext();
     }
   }
 
-  public static checkGLError(gl: WebGLRenderingContext): boolean {
+  public static checkGLError(gl: WebGL2RenderingContext): boolean {
     let err: number = gl.getError();
     if (err === 0) {
       return false;
@@ -107,7 +107,7 @@ export class GLHelper {
     }
   }
 
-  public static setDefaultState(gl: WebGLRenderingContext): void {
+  public static setDefaultState(gl: WebGL2RenderingContext): void {
     // default [r=0,g=0,b=0,a=0]
     gl.clearColor(0.0, 0.0, 0.0, 0.0); // 每次清屏时，将颜色缓冲区设置为全透明黑色
     gl.clearDepth(1.0); // 每次清屏时，将深度缓冲区设置为1.0
@@ -116,12 +116,12 @@ export class GLHelper {
     gl.enable(gl.SCISSOR_TEST); // 开启裁剪测试
   }
 
-  public static setViewport(gl: WebGLRenderingContext, v: number[]): void {
+  public static setViewport(gl: WebGL2RenderingContext, v: number[]): void {
     gl.viewport(v[0], v[1], v[2], v[3]);
   }
 
   public static compileShader(
-    gl: WebGLRenderingContext,
+    gl: WebGL2RenderingContext,
     code: string,
     shader: WebGLShader
   ): boolean {
@@ -141,12 +141,12 @@ export class GLHelper {
   }
 
   public static linkProgram(
-    gl: WebGLRenderingContext, // 渲染上下文对象
+    gl: WebGL2RenderingContext, // 渲染上下文对象
     program: WebGLProgram, // 链接器对象
     vsShader: WebGLShader, // 要链接的顶点着色器
     fsShader: WebGLShader, // 要链接的片段着色器
     beforeProgramLink?: (
-      gl: WebGLRenderingContext,
+      gl: WebGL2RenderingContext,
       program: WebGLProgram
     ) => void
   ) {
@@ -174,7 +174,7 @@ export class GLHelper {
   }
 
   public static logProgramActiveAttribs(
-    gl: WebGLRenderingContext,
+    gl: WebGL2RenderingContext,
     program: WebGLProgram
   ) {
     //获取当前active状态的attribute和uniform的数量
@@ -200,7 +200,7 @@ export class GLHelper {
   }
 
   public static logProgramAtciveUniforms(
-    gl: WebGLRenderingContext,
+    gl: WebGL2RenderingContext,
     program: WebGLProgram
   ) {
     let uniformsCount: number = gl.getProgramParameter(
@@ -223,7 +223,7 @@ export class GLHelper {
     console.log(JSON.stringify(out));
   }
 
-  public static getColorBufferData(gl: WebGLRenderingContext): Uint8Array {
+  public static getColorBufferData(gl: WebGL2RenderingContext): Uint8Array {
     let pixels: Uint8Array = new Uint8Array(
       gl.drawingBufferWidth * gl.drawingBufferHeight * 4
     );
@@ -240,7 +240,7 @@ export class GLHelper {
   }
 
   public static createBuilder(
-    gl: WebGLRenderingContext,
+    gl: WebGL2RenderingContext,
     type: GLShaderType,
     vertexAttribs: GLAttribName[] = [GLAttribName.POSITION, GLAttribName.COLOR]
   ) {
