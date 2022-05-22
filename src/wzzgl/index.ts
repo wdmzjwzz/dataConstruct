@@ -1,6 +1,7 @@
 
 import { GLShaderSource } from "./glsl";
 import Attributes from "./twgl/attributes";
+import { Programs } from "./twgl/Programs";
 
 const twgl = (window as any).twgl
 const m4 = (window as any).m4
@@ -19,6 +20,7 @@ export default class Application {
     }
     main() {
         const { vs, fs } = GLShaderSource;
+        const programInfo = new Programs()
         const gl = this.gl
         // Tell the twgl to match position with a_position, n
         // normal with a_normal etc..
@@ -40,14 +42,16 @@ export default class Application {
         // var bufferInfo = twgl.createBufferInfoFromArrays(gl, arrays);
 
 
-        var bufferInfo  = new Attributes().createBufferInfoFromArrays(gl, arrays2)
-        console.log(bufferInfo);
+        var bufferInfo = new Attributes().createBufferInfoFromArrays(gl, arrays2)
+
 
         // setup GLSL program
-        var program = twgl.createProgramFromSources(gl, [vs, fs]);
+        // var program = twgl.createProgramFromSources(gl, [vs, fs]);
+        var program = programInfo.createProgramFromSources(gl, vs, fs);
+        // console.log(program, 222);
         var uniformSetters = twgl.createUniformSetters(gl, program);
         var attribSetters = twgl.createAttributeSetters(gl, program);
-
+        console.log(uniformSetters,attribSetters, 222);
         var vao = twgl.createVAOFromBufferInfo(
             gl, attribSetters, bufferInfo);
 
