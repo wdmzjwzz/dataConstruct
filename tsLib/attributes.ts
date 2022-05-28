@@ -59,7 +59,7 @@ function setAttribInfoBufferFromArray(gl: WebGLRenderingContext, attribInfo: Att
   }
 }
 
-function createBufferInfoFromArrays(gl: WebGL2RenderingContext, arrays: AttribInfo) {
+export  function createBufferInfoFromArrays(gl: WebGL2RenderingContext, arrays: AttribInfo) {
   const newAttribs = createAttribsFromArrays(gl, arrays);
   const bufferInfo: any = {};
   bufferInfo.attribs = newAttribs
@@ -85,8 +85,7 @@ function createBufferFromArray(gl: WebGLRenderingContext, array: AttribItem, arr
 export {
   createAttribsFromArrays,
   createBufferFromArray,
-  createBufferFromTypedArray,
-  createBufferInfoFromArrays,
+  createBufferFromTypedArray, 
   setAttribInfoBufferFromArray,
 };
 
