@@ -1,7 +1,7 @@
 import { DataType } from "./constants"
 import { isTexture } from "./utils";
 
-export const typeMap = {
+export const typeMap: { [key: number]: any } = {
     [DataType.FLOAT]: {
         Type: Float32Array,
         size: 4,
@@ -162,105 +162,98 @@ export const typeMap = {
         cols: 3,
     },
     [DataType.SAMPLER_2D]: {
-        Type: null,
+      
         size: 0,
         setter: samplerSetter,
         arraySetter: samplerArraySetter,
         bindPoint: DataType.TEXTURE_2D,
     },
-    [DataType.SAMPLER_CUBE]: {
-        Type: null,
+    [DataType.SAMPLER_CUBE]: { 
         size: 0,
         setter: samplerSetter,
         arraySetter: samplerArraySetter,
         bindPoint: DataType.TEXTURE_CUBE_MAP,
     },
-    [DataType.SAMPLER_3D]: {
-        Type: null,
+    [DataType.SAMPLER_3D]: { 
         size: 0,
         setter: samplerSetter,
         arraySetter: samplerArraySetter,
         bindPoint: DataType.TEXTURE_3D,
     },
-    [DataType.SAMPLER_2D_SHADOW]: {
-        Type: null,
+    [DataType.SAMPLER_2D_SHADOW]: { 
         size: 0,
         setter: samplerSetter,
         arraySetter: samplerArraySetter,
         bindPoint: DataType.TEXTURE_2D,
     },
-    [DataType.SAMPLER_2D_ARRAY]: {
-        Type: null,
+    [DataType.SAMPLER_2D_ARRAY]: { 
         size: 0,
         setter: samplerSetter,
         arraySetter: samplerArraySetter,
         bindPoint: DataType.TEXTURE_2D_ARRAY,
     },
-    [DataType.SAMPLER_2D_ARRAY_SHADOW]: {
-        Type: null,
+    [DataType.SAMPLER_2D_ARRAY_SHADOW]: { 
         size: 0,
         setter: samplerSetter,
         arraySetter: samplerArraySetter,
         bindPoint: DataType.TEXTURE_2D_ARRAY,
     },
-    [DataType.SAMPLER_CUBE_SHADOW]: {
-        Type: null,
+    [DataType.SAMPLER_CUBE_SHADOW]: { 
         size: 0,
         setter: samplerSetter,
         arraySetter: samplerArraySetter,
         bindPoint: DataType.TEXTURE_CUBE_MAP,
     },
-    [DataType.INT_SAMPLER_2D]: {
-        Type: null,
+    [DataType.INT_SAMPLER_2D]: { 
         size: 0,
         setter: samplerSetter,
         arraySetter: samplerArraySetter,
         bindPoint: DataType.TEXTURE_2D,
     },
     [DataType.INT_SAMPLER_3D]: {
-        Type: null,
+        
         size: 0,
         setter: samplerSetter,
         arraySetter: samplerArraySetter,
         bindPoint: DataType.TEXTURE_3D,
     },
     [DataType.INT_SAMPLER_CUBE]: {
-        Type: null,
+        
         size: 0,
         setter: samplerSetter,
         arraySetter: samplerArraySetter,
         bindPoint: DataType.TEXTURE_CUBE_MAP,
     },
     [DataType.INT_SAMPLER_2D_ARRAY]: {
-        Type: null,
+        
         size: 0,
         setter: samplerSetter,
         arraySetter: samplerArraySetter,
         bindPoint: DataType.TEXTURE_2D_ARRAY,
     },
     [DataType.UNSIGNED_INT_SAMPLER_2D]: {
-        Type: null,
+        
         size: 0,
         setter: samplerSetter,
         arraySetter: samplerArraySetter,
         bindPoint: DataType.TEXTURE_2D,
     },
     [DataType.UNSIGNED_INT_SAMPLER_3D]: {
-        Type: null,
+        
         size: 0,
         setter: samplerSetter,
         arraySetter: samplerArraySetter,
         bindPoint: DataType.TEXTURE_3D,
     },
     [DataType.UNSIGNED_INT_SAMPLER_CUBE]: {
-        Type: null,
+        
         size: 0,
         setter: samplerSetter,
         arraySetter: samplerArraySetter,
         bindPoint: DataType.TEXTURE_CUBE_MAP,
     },
     [DataType.UNSIGNED_INT_SAMPLER_2D_ARRAY]: {
-        Type: null,
+        
         size: 0,
         setter: samplerSetter,
         arraySetter: samplerArraySetter,
@@ -271,145 +264,145 @@ export const typeMap = {
 
 
 function floatSetter(gl: WebGL2RenderingContext, location: number) {
-    return function (v) {
+    return function (v: number) {
         gl.uniform1f(location, v);
     };
 }
 
 function floatArraySetter(gl: WebGL2RenderingContext, location: number) {
-    return function (v) {
+    return function (v: Iterable<number>) {
         gl.uniform1fv(location, v);
     };
 }
 
 function floatVec2Setter(gl: WebGL2RenderingContext, location: number) {
-    return function (v) {
+    return function (v: Iterable<number>) {
         gl.uniform2fv(location, v);
     };
 }
 
 function floatVec3Setter(gl: WebGL2RenderingContext, location: number) {
-    return function (v) {
+    return function (v: Iterable<number>) {
         gl.uniform3fv(location, v);
     };
 }
 
 function floatVec4Setter(gl: WebGL2RenderingContext, location: number) {
-    return function (v) {
+    return function (v: Iterable<number>) {
         gl.uniform4fv(location, v);
     };
 }
 
 function intSetter(gl: WebGL2RenderingContext, location: number) {
-    return function (v) {
+    return function (v: number) {
         gl.uniform1i(location, v);
     };
 }
 
 function intArraySetter(gl: WebGL2RenderingContext, location: number) {
-    return function (v) {
+    return function (v: Iterable<number>) {
         gl.uniform1iv(location, v);
     };
 }
 
 function intVec2Setter(gl: WebGL2RenderingContext, location: number) {
-    return function (v) {
+    return function (v: Iterable<number>) {
         gl.uniform2iv(location, v);
     };
 }
 
 function intVec3Setter(gl: WebGL2RenderingContext, location: number) {
-    return function (v) {
+    return function (v: Iterable<number>) {
         gl.uniform3iv(location, v);
     };
 }
 
 function intVec4Setter(gl: WebGL2RenderingContext, location: number) {
-    return function (v) {
+    return function (v: Iterable<number>) {
         gl.uniform4iv(location, v);
     };
 }
 
 function uintSetter(gl: WebGL2RenderingContext, location: number) {
-    return function (v) {
+    return function (v: number) {
         gl.uniform1ui(location, v);
     };
 }
 
 function uintArraySetter(gl: WebGL2RenderingContext, location: number) {
-    return function (v) {
+    return function (v: Iterable<number>) {
         gl.uniform1uiv(location, v);
     };
 }
 
 function uintVec2Setter(gl: WebGL2RenderingContext, location: number) {
-    return function (v) {
+    return function (v: Iterable<number>) {
         gl.uniform2uiv(location, v);
     };
 }
 
 function uintVec3Setter(gl: WebGL2RenderingContext, location: number) {
-    return function (v) {
+    return function (v: Iterable<number>) {
         gl.uniform3uiv(location, v);
     };
 }
 
 function uintVec4Setter(gl: WebGL2RenderingContext, location: number) {
-    return function (v) {
+    return function (v: Iterable<number>) {
         gl.uniform4uiv(location, v);
     };
 }
 
 function floatMat2Setter(gl: WebGL2RenderingContext, location: number) {
-    return function (v) {
+    return function (v: Iterable<number>) {
         gl.uniformMatrix2fv(location, false, v);
     };
 }
 
 function floatMat3Setter(gl: WebGL2RenderingContext, location: number) {
-    return function (v) {
+    return function (v: Iterable<number>) {
         gl.uniformMatrix3fv(location, false, v);
     };
 }
 
 function floatMat4Setter(gl: WebGL2RenderingContext, location: number) {
-    return function (v) {
+    return function (v: Iterable<number>) {
         gl.uniformMatrix4fv(location, false, v);
     };
 }
 
 function floatMat23Setter(gl: WebGL2RenderingContext, location: number) {
-    return function (v) {
+    return function (v: Iterable<number>) {
         gl.uniformMatrix2x3fv(location, false, v);
     };
 }
 
 function floatMat32Setter(gl: WebGL2RenderingContext, location: number) {
-    return function (v) {
+    return function (v: Iterable<number>) {
         gl.uniformMatrix3x2fv(location, false, v);
     };
 }
 
 function floatMat24Setter(gl: WebGL2RenderingContext, location: number) {
-    return function (v) {
+    return function (v: Iterable<number>) {
         gl.uniformMatrix2x4fv(location, false, v);
     };
 }
 
 function floatMat42Setter(gl: WebGL2RenderingContext, location: number) {
-    return function (v) {
+    return function (v: Iterable<number>) {
         gl.uniformMatrix4x2fv(location, false, v);
     };
 }
 
 function floatMat34Setter(gl: WebGL2RenderingContext, location: number) {
-    return function (v) {
+    return function (v: Iterable<number>) {
         gl.uniformMatrix3x4fv(location, false, v);
     };
 }
 
 function floatMat43Setter(gl: WebGL2RenderingContext, location: number) {
-    return function (v) {
+    return function (v: Iterable<number>) {
         gl.uniformMatrix4x3fv(location, false, v);
     };
 }
@@ -420,7 +413,7 @@ function samplerSetter(
     location: number
 ) {
     const bindPoint = getBindPointForSamplerType(type);
-    return function (textureOrPair) {
+    return function (textureOrPair: { texture: any; sampler: any; }) {
         let texture;
         let sampler;
         if (isTexture(textureOrPair)) {
@@ -430,14 +423,14 @@ function samplerSetter(
             texture = textureOrPair.texture;
             sampler = textureOrPair.sampler;
         }
-        gl.uniform1i(location, unit);
+        // gl.uniform1i(location, unit);
         gl.activeTexture(gl.TEXTURE0 + unit);
         gl.bindTexture(bindPoint, texture);
-        gl.bindSampler(unit, sampler);
+        // gl.bindSampler(unit, sampler);
     };
 }
 function getBindPointForSamplerType(type: number) {
-    return typeMap[type].bindPoint;
+    return (typeMap as any)[type].bindPoint;
 }
 
 function samplerArraySetter(

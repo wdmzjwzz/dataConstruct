@@ -33,28 +33,6 @@ export class GLTexture {
     this.filter();
   }
 
-  // 下面三个静态辅助方法用于生成纹理的mipmap使用
-
-  // 1、静态辅助数学方法，判断参数x（必须是4）是否是2的n次方，即x是不是1、2、4、8、16、32、64、.....
-  public static isPowerOfTwo(x: number): boolean {
-    return (x & (x - 1)) == 0;
-  }
-
-  // 2、静态辅助数学方法，给定整数参数x，取下一个2的n次方数
-  // 如果x为3，则返回4
-  // 如果x为4，则返回4
-  // 如果x为5，则返回8
-  // 依次类推
-  public static getNextPowerOfTwo(x: number): number {
-    if (x <= 0) {
-      throw new Error("参数必须要大于0!");
-    }
-    --x;
-    for (var i = 1; i < 32; i <<= 1) {
-      x = x | (x >> i);
-    }
-    return x + 1;
-  }
  
  
   public static createDefaultTexture(gl: WebGL2RenderingContext): GLTexture {
@@ -124,7 +102,6 @@ export class GLTexture {
   public filter(minLinear: boolean = true, magLinear: boolean = true): void {
     // 在设置filter时先要绑定当前的纹理目标
     this.gl.bindTexture(this.target, this.texture);
-     
     this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.NEAREST);
     this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_S, this.gl.REPEAT);
     this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_T, this.gl.REPEAT);

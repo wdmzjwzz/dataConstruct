@@ -117,7 +117,7 @@ export class Application implements EventListenerObject {
 
   private _fps: number = 0;
 
-  public isFlipYCoord: boolean = false;
+  public isFlipYCoord: boolean = true;
 
   // 我们的Application主要是canvas2D和webGL应用
   // 而canvas2D和webGL context都是从HTMLCanvasElement元素获取的

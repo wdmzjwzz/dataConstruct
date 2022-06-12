@@ -1,10 +1,4 @@
-import { GLProgram } from "..";
-import { GLAttribName } from "../type";
-import { GLShaderType } from "./glsl";
-import { GLAttribStateManager } from "./WebGLAttribState";
-import { GLMeshBuilder } from "./WebGLMesh";
  
-
 export enum EGLSLESDataType {
   FLOAT_Vector2 = 0x8b50,
   FLOAT_Vector3,
@@ -56,7 +50,7 @@ export class GLHelper {
     );
     console.log(
       "6. isSampleAlphtToCoverageEnable = " +
-        gl.isEnabled(gl.SAMPLE_ALPHA_TO_COVERAGE)
+      gl.isEnabled(gl.SAMPLE_ALPHA_TO_COVERAGE)
     );
     console.log(
       "7. isSampleCoverageEnable = " + gl.isEnabled(gl.SAMPLE_COVERAGE)
@@ -188,13 +182,13 @@ export class GLHelper {
     //很重要一点，attribute在shader中只能读取，不能赋值,如果没有被使用的话，也是不算入activeAttrib中去的
     for (let i = 0; i < attributsCount; i++) {
       let info: WebGLActiveInfo = gl.getActiveAttrib(program, i);
-      
-        out[info.name] = new GLAttribInfo(
-          info.size,
-          info.type,
-          gl.getAttribLocation(program, info.name)
-        );
-      
+
+      out[info.name] = new GLAttribInfo(
+        info.size,
+        info.type,
+        gl.getAttribLocation(program, info.name)
+      );
+
     }
     console.log(JSON.stringify(out));
   }
@@ -238,15 +232,5 @@ export class GLHelper {
     );
     return pixels;
   }
-
-  public static createBuilder(
-    gl: WebGL2RenderingContext,
-    type: GLShaderType,
-    vertexAttribs: GLAttribName[] = [GLAttribName.POSITION, GLAttribName.COLOR]
-  ) {
-    const bit = GLAttribStateManager.makeVertexAttribs(vertexAttribs);
-    const program = GLProgram.createProgram(type, gl, bit);
-
-    return new GLMeshBuilder(gl, bit, program);
-  }
+ 
 }

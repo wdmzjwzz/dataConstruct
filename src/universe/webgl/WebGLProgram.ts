@@ -1,78 +1,40 @@
-import { GLAttribStateManager } from "./WebGLAttribState";
+
 import { Vector2, Vector3, Vector4, Matrix4, quat } from "../common/math/TSM";
- 
+
 import { GLHelper } from "./WebGLHepler";
-import { GLAttribBits } from "../type";
-import { attribNames, GLAttribMap } from "../constants";
-import { GLShaderSource, GLShaderType } from "./glsl";
-/*
-比较特别的是Texture Unit
-glActiveTexture 激活某个TextureUnit
-glBindTexture   激活的TextureUnit中放入纹理
-glUniform1i     将unit所绑定的纹理sampler传输到GPU
+import { attrTypeMap } from "../../tinyWebGL/attriMap";
+import { typeMap } from "../../tinyWebGL/programTypeMap";
 
-绘制时，不需要ActiveTexture了，只要bingTexture就可以了
-*/
-// camera相关transform uniform可以预先设定
-// texture相关，固定化，可以预先设定
-// 其他需要每帧更新
-
+export interface GLSetters {
+  [key: string]: (...arg: any) => boolean
+}
 export class GLProgram {
-  // uniforms相关定义
-
-  //vs常用的uniform命名
-  public static readonly MVMatrix: string = "uMVMatrix"; // 模型视图矩阵
-  public static readonly ModelMatrix: string = "uModelMatrix"; // 模型矩阵
-  public static readonly ViewMatrix: string = "uViewMatrix"; // 视矩阵
-  public static readonly ProjectMatrix: string = "uProjectMatrix"; // 投影矩阵
-  public static readonly NormalMatrix: string = "uNormalMatrix"; // 法线矩阵
-  public static readonly MVPMatrix: string = "uMVPMatrix"; // 模型_视图_投影矩阵
-  public static readonly Color: string = "uColor"; // 颜色值
-
-  //ps常用的uniform命名
-  public static readonly Sampler: string = "uSampler"; // 纹理取样器
-  public static readonly DiffuseSampler: string = "uDiffuseSampler"; // 漫反射取样器
-  public static readonly NormalSampler: string = "uNormalSampler"; // 法线取样器
-  public static readonly SpecularSampler: string = "uSpecularSampler"; // 高光取样器
-  public static readonly DepthSampler: string = "uDepthSampler"; // 深度取样器
 
   public gl: WebGL2RenderingContext; // WebGL上下文渲染对象
   public name: string; // program名
 
-  private _attribState: GLAttribBits; // 当前的Program使用的顶点属性bits值
 
   public program: WebGLProgram; // 链接器
   public vsShader: WebGLShader; // vertex shader编译器
   public fsShader: WebGLShader; // fragment shader编译器
 
-  public get attribState(): GLAttribBits {
-    return this._attribState;
-  }
+  public attribSetters: GLSetters = {};
+  public uniformSetters: GLSetters = {};
 
   private progromBeforeLink(
     gl: WebGL2RenderingContext,
     program: WebGLProgram
   ): void {
-    //链接前才能使用bindAttribLocation函数
-    //1 attrib名字必须和shader中的命名要一致
-    //2 数量必须要和mesh中一致
-    //3 mesh中的数组的component必须固定
-    attribNames.forEach((name) => {
-      if (GLAttribStateManager.hasAttrib(name, this._attribState)) {
-        gl.bindAttribLocation(program, GLAttribMap[name].location, name);
-      }
-    });
+    //链接前才能使用bindAttribLocation函数 
+
   }
 
   public constructor(
     context: WebGL2RenderingContext,
-    attribState: GLAttribBits,
     vsShader: string,
     fsShader: string,
-    name: string = ""
   ) {
     this.gl = context;
-    this._attribState = attribState; //最好从shader中抽取
 
     this.vsShader = this.gl.createShader(this.gl.VERTEX_SHADER);
 
@@ -82,7 +44,8 @@ export class GLProgram {
 
     this.loadShaders(vsShader, fsShader);
 
-    this.name = name;
+    this.loadAttribSetters()
+    this.loadUniformSetters()
   }
   public loadShaders(vs: string, fs: string): void {
     GLHelper.compileShader(this.gl, vs, this.vsShader);
@@ -100,7 +63,63 @@ export class GLProgram {
     GLHelper.logProgramActiveAttribs(this.gl, this.program);
     GLHelper.logProgramAtciveUniforms(this.gl, this.program);
   }
+  public loadAttribSetters() {
+    const numAttribs = this.gl.getProgramParameter(this.program, this.gl.ACTIVE_ATTRIBUTES);
 
+    for (let i = 0; i < numAttribs; ++i) {
+      const attribInfo = this.gl.getActiveAttrib(this.program, i);
+      const index = this.gl.getAttribLocation(this.program, attribInfo.name);
+      const typeInfo = attrTypeMap[attribInfo.type];
+      const setter = typeInfo.setter(this.gl, index, typeInfo);
+      setter.location = index;
+      if (!this.attribSetters[attribInfo.name]) {
+        this.attribSetters[attribInfo.name] = null
+      }
+      this.attribSetters[attribInfo.name] = setter;
+    }
+  }
+
+  public loadUniformSetters() {
+
+    const uniformSetters: any = this.uniformSetters;
+    // const uniformTree = {};
+    const numUniforms = this.gl.getProgramParameter(this.program, this.gl.ACTIVE_UNIFORMS);
+
+
+    for (let ii = 0; ii < numUniforms; ++ii) {
+      const uniformInfo = this.gl.getActiveUniform(this.program, ii);
+      let name = uniformInfo.name;
+      const location = this.gl.getUniformLocation(this.program, uniformInfo.name);
+      // the uniform will have no location if it's in a uniform block
+      if (!location) {
+        continue;
+      }
+      const setter = this.createUniformSetter(uniformInfo, location);
+      uniformSetters[name] = setter;
+    }
+
+  }
+
+  private createUniformSetter(uniformInfo: WebGLActiveInfo, location: WebGLUniformLocation) {
+    let textureUnit = 0; 
+    const type = uniformInfo.type;
+    const typeInfo = typeMap[type];
+    if (!typeInfo) {
+      throw new Error(`unknown type: 0x${type.toString(16)}`); // we should never get here.
+    }
+    let setter;
+    if (typeInfo.bindPoint) {
+      // it's a sampler
+      const unit = textureUnit;
+      textureUnit += uniformInfo.size;
+      debugger
+      setter = typeInfo.setter(this.gl, type, unit, location, uniformInfo.size);
+    } else {
+      setter = typeInfo.setter(this.gl, location);
+    }
+    setter.location = location;
+    return setter;
+  }
   public bind(): void {
     this.gl.useProgram(this.program);
   }
@@ -119,6 +138,10 @@ export class GLProgram {
 
   public setAttributeLocation(name: string, loc: number): void {
     this.gl.bindAttribLocation(this.program, loc, name);
+  }
+
+  public loadSampler(unit: number = 0): boolean {
+    return this.setSampler('u_diffuse', unit);
   }
 
   public setInt(name: string, i: number): boolean {
@@ -202,25 +225,4 @@ export class GLProgram {
     return false;
   }
 
-  public loadModeViewMatrix(mat: Matrix4): boolean {
-    return this.setMatrix4(GLProgram.MVMatrix, mat);
-  }
-
-  public loadSampler(unit: number = 0): boolean {
-    return this.setSampler(GLProgram.Sampler, unit);
-  }
-
-  public static createProgram(
-    type: GLShaderType,
-    gl: WebGL2RenderingContext,
-    bit: GLAttribBits
-  ): GLProgram {
-    let pro: GLProgram = new GLProgram(
-      gl,
-      bit,
-      GLShaderSource[type].vs,
-      GLShaderSource[type].fs
-    );
-    return pro;
-  }
 }

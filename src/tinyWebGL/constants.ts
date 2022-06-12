@@ -38,11 +38,11 @@ export enum DataType {
     UNIFORM_BLOCK_DATA_SIZE = 0x8a40,
     UNIFORM_BLOCK_ACTIVE_UNIFORM_INDICES = 0x8a43,
 
-     
+
     FLOAT_VEC2 = 0x8b50,
     FLOAT_VEC3 = 0x8b51,
     FLOAT_VEC4 = 0x8b52,
-    
+
     INT_VEC2 = 0x8b53,
     INT_VEC3 = 0x8b54,
     INT_VEC4 = 0x8b55,
@@ -66,7 +66,7 @@ export enum DataType {
     SAMPLER_2D_ARRAY = 0x8dc1,
     SAMPLER_2D_ARRAY_SHADOW = 0x8dc4,
     SAMPLER_CUBE_SHADOW = 0x8dc5,
- 
+
     UNSIGNED_INT_VEC2 = 0x8dc6,
     UNSIGNED_INT_VEC3 = 0x8dc7,
     UNSIGNED_INT_VEC4 = 0x8dc8,
@@ -85,7 +85,7 @@ export enum DataType {
     TEXTURE_2D_ARRAY = 0x8c1a,
 
 }
-export const glTypeToTypedArray =
+export const glTypeToTypedArray: { [key: number]: any } =
 {
 
     [DataType.BYTE]: Int8Array,

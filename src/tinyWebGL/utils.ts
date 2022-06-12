@@ -4,7 +4,7 @@ export function isIndices(name: string) {
   return name === "indices";
 }
 
-export function copyNamedProperties(names, src, dst) {
+export function copyNamedProperties(names: any[], src: { [x: string]: any; }, dst: { [x: string]: any; }) {
   names.forEach((name) => {
     const value = src[name];
     if (value !== undefined) {
@@ -13,7 +13,7 @@ export function copyNamedProperties(names, src, dst) {
   });
 }
 
-export function copyExistingProperties(src, dst) {
+export function copyExistingProperties(src: { [x: string]: any; hasOwnProperty: (arg0: string) => any; }, dst: { [x: string]: any; hasOwnProperty?: any; }) {
   Object.keys(dst).forEach((key) => {
     if (dst.hasOwnProperty(key) && src.hasOwnProperty(key)) {
       /* eslint no-prototype-builtins: 0 */
@@ -22,11 +22,11 @@ export function copyExistingProperties(src, dst) {
   });
 }
 
-export function error(...args) {
+export function error(...args: any[]) {
   console.error(...args);
 }
 
-export function warn(...args) {
+export function warn(...args: any[]) {
   console.warn(...args);
 }
 
@@ -59,7 +59,7 @@ export function isSampler(t: any) {
  *   be returned. Pass in a `Uint32Array` and `gl.UNSIGNED_INT` will be returned
  * @memberOf module:twgl/typedArray
  */
-export function getGLTypeForTypedArray(typedArray) {
+export function getGLTypeForTypedArray(typedArray: any) {
   if (typedArray instanceof Int8Array) {
     return DataType.BYTE;
   } // eslint-disable-line
@@ -93,7 +93,7 @@ export function getGLTypeForTypedArray(typedArray) {
  * @return {function} the constructor for a the corresponding typed array. (eg. `Uint32Array`).
  * @memberOf module:twgl/typedArray
  */
-export function geypedArrayTypeForGLType(type) {
+export function geypedArrayTypeForGLType(type: number) {
   const CTOR = glTypeToTypedArray[type];
   if (!CTOR) {
     throw new Error("unknown gl type");
@@ -103,22 +103,27 @@ export function geypedArrayTypeForGLType(type) {
 
 export const isArrayBuffer =
   typeof SharedArrayBuffer !== "undefined"
-    ? function isArrayBufferOrSharedArrayBuffer(a) {
-        return (
-          a &&
-          a.buffer &&
-          (a.buffer instanceof ArrayBuffer ||
-            a.buffer instanceof SharedArrayBuffer)
-        );
-      }
-    : function isArrayBuffer(a) {
-        return a && a.buffer && a.buffer instanceof ArrayBuffer;
-      };
+    ? function isArrayBufferOrSharedArrayBuffer(a: { buffer: any; }) {
+      return (
+        a &&
+        a.buffer &&
+        (a.buffer instanceof ArrayBuffer ||
+          a.buffer instanceof SharedArrayBuffer)
+      );
+    }
+    : function isArrayBuffer(a: { buffer: any; }) {
+      return a && a.buffer && a.buffer instanceof ArrayBuffer;
+    };
 
-export function getArray(array) {
+export function getArray(array: { length: any; data: any; }) {
   return array.length ? array : array.data;
 }
 
-export function getNumComponents(array, arrayName) {
+export function getNumComponents(array: { numComponents: any; }, arrayName: any) {
   return array.numComponents;
+}
+export function getNormalizationForTypedArray(typedArray: ArrayBufferView) {
+  if (typedArray instanceof Int8Array) { return true; }  // eslint-disable-line
+  if (typedArray instanceof Uint8Array) { return true; }  // eslint-disable-line
+  return false;
 }

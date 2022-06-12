@@ -11,7 +11,7 @@ export class CameraApplication extends WebGLApplication {
   ) {
     super(canvas, contextAttributes);
     this.camera = new Camera(this.gl, canvas.width, canvas.height, 45, 0.1, 1000);
-    this.camera.z = 500;
+    this.camera.z = 10;
   }
 
   //子类override update函数时必须要调用基类本方法
