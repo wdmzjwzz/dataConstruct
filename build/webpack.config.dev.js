@@ -39,7 +39,7 @@ module.exports = (env, argv) => ({
             {
                 test: /\.(vert|frag)$/,
                 use: {
-                    loader: path.resolve(__dirname, './glsl-loader'),
+                    loader: 'raw-loader',
                 }
             }
         ],

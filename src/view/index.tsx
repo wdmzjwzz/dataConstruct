@@ -1,14 +1,16 @@
 import React, { useEffect, useRef } from 'react'
 import ReactDOM from 'react-dom'
-import { MeshApplication } from '../universe/MeshApplication';
+import { Camera } from '../app/Camera';
+import { CameraApplication } from '../app/CameraApplication';
 import "./index.less"
 
 function App() {
     const canvas = useRef<HTMLCanvasElement>(null);
-    let app: MeshApplication;
+    let app: CameraApplication;
     const init = () => {
-        app = new MeshApplication(canvas.current);
-        app.run()
+        const camera = new Camera(canvas.current.clientWidth, canvas.current.clientHeight);
+        app = new CameraApplication(canvas.current,camera);
+        app.start()
     };
     useEffect(() => {
         init();
