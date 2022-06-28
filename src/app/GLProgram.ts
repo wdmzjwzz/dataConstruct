@@ -11,7 +11,7 @@ export interface GLParamsInfo {
     name: string;
 }
 export type BufferData = {
-    data: Float32Array | Uint16Array;
+    data: Float32Array | Uint16Array|Uint8Array;
     numComponents?: number;
     type?: number;
     normalize?: boolean;
