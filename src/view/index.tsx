@@ -9,6 +9,7 @@ function App() {
     let app: CameraApplication;
     const init = () => {
         const camera = new Camera(canvas.current.clientWidth, canvas.current.clientHeight);
+ 
         app = new CameraApplication(canvas.current,camera);
         app.start()
     };

@@ -46,7 +46,7 @@ export class CameraApplication extends Application {
   public addLight(light: BaseLight) {
     this.light = light;
   }
-  public update(elapsedMsec: number, intervalSec: number): void { }
+  public update(elapsedMsec: number, intervalSec: number): void {}
 
   resizeCanvasToDisplaySize() {
     const canvas = this.gl.canvas as HTMLCanvasElement;
@@ -56,73 +56,85 @@ export class CameraApplication extends Application {
     }
   }
   public start(): void {
-    this.resizeCanvasToDisplaySize()
+    this.resizeCanvasToDisplaySize();
 
     const bufferData: { [key: string]: BufferData } = {
       a_position: {
         data: new Float32Array([
-          -100, -100, 100,
-          100, -100, 100,
-          100, 100, 100,
-          -100, 100, 100,
+          -100, -100, 100, 100, -100, 100, 100, 100, 100, -100, 100, 100,
 
           // Back face
-          -100, -100, -100,
-          -100, 100, -100,
-          100, 100, -100,
-          100, -100, -100,
+          -100, -100, -100, -100, 100, -100, 100, 100, -100, 100, -100, -100,
 
           // Top face
-          -100, 100, -100,
-          -100, 100, 100,
-          100, 100, 100,
-          100, 100, -100,
+          -100, 100, -100, -100, 100, 100, 100, 100, 100, 100, 100, -100,
 
           // Bottom face
-          -100, -100, -100,
-          100, -100, -100,
-          100, -100, 100,
-          -100, -100, 100,
+          -100, -100, -100, 100, -100, -100, 100, -100, 100, -100, -100, 100,
 
           // Right face
-          100, -100, -100,
-          100, 100, -100,
-          100, 100, 100,
-          100, -100, 100,
+          100, -100, -100, 100, 100, -100, 100, 100, 100, 100, -100, 100,
 
           // Left face
-          -100, -100, -100,
-          -100, -100, 100,
-          -100, 100, 100,
-          -100, 100, -100
+          -100, -100, -100, -100, -100, 100, -100, 100, 100, -100, 100, -100,
         ]),
-        numComponents: 3
+        numComponents: 3,
       },
       indices: {
         data: new Uint16Array([
-          0, 1, 2, 0, 2, 3,    // front
-          4, 5, 6, 4, 6, 7,    // back
-          8, 9, 10, 8, 10, 11,   // top
-          12, 13, 14, 12, 14, 15,   // bottom
-          16, 17, 18, 16, 18, 19,   // right
-          20, 21, 22, 20, 22, 23    // left
-        ])
-      }
-    }
-    const buffers = GLHelper.createBuffers(this.gl, bufferData)
+          0,
+          1,
+          2,
+          0,
+          2,
+          3, // front
+          4,
+          5,
+          6,
+          4,
+          6,
+          7, // back
+          8,
+          9,
+          10,
+          8,
+          10,
+          11, // top
+          12,
+          13,
+          14,
+          12,
+          14,
+          15, // bottom
+          16,
+          17,
+          18,
+          16,
+          18,
+          19, // right
+          20,
+          21,
+          22,
+          20,
+          22,
+          23, // left
+        ]),
+      },
+    };
+    const buffers = GLHelper.createBuffers(this.gl, bufferData);
     const mat4 = new Matrix4();
-    mat4.translate(new Vector3([100, 100, 100]));
+    mat4.scale(new Vector3([0.1, 0.1, 0.1]));
     // mat4.rotate(Math.PI / 4, Vector3.up)
-    const projectionMat4 = this.camera.viewProjection
-    const mvpMat4 = Matrix4.product(mat4, projectionMat4)
+    const projectionMat4 = this.camera.viewProjectionMatrix;
+    const mvpMat4 = Matrix4.product(mat4, projectionMat4);
     const uniformData = {
       u_color: new Uint16Array([0, 1, 1, 1]),
-      u_mvpMat4: mvpMat4.values
-    }
-    this.glProgram.bind()
-    this.glProgram.setUniformInfo(uniformData)
-    this.glProgram.setAttributeInfo(buffers)
-    GLHelper.setDefaultState(this.gl)
+      u_mvpMat4: mvpMat4.values,
+    };
+    this.glProgram.bind();
+    this.glProgram.setUniformInfo(uniformData);
+    this.glProgram.setAttributeInfo(buffers);
+    GLHelper.setDefaultState(this.gl);
     // draw
     var primitiveType = this.gl.TRIANGLES;
     var offset = 0;
@@ -131,11 +143,9 @@ export class CameraApplication extends Application {
     super.start();
   }
 
-  public render(): void {
-
-  }
+  public render(): void {}
   degToRad(d: number) {
     return (d * Math.PI) / 180;
   }
-  public onKeyPress(evt: CanvasKeyBoardEvent): void { }
+  public onKeyPress(evt: CanvasKeyBoardEvent): void {}
 }
