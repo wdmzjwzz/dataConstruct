@@ -47,17 +47,6 @@ export class Camera {
     this._position = value;
   }
 
-  public setViewport(
-    x: number,
-    y: number,
-    width: number,
-    height: number
-  ): void {
-    this.gl.viewport(x, y, width, height);
-    this.gl.scissor(x, y, width, height);
-    this.aspectRatio = width / height;
-  }
-
   public getViewport(): Int32Array {
     return this.gl.getParameter(this.gl.VIEWPORT);
   }
@@ -134,7 +123,7 @@ export class Camera {
     height: number,
     fovY: number = 45.0,
     zNear: number = 1,
-    zFar: number = 1000
+    zFar: number = 2000
   ) {
     this._aspectRatio = width / height;
     this._fovY = MathHelper.toRadian(fovY);
@@ -142,8 +131,8 @@ export class Camera {
     this._near = zNear;
     this._far = zFar;
 
-    (this._top = this._near * Math.tan(this._fovY * 0.5)),
-      (this._right = this._top * this._aspectRatio);
+    this._top = this._near * Math.tan(this._fovY * 0.5)
+    this._right = this._top * this._aspectRatio
     this._bottom = -this._top;
     this._left = -this._right;
 
@@ -153,7 +142,7 @@ export class Camera {
     this._viewProjMatrix = new Matrix4();
     this._invViewProjMatrix = new Matrix4();
     this.controlByMouse = false;
-    this.update(0);
+   
   }
 
   public update(intervalSec: number): void {
@@ -290,7 +279,7 @@ export class Camera {
 
   private _type: ECameraType = ECameraType.FPSCAMERA;
 
-  private _position: Vector3 = new Vector3([0, 0, 500]);
+  private _position: Vector3 = new Vector3([200, 500, 500]);
   private _xAxis: Vector3 = new Vector3([1, 0, 0]);
   private _yAxis: Vector3 = new Vector3([0, 1, 0]);
   private _zAxis: Vector3 = new Vector3([0, 0, 1]);
