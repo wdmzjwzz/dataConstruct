@@ -57,7 +57,27 @@ export class CameraApplication extends Application {
   }
   public start(): void {
     this.resizeCanvasToDisplaySize();
+    const faceColors = [
+      [1.0, 0.0, 1.0, 1.0], // Front face: white
+      [1.0, 0.0, 0.0, 1.0], // Back face: red
+      [0.0, 1.0, 0.0, 1.0], // Top face: green
+      [0.0, 0.0, 1.0, 1.0], // Bottom face: blue
+      [1.0, 1.0, 0.0, 1.0], // Right face: yellow
+      [1.0, 0.0, 1.0, 1.0], // Left face: purple
+    ];
 
+    // Convert the array of colors into a table for all the vertices.
+
+    var colors: any = [];
+
+    for (var j = 0; j < faceColors.length; ++j) {
+      const c = faceColors[j];
+
+      // Repeat each color four times for the four vertices of the face
+      colors = colors.concat(c, c, c, c);
+    }
+   
+    
     const bufferData: { [key: string]: BufferData } = {
       a_position: {
         data: new Float32Array([
@@ -79,6 +99,10 @@ export class CameraApplication extends Application {
           -100, -100, -100, -100, -100, 100, -100, 100, 100, -100, 100, -100,
         ]),
         numComponents: 3,
+      },
+      a_color: {
+        data: new Float32Array(colors),
+        numComponents: 4,
       },
       indices: {
         data: new Uint16Array([
@@ -123,12 +147,11 @@ export class CameraApplication extends Application {
     };
     const buffers = GLHelper.createBuffers(this.gl, bufferData);
     const mat4 = new Matrix4();
-    mat4.scale(new Vector3([0.1, 0.1, 0.1]));
-    // mat4.rotate(Math.PI / 4, Vector3.up)
+     
+    mat4.rotate(Math.PI /4, Vector3.up);
     const projectionMat4 = this.camera.viewProjectionMatrix;
     const mvpMat4 = Matrix4.product(mat4, projectionMat4);
     const uniformData = {
-      u_color: new Uint16Array([0, 1, 1, 1]),
       u_mvpMat4: mvpMat4.values,
     };
     this.glProgram.bind();

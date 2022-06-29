@@ -7,7 +7,7 @@ precision highp float;
 // we need to declare an output for the fragment shader
 out vec4 outColor;
 
-uniform vec4 u_color;
+in vec4 u_color;
 
 void main() {
   // Just set the output to a constant redish-purple

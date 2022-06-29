@@ -129,14 +129,13 @@ export class Camera {
 
   public controlByMouse: boolean;
 
-  public constructor( 
+  public constructor(
     width: number,
     height: number,
     fovY: number = 45.0,
     zNear: number = 1,
     zFar: number = 1000
   ) {
-   
     this._aspectRatio = width / height;
     this._fovY = MathHelper.toRadian(fovY);
 
@@ -283,39 +282,7 @@ export class Camera {
   //从当前轴以及postion合成view矩阵
   private _calcViewMatrix(): void {
     //固定forward方向
-    this._zAxis.normalize();
-
-    //forward cross right = up
-    Vector3.cross(this._zAxis, this._xAxis, this._yAxis);
-    this._yAxis.normalize();
-
-    //up cross forward = right
-    Vector3.cross(this._yAxis, this._zAxis, this._xAxis);
-    this._xAxis.normalize();
-
-    let x: number = -Vector3.dot(this._xAxis, this._position);
-    let y: number = -Vector3.dot(this._yAxis, this._position);
-    let z: number = -Vector3.dot(this._zAxis, this._position);
-
-    this._viewMatrix.values[0] = this._xAxis.x;
-    this._viewMatrix.values[1] = this._yAxis.x;
-    this._viewMatrix.values[2] = this._zAxis.x;
-    this._viewMatrix.values[3] = 0.0;
-
-    this._viewMatrix.values[4] = this._xAxis.y;
-    this._viewMatrix.values[5] = this._yAxis.y;
-    this._viewMatrix.values[6] = this._zAxis.y;
-    this._viewMatrix.values[7] = 0.0;
-
-    this._viewMatrix.values[8] = this._xAxis.z;
-    this._viewMatrix.values[9] = this._yAxis.z;
-    this._viewMatrix.values[10] = this._zAxis.z;
-    this._viewMatrix.values[11] = 0.0;
-
-    this._viewMatrix.values[12] = x;
-    this._viewMatrix.values[13] = y;
-    this._viewMatrix.values[14] = z;
-    this._viewMatrix.values[15] = 1.0;
+    this.lookAt(new Vector3([0, 0, 0]), Vector3.up);
 
     //求view的逆矩阵，也就是世界矩阵
     this._invViewMatrix = this._viewMatrix.copy().inverse();
@@ -323,7 +290,7 @@ export class Camera {
 
   private _type: ECameraType = ECameraType.FPSCAMERA;
 
-  private _position: Vector3 = new Vector3([0,0,200]);
+  private _position: Vector3 = new Vector3([0, 0, 500]);
   private _xAxis: Vector3 = new Vector3([1, 0, 0]);
   private _yAxis: Vector3 = new Vector3([0, 1, 0]);
   private _zAxis: Vector3 = new Vector3([0, 0, 1]);
