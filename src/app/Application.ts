@@ -11,6 +11,7 @@ export enum EInputEventType {
   KEYUP, //总类，键按下事件
   KEYDOWN, //键弹起事件
   KEYPRESS, //按键事件
+  WHEEL
 }
 
 // CanvasKeyboardEvent和CanvasMouseEvent都继承自本类
@@ -72,17 +73,20 @@ export class CanvasMouseEvent extends CanvasInputEvent {
   // 基于canvas坐标系的表示
   public canvasPosition: Vector2;
 
+  public wheelDelta: number
   public constructor(
     type: EInputEventType,
     canvasPos: Vector2,
     button: number,
     altKey: boolean = false,
     ctrlKey: boolean = false,
-    shiftKey: boolean = false
+    shiftKey: boolean = false,
+    wheelDelta: number = 0
   ) {
     super(type, altKey, ctrlKey, shiftKey);
     this.canvasPosition = canvasPos;
     this.button = button;
+    this.wheelDelta = wheelDelta
   }
 }
 
@@ -117,7 +121,6 @@ export class Application implements EventListenerObject {
 
   private _fps: number = 0;
 
-  public isFlipYCoord: boolean = true;
 
   public canvas: HTMLCanvasElement;
 
@@ -220,7 +223,7 @@ export class Application implements EventListenerObject {
     this._lastTime = timeStamp;
 
     this._handleTimers(intervalSec);
-   
+
     // 先更新
     this.update(elapsedMsec, intervalSec);
     // 后渲染
@@ -237,32 +240,25 @@ export class Application implements EventListenerObject {
 
   // 停止动画循环
   public stop(): void {
-    if (this._start) {
-      // cancelAnimationFrame函数用于:
-      //取消一个先前通过调用window.requestAnimationFrame()方法添加到计划中的动画帧请求
-      //alert(this._requestId);
-      cancelAnimationFrame(this._requestId);
-      //this . _requestId = -1 ; // 将_requestId设置为-1
-
-      // 在start和stop函数中，_lastTime和_startTime都设置为-1
+    if (this._start) { 
+      cancelAnimationFrame(this._requestId); 
       this._lastTime = -1;
       this._startTime = -1;
       this._start = false;
     }
   }
 
-  //虚方法，子类能覆写（override），用于更新
   //注意: 第二个参数是秒为单位，第一参数是毫秒为单位
-  public update(elapsedMsec: number, intervalSec: number): void {}
+  public update(elapsedMsec: number, intervalSec: number): void { }
 
-  //虚方法，子类能覆写（override），用于渲染
-  public render(): void {}
 
- 
-  public clearCanvas() {}
-  // 调用dispatchXXXX虚方法进行事件分发
+  public render(): void { }
+
+
+  public clearCanvas() { }
+
   // handleEvent是接口EventListenerObject定义的协议分发，必须要实现
-  public handleEvent(evt: Event): void {
+  public handleEvent(evt: MouseEvent): void {
     switch (evt.type) {
       case "mousedown":
         this._isMouseDown = true;
@@ -301,7 +297,7 @@ export class Application implements EventListenerObject {
         this.onKeyUp(this._toCanvasKeyBoardEvent(evt, EInputEventType.KEYUP));
         break;
       case "wheel":
-        this.onWheel(evt);
+        this.onWheel(this._toCanvasMouseEvent(evt, EInputEventType.WHEEL));
         break;
     }
   }
@@ -333,7 +329,7 @@ export class Application implements EventListenerObject {
   protected onKeyPress(evt: CanvasKeyBoardEvent): void {
     return;
   }
-  protected onWheel(evt: Event): void {
+  protected onWheel(evt: CanvasMouseEvent): void {
     return;
   }
   protected getMouseCanvas(): HTMLCanvasElement {
@@ -348,15 +344,10 @@ export class Application implements EventListenerObject {
     // 切记，很重要一点：
     // getBoundingClientRect方法返回的ClientRect
     let rect: ClientRect = this.getMouseCanvas().getBoundingClientRect();
-
     // 获取触发鼠标事件的target元素，这里总是HTMLCanvasElement
     if (evt.target) {
       let x: number = evt.clientX - rect.left;
-      let y: number = 0;
-      y = evt.clientY - rect.top; // 相对于canvas左上的偏移
-      if (this.isFlipYCoord) {
-        y = this.getMouseCanvas().height - y;
-      }
+      let y: number = evt.clientY - rect.top;
       // 变成矢量表示
       let pos: Vector2 = new Vector2([x, y]);
       return pos;
@@ -367,11 +358,10 @@ export class Application implements EventListenerObject {
 
   // 将DOM Event对象信息转换为我们自己定义的CanvasMouseEvent事件
   private _toCanvasMouseEvent(
-    evt: Event,
+    event: MouseEvent,
     type: EInputEventType
   ): CanvasMouseEvent {
-    // 向下转型，将Event转换为MouseEvent
-    let event: MouseEvent = evt as MouseEvent;
+
     if (type === EInputEventType.MOUSEDOWN && event.button === 2) {
       this._isRightMouseDown = true;
     } else if (type === EInputEventType.MOUSEUP && event.button === 2) {
@@ -386,14 +376,15 @@ export class Application implements EventListenerObject {
 
     // 将客户区的鼠标pos变换到Canvas坐标系中表示
     let mousePosition: Vector2 = this.viewportToCanvasCoordinate(event);
-    // 将Event一些要用到的信息传递给CanvasMouseEvent并返回
+    let wheelDelta = (event as WheelEvent).deltaY || 0
     let canvasMouseEvent: CanvasMouseEvent = new CanvasMouseEvent(
       type,
       mousePosition,
       buttonNum,
       event.altKey,
       event.ctrlKey,
-      event.shiftKey
+      event.shiftKey,
+      wheelDelta
     );
     return canvasMouseEvent;
   }

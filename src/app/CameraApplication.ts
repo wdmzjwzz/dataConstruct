@@ -1,5 +1,5 @@
 /* eslint-disable */
-import { Application, CanvasKeyBoardEvent } from "./Application";
+import { Application, CanvasKeyBoardEvent, CanvasMouseEvent } from "./Application";
 import { Camera } from "./Camera";
 
 import colorVS from "./shaders/shodowColor.vert";
@@ -46,7 +46,7 @@ export class CameraApplication extends Application {
     this.light = light;
   }
   public update(elapsedMsec: number, intervalSec: number): void {
-    this.camera.rotate(1,new Vector3([1,0,0]))
+    // this.camera.rotate(1, new Vector3([1, 0, 0]))
     this.camera.update(elapsedMsec)
   }
 
@@ -90,12 +90,21 @@ export class CameraApplication extends Application {
     GLHelper.setDefaultState(this.gl)
     // draw 
     this.gl.drawElements(this.gl.TRIANGLES, 36, this.gl.UNSIGNED_SHORT, 0);
-   
+
   }
   degToRad(d: number) {
     return (d * Math.PI) / 180;
   }
-  public onKeyPress(evt: CanvasKeyBoardEvent): void {
+
+  public onWheel(evt: CanvasMouseEvent) {
+    console.log(evt, 1111);
+    // const position = [evt.x, evt.y]
+    // 放大
+    if (evt.wheelDelta < 0) {
+      
+    } else {
+      // 缩小
+    }
 
   }
 }
