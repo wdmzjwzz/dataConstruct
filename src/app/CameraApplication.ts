@@ -10,8 +10,7 @@ import { GLWorldMatrixStack } from "./GLMatrixStack";
 
 import GLProgram, { BufferData, BufferInfo } from "./GLProgram";
 import { GLHelper } from "./GLHepler";
-import { Matrix4 } from "./math/TSM";
-
+import { Vector3 } from "./math/TSM";
 export class CameraApplication extends Application {
   public camera: Camera; // 在WebGLApplication的基础上增加了对摄像机系统的支持
   public angle = 0; // 用来更新旋转角度
@@ -46,7 +45,10 @@ export class CameraApplication extends Application {
   public addLight(light: BaseLight) {
     this.light = light;
   }
-  public update(elapsedMsec: number, intervalSec: number): void { }
+  public update(elapsedMsec: number, intervalSec: number): void {
+    this.camera.rotate(1,new Vector3([1,0,0]))
+    this.camera.update(elapsedMsec)
+  }
 
   resizeCanvasToDisplaySize() {
     const canvas = this.gl.canvas as HTMLCanvasElement;
@@ -72,32 +74,28 @@ export class CameraApplication extends Application {
         data: indices
       }
     }
-    const buffers = this.glProgram.createBuffers(bufferData)
-    const mat4 = new Matrix4();
-    // mat4.translate(new Vector3([-0.4, 0, 0]));
-    // mat4.rotate(Math.PI / 4, Vector3.up)
-    const projectionMat4 = this.camera.viewProjMatrix
-    const mvpMat4 = Matrix4.product(mat4, projectionMat4)
-    const uniformData = {
-      u_matrix: mvpMat4.values
-    }
-    this.glProgram.bind()
-    this.glProgram.setUniformInfo(uniformData)
-    this.glProgram.setAttributeInfo(buffers)
-    GLHelper.setDefaultState(this.gl)
-    // draw
-    var primitiveType = this.gl.TRIANGLES;
-    var offset = 0;
-    var count = 36;
-    this.gl.drawElements(primitiveType, count, this.gl.UNSIGNED_SHORT, offset);
+    this.bufferInfo = this.glProgram.createBuffers(bufferData)
     super.start();
   }
 
   public render(): void {
-
+    this.angle += 0.1;
+    const projectionMat4 = this.camera.viewProjMatrix
+    const uniformData = {
+      u_matrix: projectionMat4.values
+    }
+    this.glProgram.bind()
+    this.glProgram.setUniformInfo(uniformData)
+    this.glProgram.setAttributeInfo(this.bufferInfo)
+    GLHelper.setDefaultState(this.gl)
+    // draw 
+    this.gl.drawElements(this.gl.TRIANGLES, 36, this.gl.UNSIGNED_SHORT, 0);
+   
   }
   degToRad(d: number) {
     return (d * Math.PI) / 180;
   }
-  public onKeyPress(evt: CanvasKeyBoardEvent): void { }
+  public onKeyPress(evt: CanvasKeyBoardEvent): void {
+
+  }
 }

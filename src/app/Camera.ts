@@ -10,7 +10,7 @@ export enum ECameraType {
 export class Camera {
 
   public controlByMouse: boolean;
-  public position: Vector3;
+  public readonly position: Vector3;
   public target: Vector3;
   public far: number
   public near: number
@@ -36,7 +36,7 @@ export class Camera {
     this.far = zFar;
 
     this.controlByMouse = false;
-    this.position = new Vector3([0, 500, 500])
+    this.position = new Vector3([0, 0, 500])
     this.target = new Vector3([0, 0, 0])
     this.update(0)
   }
@@ -55,97 +55,28 @@ export class Camera {
       this.invViewMatrix,
     );
   }
-
-  //局部坐标系下的前后运动
-  public moveForward(speed: number): void {
-    if (this._type === ECameraType.FPSCAMERA) {
-      this.position.x += this.zAxis.x * speed;
-      this.position.z += this.zAxis.z * speed;
+  setPosition(newPosition: number[] | Vector3) {
+    if (newPosition instanceof Vector3) {
+      this.position.x = newPosition.x;
+      this.position.y = newPosition.y
+      this.position.z = newPosition.z
     } else {
-      this.position.x += this.zAxis.x * speed;
-      this.position.y += this.zAxis.y * speed;
-      this.position.z += this.zAxis.z * speed;
-    }
-  }
-
-  //局部坐标系下的左右运动
-  public moveRightward(speed: number): void {
-    if (this._type === ECameraType.FPSCAMERA) {
-      this.position.x += this.xAxis.x * speed;
-      this.position.z += this.xAxis.z * speed;
-    } else {
-      this.position.x += this.xAxis.x * speed;
-      this.position.y += this.xAxis.y * speed;
-      this.position.z += this.xAxis.z * speed;
-    }
-  }
-
-  //局部坐标系下的上下运动
-  public moveUpward(speed: number): void {
-    if (this._type === ECameraType.FPSCAMERA) {
-      this.position.y += speed;
-    } else {
-      this.position.x += this.yAxis.x * speed;
-      this.position.y += this.yAxis.y * speed;
-      this.position.z += this.yAxis.z * speed;
-    }
-  }
-
-  //局部坐标轴的左右旋转
-  public yaw(angle: number): void {
-    Matrix4.m0.setIdentity();
-    angle = MathHelper.toRadian(angle);
-    if (this._type === ECameraType.FPSCAMERA) {
-      Matrix4.m0.rotate(angle, Vector3.up);
-    } else {
-      Matrix4.m0.rotate(angle, this.yAxis);
+      if (newPosition.length !== 3) {
+        throw new Error("相机位置格式不真确");
+      }
+      this.position.x = newPosition[0];
+      this.position.y = newPosition[1]
+      this.position.z = newPosition[2]
     }
 
-    Matrix4.m0.multiplyVector3(this.zAxis, this.zAxis);
-    Matrix4.m0.multiplyVector3(this.xAxis, this.xAxis);
-  }
-
-  //局部坐标轴的上下旋转
-  public pitch(angle: number): void {
-    Matrix4.m0.setIdentity();
-    angle = MathHelper.toRadian(angle);
-    Matrix4.m0.rotate(angle, this.xAxis);
-    Matrix4.m0.multiplyVector3(this.yAxis, this.yAxis);
-    Matrix4.m0.multiplyVector3(this.zAxis, this.zAxis);
-  }
+  } 
 
   //局部坐标轴的滚转
-  public roll(angle: number): void {
-    if (this._type === ECameraType.FLYCAMERA) {
-      angle = MathHelper.toRadian(angle);
-      Matrix4.m0.setIdentity();
-      Matrix4.m0.rotate(angle, this.zAxis);
-      Matrix4.m0.multiplyVector3(this.xAxis, this.xAxis);
-      Matrix4.m0.multiplyVector3(this.yAxis, this.yAxis);
-    }
-  }
-
-  //从当前postition和target获得view矩阵
-  //并且从view矩阵抽取forward,up,right方向矢量
-  public lookAt(target: Vector3, up: Vector3 = Vector3.up): void {
-    this.viewMatrix = Matrix4.lookAt(this.position, target, up);
-
-    this.xAxis.x = this.viewMatrix.values[0];
-    this.yAxis.x = this.viewMatrix.values[1];
-    this.zAxis.x = this.viewMatrix.values[2];
-
-    this.xAxis.y = this.viewMatrix.values[4];
-    this.yAxis.y = this.viewMatrix.values[5];
-    this.zAxis.y = this.viewMatrix.values[6];
-
-    this.xAxis.z = this.viewMatrix.values[8];
-    this.yAxis.z = this.viewMatrix.values[9];
-    this.zAxis.z = this.viewMatrix.values[10];
-  }
-
-  private _type: ECameraType = ECameraType.FPSCAMERA;
-  private xAxis: Vector3 = new Vector3([1, 0, 0]);
-  private yAxis: Vector3 = new Vector3([0, 1, 0]);
-  private zAxis: Vector3 = new Vector3([0, 0, 1]);
+  public rotate(angle: number, vector3: Vector3 = Vector3.up): void {
+    angle = MathHelper.toRadian(angle);
+    Matrix4.m0.setIdentity();
+    Matrix4.m0.rotate(angle, vector3);
+    Matrix4.m0.multiplyVector3(this.position, this.position);
+  } 
 
 }
