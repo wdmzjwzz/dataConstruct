@@ -10,7 +10,7 @@ import { GLWorldMatrixStack } from "./GLMatrixStack";
 
 import GLProgram, { BufferData, BufferInfo } from "./GLProgram";
 import { GLHelper } from "./GLHepler";
-import { Matrix4, Vector3 } from "./math/TSM";
+import { Matrix4 } from "./math/TSM";
 
 export class CameraApplication extends Application {
   public camera: Camera; // 在WebGLApplication的基础上增加了对摄像机系统的支持
@@ -57,279 +57,87 @@ export class CameraApplication extends Application {
   }
   public start(): void {
     this.resizeCanvasToDisplaySize()
+    var colors = [
+      [1.0, 1.0, 1.0, 1.0],    // Front face: white
+      [1.0, 0.0, 0.0, 1.0],    // Back face: red
+      [0.0, 1.0, 0.0, 1.0],    // Top face: green
+      [0.0, 0.0, 1.0, 1.0],    // Bottom face: blue
+      [1.0, 1.0, 0.0, 1.0],    // Right face: yellow
+      [1.0, 0.0, 1.0, 1.0]     // Left face: purple
+    ];
+
+    let generatedColors: number[] = [];
+
+    for (let j = 0; j < 6; j++) {
+      var c = colors[j];
+
+      for (var i = 0; i < 4; i++) {
+        generatedColors = generatedColors.concat(c);
+      }
+    }
 
     const bufferData: { [key: string]: BufferData } = {
       a_position: {
         data: new Float32Array([
-          0, 0, 0,
-          0, 150, 0,
-          30, 0, 0,
-          0, 150, 0,
-          30, 150, 0,
-          30, 0, 0,
+          -100, -100, 100,
+          100, -100, 100,
+          100, 100, 100,
+          -100, 100, 100,
 
-          // top rung front
-          30, 0, 0,
-          30, 30, 0,
-          100, 0, 0,
-          30, 30, 0,
-          100, 30, 0,
-          100, 0, 0,
+          // Back face
+          -100, -100, -100,
+          -100, 100, -100,
+          100, 100, -100,
+          100, -100, -100,
 
-          // middle rung front
-          30, 60, 0,
-          30, 90, 0,
-          67, 60, 0,
-          30, 90, 0,
-          67, 90, 0,
-          67, 60, 0,
+          // Top face
+          -100, 100, -100,
+          -100, 100, 100,
+          100, 100, 100,
+          100, 100, -100,
 
-          // left column back
-          0, 0, 30,
-          30, 0, 30,
-          0, 150, 30,
-          0, 150, 30,
-          30, 0, 30,
-          30, 150, 30,
+          // Bottom face
+          -100, -100, -100,
+          100, -100, -100,
+          100, -100, 100,
+          -100, -100, 100,
 
-          // top rung back
-          30, 0, 30,
-          100, 0, 30,
-          30, 30, 30,
-          30, 30, 30,
-          100, 0, 30,
-          100, 30, 30,
+          // Right face
+          100, -100, -100,
+          100, 100, -100,
+          100, 100, 100,
+          100, -100, 100,
 
-          // middle rung back
-          30, 60, 30,
-          67, 60, 30,
-          30, 90, 30,
-          30, 90, 30,
-          67, 60, 30,
-          67, 90, 30,
-
-          // top
-          0, 0, 0,
-          100, 0, 0,
-          100, 0, 30,
-          0, 0, 0,
-          100, 0, 30,
-          0, 0, 30,
-
-          // top rung right
-          100, 0, 0,
-          100, 30, 0,
-          100, 30, 30,
-          100, 0, 0,
-          100, 30, 30,
-          100, 0, 30,
-
-          // under top rung
-          30, 30, 0,
-          30, 30, 30,
-          100, 30, 30,
-          30, 30, 0,
-          100, 30, 30,
-          100, 30, 0,
-
-          // between top rung and middle
-          30, 30, 0,
-          30, 60, 30,
-          30, 30, 30,
-          30, 30, 0,
-          30, 60, 0,
-          30, 60, 30,
-
-          // top of middle rung
-          30, 60, 0,
-          67, 60, 30,
-          30, 60, 30,
-          30, 60, 0,
-          67, 60, 0,
-          67, 60, 30,
-
-          // right of middle rung
-          67, 60, 0,
-          67, 90, 30,
-          67, 60, 30,
-          67, 60, 0,
-          67, 90, 0,
-          67, 90, 30,
-
-          // bottom of middle rung.
-          30, 90, 0,
-          30, 90, 30,
-          67, 90, 30,
-          30, 90, 0,
-          67, 90, 30,
-          67, 90, 0,
-
-          // right of bottom
-          30, 90, 0,
-          30, 150, 30,
-          30, 90, 30,
-          30, 90, 0,
-          30, 150, 0,
-          30, 150, 30,
-
-          // bottom
-          0, 150, 0,
-          0, 150, 30,
-          30, 150, 30,
-          0, 150, 0,
-          30, 150, 30,
-          30, 150, 0,
-
-          // left side
-          0, 0, 0,
-          0, 0, 30,
-          0, 150, 30,
-          0, 0, 0,
-          0, 150, 30,
-          0, 150, 0,
+          // Left face
+          -100, -100, -100,
+          -100, -100, 100,
+          -100, 100, 100,
+          -100, 100, -100
         ]),
         numComponents: 3
       },
       a_color: {
+        data: new Uint8Array(generatedColors),
+        numComponents: 4
+      },
+      indices: {
         data: new Uint8Array([
-          // left column front
-          200, 70, 120,
-          200, 70, 120,
-          200, 70, 120,
-          200, 70, 120,
-          200, 70, 120,
-          200, 70, 120,
-
-          // top rung front
-          200, 70, 120,
-          200, 70, 120,
-          200, 70, 120,
-          200, 70, 120,
-          200, 70, 120,
-          200, 70, 120,
-
-          // middle rung front
-          200, 70, 120,
-          200, 70, 120,
-          200, 70, 120,
-          200, 70, 120,
-          200, 70, 120,
-          200, 70, 120,
-
-          // left column back
-          80, 70, 200,
-          80, 70, 200,
-          80, 70, 200,
-          80, 70, 200,
-          80, 70, 200,
-          80, 70, 200,
-
-          // top rung back
-          80, 70, 200,
-          80, 70, 200,
-          80, 70, 200,
-          80, 70, 200,
-          80, 70, 200,
-          80, 70, 200,
-
-          // middle rung back
-          80, 70, 200,
-          80, 70, 200,
-          80, 70, 200,
-          80, 70, 200,
-          80, 70, 200,
-          80, 70, 200,
-
-          // top
-          70, 200, 210,
-          70, 200, 210,
-          70, 200, 210,
-          70, 200, 210,
-          70, 200, 210,
-          70, 200, 210,
-
-          // top rung right
-          200, 200, 70,
-          200, 200, 70,
-          200, 200, 70,
-          200, 200, 70,
-          200, 200, 70,
-          200, 200, 70,
-
-          // under top rung
-          210, 100, 70,
-          210, 100, 70,
-          210, 100, 70,
-          210, 100, 70,
-          210, 100, 70,
-          210, 100, 70,
-
-          // between top rung and middle
-          210, 160, 70,
-          210, 160, 70,
-          210, 160, 70,
-          210, 160, 70,
-          210, 160, 70,
-          210, 160, 70,
-
-          // top of middle rung
-          70, 180, 210,
-          70, 180, 210,
-          70, 180, 210,
-          70, 180, 210,
-          70, 180, 210,
-          70, 180, 210,
-
-          // right of middle rung
-          100, 70, 210,
-          100, 70, 210,
-          100, 70, 210,
-          100, 70, 210,
-          100, 70, 210,
-          100, 70, 210,
-
-          // bottom of middle rung.
-          76, 210, 100,
-          76, 210, 100,
-          76, 210, 100,
-          76, 210, 100,
-          76, 210, 100,
-          76, 210, 100,
-
-          // right of bottom
-          140, 210, 80,
-          140, 210, 80,
-          140, 210, 80,
-          140, 210, 80,
-          140, 210, 80,
-          140, 210, 80,
-
-          // bottom
-          90, 130, 110,
-          90, 130, 110,
-          90, 130, 110,
-          90, 130, 110,
-          90, 130, 110,
-          90, 130, 110,
-
-          // left side
-          160, 160, 220,
-          160, 160, 220,
-          160, 160, 220,
-          160, 160, 220,
-          160, 160, 220,
-          160, 160, 220,
-        ]),
-        numComponents: 3
+          0, 1, 2, 0, 2, 3,    // front
+          4, 5, 6, 4, 6, 7,    // back
+          8, 9, 10, 8, 10, 11,   // top
+          12, 13, 14, 12, 14, 15,   // bottom
+          16, 17, 18, 16, 18, 19,   // right
+          20, 21, 22, 20, 22, 23    // left
+        ])
       }
     }
     const buffers = GLHelper.createBuffers(this.gl, bufferData)
     const mat4 = new Matrix4();
-    mat4.translate(new Vector3([-0.4, 0, 0]));
-    mat4.rotate(Math.PI / 4, Vector3.up)
+    // mat4.translate(new Vector3([-0.4, 0, 0]));
+    // mat4.rotate(Math.PI / 4, Vector3.up)
     const projectionMat4 = this.camera.viewProjection
     const mvpMat4 = Matrix4.product(mat4, projectionMat4)
-    const uniformData = { 
+    const uniformData = {
       u_matrix: mvpMat4.values
     }
     this.glProgram.bind()
@@ -339,8 +147,8 @@ export class CameraApplication extends Application {
     // draw
     var primitiveType = this.gl.TRIANGLES;
     var offset = 0;
-    var count = 16 * 6;
-    this.gl.drawArrays(primitiveType, offset, count);
+    var count = 36;
+    this.gl.drawElements(primitiveType, count, this.gl.UNSIGNED_SHORT, offset);
     super.start();
   }
 
