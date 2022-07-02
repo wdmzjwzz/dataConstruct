@@ -1,3 +1,5 @@
+import { Point3 } from "../Geometry/Point";
+
 /* eslint-disable */
 export const EPSILON: number = 0.0001;
 export class Vector2 {
@@ -34,6 +36,13 @@ export class Vector2 {
     dest.y = this.y;
     return dest;
   }
+  subtract(vector: Vector2): Vector2 {
+    const dest = this.copy();
+    dest.x -= vector.x;
+    dest.y -= vector.y;
+    return dest;
+  }
+
 }
 
 export class Vector3 {
@@ -117,7 +126,7 @@ export class Vector3 {
     return Math.sqrt(this.length2);
   }
 
-  public get length2(): number {
+  private get length2(): number {
     let x = this.x,
       y = this.y,
       z = this.z;
@@ -189,7 +198,15 @@ export class Vector3 {
     this.z *= len;
     return length;
   }
-
+  public multiply(
+    value: number
+  ): Vector3 {
+    const dest = this.copy();
+    dest.x *= value;
+    dest.y *= value;
+    dest.z *= value;
+    return dest;
+  }
   public static multiplyScalar(
     vector: Vector3,
     value: number,
@@ -936,7 +953,7 @@ export class Matrix4 {
     far: number
   ): Matrix4 {
     const f = Math.tan(Math.PI * 0.5 - 0.5 * fov);
-    const rangeInv = 1.0 / (near - far); 
+    const rangeInv = 1.0 / (near - far);
     return new Matrix4([
       f / aspect, 0, 0, 0,
       0, f, 0, 0,
@@ -982,15 +999,15 @@ export class Matrix4 {
   }
 
   public static lookAt(
-    position: Vector3,
-    target: Vector3,
+    position: Point3,
+    target: Point3,
     up: Vector3 = Vector3.up
   ): Matrix4 {
     if (position.equals(target)) {
       return this.identity;
     }
 
-    const zAxis = Vector3.difference(position, target).normalize();
+    const zAxis = position.subtract(target).normalize();
     const xAxis = Vector3.cross(up, zAxis).normalize();
     const yAxis = Vector3.cross(zAxis, xAxis).normalize();
 

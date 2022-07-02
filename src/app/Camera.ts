@@ -1,3 +1,4 @@
+import { Point3 } from "./Geometry/Point";
 import { MathHelper } from "./math/MathHelper";
 import { Matrix4, Vector3 } from "./math/TSM";
 
@@ -10,8 +11,8 @@ export enum ECameraType {
 export class Camera {
 
   public controlByMouse: boolean;
-  public readonly position: Vector3;
-  public target: Vector3;
+  public readonly position: Point3;
+  public target: Point3;
   public far: number
   public near: number
   public aspectRatio: number
@@ -36,8 +37,8 @@ export class Camera {
     this.far = zFar;
 
     this.controlByMouse = false;
-    this.position = new Vector3([0, 0, 500])
-    this.target = new Vector3([0, 0, 0])
+    this.position = new Point3(0,0, 500)
+    this.target = new Point3(0, 0, 0)
     this.update(0)
   }
 
@@ -55,8 +56,8 @@ export class Camera {
       this.invViewMatrix,
     );
   }
-  setPosition(newPosition: number[] | Vector3) {
-    if (newPosition instanceof Vector3) {
+  setPosition(newPosition: number[] | Point3) {
+    if (newPosition instanceof Point3) {
       this.position.x = newPosition.x;
       this.position.y = newPosition.y
       this.position.z = newPosition.z
@@ -67,16 +68,10 @@ export class Camera {
       this.position.x = newPosition[0];
       this.position.y = newPosition[1]
       this.position.z = newPosition[2]
-    }
-
+    } 
   } 
-
-  //局部坐标轴的滚转
-  public rotate(angle: number, vector3: Vector3 = Vector3.up): void {
-    angle = MathHelper.toRadian(angle);
-    Matrix4.m0.setIdentity();
-    Matrix4.m0.rotate(angle, vector3);
-    Matrix4.m0.multiplyVector3(this.position, this.position);
+  lookAt(target:Point3=this.target){
+    this.target = target
+    this.viewMatrix = Matrix4.lookAt(this.position, target, Vector3.up) 
   } 
-
 }
