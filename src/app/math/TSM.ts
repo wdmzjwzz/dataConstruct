@@ -605,7 +605,7 @@ export class Matrix4 {
   }
 
   public inverse(): Matrix4 {
-   
+
     const a00 = this.values[0],
       a01 = this.values[1],
       a02 = this.values[2],
@@ -935,10 +935,15 @@ export class Matrix4 {
     near: number,
     far: number
   ): Matrix4 {
-    const top = near * Math.tan(fov * 0.5),
-      right = top * aspect;
+    const f = Math.tan(Math.PI * 0.5 - 0.5 * fov);
+    const rangeInv = 1.0 / (near - far); 
+    return new Matrix4([
+      f / aspect, 0, 0, 0,
+      0, f, 0, 0,
+      0, 0, (near + far) * rangeInv, -1,
+      0, 0, near * far * rangeInv * 2, 0,
+    ]);
 
-    return Matrix4.frustum(-right, right, -top, top, near, far);
   }
 
   public static orthographic(
@@ -985,30 +990,15 @@ export class Matrix4 {
       return this.identity;
     }
 
-    const z = Vector3.difference(position, target).normalize();
-    const x = Vector3.cross(up, z).normalize();
-    const y = Vector3.cross(z, x).normalize();
+    const zAxis = Vector3.difference(position, target).normalize();
+    const xAxis = Vector3.cross(up, zAxis).normalize();
+    const yAxis = Vector3.cross(zAxis, xAxis).normalize();
 
     return new Matrix4([
-      x.x,
-      y.x,
-      z.x,
-      0,
-
-      x.y,
-      y.y,
-      z.y,
-      0,
-
-      x.z,
-      y.z,
-      z.z,
-      0,
-
-      -Vector3.dot(x, position),
-      -Vector3.dot(y, position),
-      -Vector3.dot(z, position),
-      1,
+      xAxis.x, xAxis.y, xAxis.z, 0,
+      yAxis.x, yAxis.y, yAxis.z, 0,
+      zAxis.x, zAxis.y, zAxis.z, 0,
+      position.x, position.y, position.z, 1,
     ]);
   }
 

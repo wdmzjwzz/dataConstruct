@@ -1,6 +1,5 @@
- 
-import { BufferData, BufferInfo } from "./GLProgram";
- 
+import { Vector3 } from "./math/TSM";
+
 
 export enum EGLSLESDataType {
   FLOAT_Vector2 = 0x8b50,
@@ -113,60 +112,74 @@ export class GLHelper {
     return pixels;
   }
 
-  public static createFVertxes() {
-    const vertexes = new Float32Array([
+  public static createCubeVertxes(length: number = 100) {
+    const positions = [
       // Front face
-      -1.0, -1.0, 1.0, -1.0, 1.0, 1.0, -1.0, 1.0,
-    ]);
+      -length, -length, length,
+      length, -length, length,
+      length, length, length,
+      -length, length, length,
+
+      // Back face
+      -length, -length, -length,
+      -length, length, -length,
+      length, length, -length,
+      length, -length, -length,
+
+      // Top face
+      -length, length, -length,
+      -length, length, length,
+      length, length, length,
+      length, length, -length,
+
+      // Bottom face
+      -length, -length, -length,
+      length, -length, -length,
+      length, -length, length,
+      -length, -length, length,
+
+      // Right face
+      length, -length, -length,
+      length, length, -length,
+      length, length, length,
+      length, -length, length,
+
+      // Left face
+      -length, -length, -length,
+      -length, -length, length,
+      -length, length, length,
+      -length, length, -length,
+    ];
+    const vertexes = new Float32Array(positions);
 
     const indices = new Uint16Array([
-      0,
-      1,
-      2,
-      0,
-      2,
-      3, // front
+      0, 1, 2, 0, 2, 3,    // front
+      4, 5, 6, 4, 6, 7,    // back
+      8, 9, 10, 8, 10, 11,   // top
+      12, 13, 14, 12, 14, 15,   // bottom
+      16, 17, 18, 16, 18, 19,   // right
+      20, 21, 22, 20, 22, 23,   // left
     ]);
-    return { vertexes, indices };
+    const faceColors = [
+      [1.0, 1.0, 1.0, 1.0],    // Front face: white
+      [1.0, 0.0, 0.0, 1.0],    // Back face: red
+      [0.0, 1.0, 0.0, 1.0],    // Top face: green
+      [0.0, 0.0, 1.0, 1.0],    // Bottom face: blue
+      [1.0, 1.0, 0.0, 1.0],    // Right face: yellow
+      [1.0, 0.0, 1.0, 1.0],    // Left face: purple
+    ];
+
+    // Convert the array of colors into a table for all the vertices.
+
+    let colors: any = [];
+
+    for (var j = 0; j < faceColors.length; ++j) {
+      const c = faceColors[j];
+
+      // Repeat each color four times for the four vertices of the face
+      colors = colors.concat(c, c, c, c);
+    }
+    colors = new Float32Array(colors)
+    return { vertexes, colors, indices };
   }
-  public static createBuffers(
-    gl: WebGL2RenderingContext,
-    bufferData: { [key: string]: BufferData }
-  ): BufferInfo {
-    const keys = Object.keys(bufferData);
-    const buffers: BufferInfo = {};
-
-    keys.forEach((key) => {
-      const { data, numComponents, type, stride, offset, normalize } =
-        bufferData[key];
-      if (key === "indices") {
-        const indexBuffer = gl.createBuffer();
-        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
-        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, data, gl.STATIC_DRAW);
-
-        buffers.indices = {
-          buffer: indexBuffer!,
-          elementType: gl.UNSIGNED_SHORT,
-        };
-        return;
-      }
-
-      const buffer = gl.createBuffer();
-      gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-      gl.bufferData(gl.ARRAY_BUFFER, data, gl.STATIC_DRAW);
-
-      buffers[key] = {
-        buffer: buffer!,
-        numComponents: numComponents,
-        type: type || gl.FLOAT,
-        normalize: normalize || false,
-        stride: stride || 0,
-        offset: offset || 0,
-        drawType: gl.STATIC_DRAW,
-      };
-    });
-
-    return buffers;
-  }
- 
 }

@@ -11,7 +11,7 @@ export interface GLParamsInfo {
     name: string;
 }
 export type BufferData = {
-    data: Float32Array | Uint16Array|Uint8Array;
+    data: Float32Array | Uint16Array | Uint8Array;
     numComponents?: number;
     type?: number;
     normalize?: boolean;
@@ -20,7 +20,7 @@ export type BufferData = {
     attrib?: string;
     name?: string;
     attribName?: string;
-    buffer?: WebGLBuffer;
+    buffer?: WebGLBuffer; 
 };
 export type AttribInfo = {
     numComponents?: number;
@@ -31,7 +31,7 @@ export type AttribInfo = {
     stride?: number;
     buffer: WebGLBuffer;
     drawType?: number;
-    elementType?: number;
+    elementType?: number; 
 };
 export type BufferInfo = {
     [key: string]: AttribInfo;
@@ -165,6 +165,44 @@ export default class GLProgram {
             throw new Error("getUniformLocation error:" + name);
         }
         return uniform.localtion
+    }
+    public createBuffers(
+        bufferData: { [key: string]: BufferData }
+    ): BufferInfo {
+        const keys = Object.keys(bufferData);
+        const buffers: BufferInfo = {};
+        const gl = this.gl
+        keys.forEach((key) => {
+            const { data, numComponents, type, stride, offset, normalize } =
+                bufferData[key];
+            if (key === "indices") {
+                const indexBuffer = gl.createBuffer();
+                gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
+                gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, data, gl.STATIC_DRAW);
+
+                buffers.indices = {
+                    buffer: indexBuffer!,
+                    elementType: gl.UNSIGNED_SHORT,
+                };
+                return;
+            }
+
+            const buffer = gl.createBuffer();
+            gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+            gl.bufferData(gl.ARRAY_BUFFER, data, gl.STATIC_DRAW);
+
+            buffers[key] = {
+                buffer: buffer!,
+                numComponents: numComponents,
+                type: type || gl.FLOAT,
+                normalize: normalize || false,
+                stride: stride || 0,
+                offset: offset || 0,
+                drawType: gl.STATIC_DRAW 
+            };
+        });
+
+        return buffers;
     }
     setAttributeInfo(buffers: BufferInfo) {
         const keys = Object.keys(buffers);

@@ -9,7 +9,7 @@
     "baseUrl": "/",
     "moduleResolution": "node",
     "allowSyntheticDefaultImports": true,
-    "target": "es6",
+    "target": "esnext",
     "jsx": "react",
     "module": "esnext",
     "noImplicitAny": true,
