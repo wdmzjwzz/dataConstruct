@@ -1,5 +1,5 @@
 /* eslint-disable */
-import { Application, CanvasKeyBoardEvent, CanvasMouseEvent } from "./Application";
+import { Application, CanvasMouseEvent } from "./Application";
 import { Camera } from "./Camera";
 
 import colorVS from "./shaders/shodowColor.vert";
@@ -98,9 +98,7 @@ export class CameraApplication extends Application {
     this.gl.drawElements(this.gl.TRIANGLES, 36, this.gl.UNSIGNED_SHORT, 0);
     this.matStack.popMatrix()
   }
-  degToRad(d: number) {
-    return (d * Math.PI) / 180;
-  }
+
   protected onMouseDown(evt: CanvasMouseEvent): void {
     this.lastPoint = evt.canvasPosition
   }
@@ -127,32 +125,30 @@ export class CameraApplication extends Application {
     const cameraPosition = this.camera.position.copy()
     const endPoint = evt.canvasPosition
     const delta = endPoint.subtract(this.lastPoint)
-    const deltaVector = new Vector3([-delta.x * 3, delta.y * 3, 0])
-
-
+    const deltaVector = new Vector3([-delta.x * 3, delta.y * 3, 0]) 
     const center = this.camera.target.copy();
-
-
     const centerToCamera = cameraPosition.subtract(center);
-    const length = centerToCamera.length
 
-    const newCenterToMoved = centerToCamera.add(deltaVector);
-    const normalize = newCenterToMoved.copy().normalize()
-    const newPosition = center.add(normalize.multiply(length))
 
     this.lastPoint = evt.canvasPosition
     if (this._isRightMouseDown) {
       const newPosition = cameraPosition.add(deltaVector)
-      const newTarget = target.add(deltaVector)
+      const newTarget = target.add(deltaVector.multiply(0.8))
       console.log(newPosition.x, newPosition.y, newPosition.z);
-      console.log(newTarget.x, newTarget.y, newTarget.z);
+
       this.camera.setPosition(newPosition)
       this.camera.lookAt(newTarget)
       return
     }
     if (this._isMouseDown) {
+
+      const length = centerToCamera.length
+      const newCenterToMoved = centerToCamera.add(deltaVector);
+      const normalize = newCenterToMoved.copy().normalize()
+      const newPosition = center.add(normalize.multiply(length))
+
       this.camera.setPosition(newPosition)
-      this.camera.lookAt()
+      this.camera.lookAt(new Point3(0,0,0))
     }
   }
 }

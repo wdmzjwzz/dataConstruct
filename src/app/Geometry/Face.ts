@@ -1,11 +1,11 @@
  
 import { Vector3 } from "../math/TSM";
 import { HalfEdge } from "./HalfEdge";
-import { Point } from "./Point";
+import { Point3 } from "./Point";
 export class Face {
     public _halfedges: HalfEdge[] = [];
-    public points: Point[] = [];
-    constructor(points: Point[]) {
+    public points: Point3[] = [];
+    constructor(points: Point3[]) {
         if (points.length < 3) {
             throw new Error("绘制面至少需要三个顶点");
         }

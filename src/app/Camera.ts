@@ -26,9 +26,9 @@ export class Camera {
   public constructor(
     width: number,
     height: number,
-    fovY: number = 45.0,
-    zNear: number = 1,
-    zFar: number = 1000
+    fovY: number = 30.0,
+    zNear: number = 100,
+    zFar: number = 3000
   ) {
 
     this.aspectRatio = width / height;
@@ -37,7 +37,7 @@ export class Camera {
     this.far = zFar;
 
     this.controlByMouse = false;
-    this.position = new Point3(0,0, 500)
+    this.position = new Point3(500,500, 500)
     this.target = new Point3(0, 0, 0)
     this.update(0)
   }
@@ -70,8 +70,7 @@ export class Camera {
       this.position.z = newPosition[2]
     } 
   } 
-  lookAt(target:Point3=this.target){
-    this.target = target
+  lookAt(target:Point3=this.target){ 
     this.viewMatrix = Matrix4.lookAt(this.position, target, Vector3.up) 
   } 
 }
