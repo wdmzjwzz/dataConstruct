@@ -151,19 +151,19 @@ export class CameraApplication extends Application {
     if (this._isMouseDown) {
 
       const axis = Vector3.cross(eyeDirection, moveDirection).normalize()
-  
+
       const quaternion = quat.fromAxis(axis, angle).normalize();
-     
+
       this.camera.yAxis.applyQuaternion(quaternion);
-      cameraPosition.applyQuaternion(quaternion);  
+      cameraPosition.applyQuaternion(quaternion);
     }
   }
 
   getMouseOnCircle(pageX: number, pageY: number) {
     const vector = new Vector2()
 
-    vector.x = - ((pageX - this.canvas.width * 0.5) / (this.canvas.width * 0.5))
-    vector.y = ((this.canvas.height + 2 * pageY) / this.canvas.width)
+    vector.x = -(pageX - this.canvas.width * 0.5) / (this.canvas.width * 0.5)
+    vector.y = (pageY - this.canvas.height * 0.5) / (this.canvas.height * 0.5)
 
     return vector;
 

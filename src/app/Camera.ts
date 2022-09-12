@@ -40,10 +40,9 @@ export class Camera {
     this.far = zFar;
 
     this.controlByMouse = false;
-    this.position = new Point3(0, 0, 1000)
+    this.position = new Point3(500, 500, 500)
     this.target = new Point3(0, 0, 0)
-    this.yAxis.y = this.position.y;
-    
+      
     this.update(0)
   }
 
@@ -54,7 +53,7 @@ export class Camera {
       this.near,
       this.far
     );
-    this.viewMatrix = Matrix4.lookAt(this.position, this.target, Vector3.up)
+    this.viewMatrix = Matrix4.lookAt(this.position, this.target, this.yAxis)
     this.invViewMatrix = this.viewMatrix.copy().inverse()
     this.viewProjMatrix = Matrix4.product(
       this.projectionMatrix,
