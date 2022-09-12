@@ -240,8 +240,8 @@ export class Application implements EventListenerObject {
 
   // 停止动画循环
   public stop(): void {
-    if (this._start) { 
-      cancelAnimationFrame(this._requestId); 
+    if (this._start) {
+      cancelAnimationFrame(this._requestId);
       this._lastTime = -1;
       this._startTime = -1;
       this._start = false;
@@ -341,9 +341,8 @@ export class Application implements EventListenerObject {
   // 只要是鼠标事件（down / up / move / drag .....）都需要调用本方法
   // 将相对于浏览器viewport表示的点变换到相对于canvas表示的点
   private viewportToCanvasCoordinate(evt: MouseEvent): Vector2 {
-    // 切记，很重要一点：
-    // getBoundingClientRect方法返回的ClientRect
-    let rect: ClientRect = this.getMouseCanvas().getBoundingClientRect();
+ 
+    let rect = this.getMouseCanvas().getBoundingClientRect();
     // 获取触发鼠标事件的target元素，这里总是HTMLCanvasElement
     if (evt.target) {
       let x: number = evt.clientX - rect.left;

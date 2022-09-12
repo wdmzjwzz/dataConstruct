@@ -18,6 +18,7 @@ export class Camera {
   public aspectRatio: number
   public fovY: number;
 
+  public up = new Vector3([0, 0, 0])
   public projectionMatrix: Matrix4 = new Matrix4();
   public viewMatrix: Matrix4 = new Matrix4();
   public invViewMatrix: Matrix4 = new Matrix4();
@@ -37,8 +38,9 @@ export class Camera {
     this.far = zFar;
 
     this.controlByMouse = false;
-    this.position = new Point3(500,500, 500)
+    this.position = new Point3(500, 500, 500)
     this.target = new Point3(0, 0, 0)
+    this.up.y = this.position.y
     this.update(0)
   }
 
@@ -68,9 +70,9 @@ export class Camera {
       this.position.x = newPosition[0];
       this.position.y = newPosition[1]
       this.position.z = newPosition[2]
-    } 
-  } 
-  lookAt(target:Point3=this.target){ 
-    this.viewMatrix = Matrix4.lookAt(this.position, target, Vector3.up) 
-  } 
+    }
+  }
+  lookAt(target: Point3 = this.target) {
+    this.viewMatrix = Matrix4.lookAt(this.position, target, Vector3.up)
+  }
 }

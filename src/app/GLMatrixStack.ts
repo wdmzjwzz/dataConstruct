@@ -1,4 +1,5 @@
 /* eslint-disable */
+import { Point3 } from "./Geometry/Point";
 import { MathHelper } from "./math/MathHelper";
 import { Matrix4, Vector3 } from "./math/TSM";
 
@@ -190,8 +191,8 @@ export class GLMatrixStack {
   }
 
   public lookAt(
-    pos: Vector3,
-    target: Vector3,
+    pos: Point3,
+    target: Point3,
     up: Vector3 = Vector3.up
   ): GLMatrixStack {
     this.matrixMode = EMatrixMode.MODELVIEW;

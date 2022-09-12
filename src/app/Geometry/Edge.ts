@@ -1,9 +1,9 @@
-import { Point } from "./Point";
+import { Point3 } from "./Point";
 
 export class Edge {
-    public vertexA: Point;
-    public vertexB: Point;
-    constructor(vertexA: Point, vertexB: Point) {
+    public vertexA: Point3;
+    public vertexB: Point3;
+    constructor(vertexA: Point3, vertexB: Point3) {
         this.vertexA = vertexA;
         this.vertexB = vertexB
     }

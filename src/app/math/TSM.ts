@@ -42,7 +42,12 @@ export class Vector2 {
     dest.y -= vector.y;
     return dest;
   }
+  get length(): number {
+    let x = this.x,
+      y = this.y;
 
+    return Math.sqrt(x * x + y * y);
+  }
 }
 
 export class Vector3 {
@@ -149,7 +154,27 @@ export class Vector3 {
 
     return this;
   }
+  applyQuaternion(q: quat) {
 
+    const x = this.x, y = this.y, z = this.z;
+    const qx = q.x, qy = q.y, qz = q.z, qw = q.w;
+
+    // calculate quat * vector
+
+    const ix = qw * x + qy * z - qz * y;
+    const iy = qw * y + qz * x - qx * z;
+    const iz = qw * z + qx * y - qy * x;
+    const iw = - qx * x - qy * y - qz * z;
+
+    // calculate result * inverse quat
+
+    this.x = ix * qw + iw * - qx + iy * - qz - iz * - qy;
+    this.y = iy * qw + iw * - qy + iz * - qx - ix * - qz;
+    this.z = iz * qw + iw * - qz + ix * - qy - iy * - qx;
+
+    return this;
+
+  }
   public scale(value: number, dest: Vector3 | null = null): Vector3 {
     if (!dest) {
       dest = this;
@@ -207,8 +232,7 @@ export class Vector3 {
     dest.z *= value;
     return dest;
   }
-  public static multiplyScalar(
-    vector: Vector3,
+  public static multiplyScalar( 
     value: number,
     dest: Vector3 | null = null
   ): Vector3 {

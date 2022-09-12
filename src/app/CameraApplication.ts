@@ -10,8 +10,8 @@ import { GLWorldMatrixStack } from "./GLMatrixStack";
 
 import GLProgram, { BufferData, BufferInfo } from "./GLProgram";
 import { GLHelper } from "./GLHepler";
-import { Matrix4, Vector2, Vector3 } from "./math/TSM";
-import { Point3 } from "./Geometry/Point";
+import { Matrix4, quat, Vector2, Vector3 } from "./math/TSM";
+
 export class CameraApplication extends Application {
   public camera: Camera; // 在WebGLApplication的基础上增加了对摄像机系统的支持
   public angle = 0; // 用来更新旋转角度
@@ -100,55 +100,74 @@ export class CameraApplication extends Application {
   }
 
   protected onMouseDown(evt: CanvasMouseEvent): void {
-    this.lastPoint = evt.canvasPosition
+    this.lastPoint = this.getMouseOnCircle(evt.canvasPosition.x, evt.canvasPosition.y)
   }
   public onWheel(evt: CanvasMouseEvent) {
-
-    // const position = [evt.x, evt.y]
     // 放大
     const position = this.camera.position
+    const lookAt = this.camera.target
+    const dir = position.subtract(lookAt).normalize()
+    const dis = dir.multiply(50)
     if (evt.wheelDelta < 0) {
-      this.camera.setPosition([position.x, position.y, position.z -= 10])
+      this.camera.setPosition([position.x -= dis.x, position.y -= dis.y, position.z -= dis.z])
     } else {
       // 缩小
-      this.camera.setPosition([position.x, position.y, position.z += 10])
+      this.camera.setPosition([position.x += dis.x, position.y += dis.y, position.z += dis.z])
     }
 
   }
 
   protected onMouseMove(evt: CanvasMouseEvent): void {
 
+
     if (!this._isMouseDown && !this._isRightMouseDown) {
       return
     }
-    const target = this.camera.target.copy()
-    const cameraPosition = this.camera.position.copy()
-    const endPoint = evt.canvasPosition
+    const target = this.camera.target
+    const cameraPosition = this.camera.position
+    const endPoint = this.getMouseOnCircle(evt.canvasPosition.x, evt.canvasPosition.y)
     const delta = endPoint.subtract(this.lastPoint)
-    const deltaVector = new Vector3([-delta.x * 3, delta.y * 3, 0]) 
-    const center = this.camera.target.copy();
-    const centerToCamera = cameraPosition.subtract(center);
 
+    let eye = cameraPosition.subtract(target)
+    let eyeDirection = eye.normalize()
+    let angle = delta.length
+    let objectUpDirection = this.camera.up.copy().normalize();
+    let objectSidewaysDirection = Vector3.cross(objectUpDirection, eyeDirection).normalize()
+    objectUpDirection = objectUpDirection.multiply(delta.y)
+    objectSidewaysDirection = objectSidewaysDirection.multiply(delta.x)
 
-    this.lastPoint = evt.canvasPosition
+    const moveDirection = objectUpDirection.add(objectSidewaysDirection);
+
+    this.lastPoint = this.getMouseOnCircle(evt.canvasPosition.x, evt.canvasPosition.y)
     if (this._isRightMouseDown) {
-      const newPosition = cameraPosition.add(deltaVector)
-      const newTarget = target.add(deltaVector.multiply(0.8))
-      console.log(newPosition.x, newPosition.y, newPosition.z);
+      const newPosition = cameraPosition.add(moveDirection.multiply(cameraPosition.subtract(target).length * 0.30))
+      const newTarget = target.add(moveDirection.multiply(cameraPosition.subtract(target).length * 0.30))
 
+      this.camera.target = newTarget
       this.camera.setPosition(newPosition)
-      this.camera.lookAt(newTarget)
+
       return
     }
     if (this._isMouseDown) {
 
-      const length = centerToCamera.length
-      const newCenterToMoved = centerToCamera.add(deltaVector);
-      const normalize = newCenterToMoved.copy().normalize()
-      const newPosition = center.add(normalize.multiply(length))
+      const axis = Vector3.cross(eyeDirection, moveDirection).normalize()
+  
+      const quaternion = quat.fromAxis(axis, angle).normalize();
+     
+      this.camera.up.applyQuaternion(quaternion);
+      cameraPosition.applyQuaternion(quaternion);
+    
 
-      this.camera.setPosition(newPosition)
-      this.camera.lookAt(new Point3(0,0,0))
     }
+  }
+
+  getMouseOnCircle(pageX: number, pageY: number) {
+    const vector = new Vector2()
+
+    vector.x = - ((pageX - this.canvas.width * 0.5) / (this.canvas.width * 0.5))
+    vector.y = ((this.canvas.height + 2 * pageY) / this.canvas.width)
+
+    return vector;
+
   }
 }
