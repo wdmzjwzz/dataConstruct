@@ -131,7 +131,7 @@ export class CameraApplication extends Application {
     let eye = cameraPosition.subtract(target)
     let eyeDirection = eye.normalize()
     let angle = delta.length
-    let objectUpDirection = this.camera.up.copy().normalize();
+    let objectUpDirection = this.camera.yAxis.copy().normalize();
     let objectSidewaysDirection = Vector3.cross(objectUpDirection, eyeDirection).normalize()
     objectUpDirection = objectUpDirection.multiply(delta.y)
     objectSidewaysDirection = objectSidewaysDirection.multiply(delta.x)
@@ -154,10 +154,8 @@ export class CameraApplication extends Application {
   
       const quaternion = quat.fromAxis(axis, angle).normalize();
      
-      this.camera.up.applyQuaternion(quaternion);
-      cameraPosition.applyQuaternion(quaternion);
-    
-
+      this.camera.yAxis.applyQuaternion(quaternion);
+      cameraPosition.applyQuaternion(quaternion);  
     }
   }
 
