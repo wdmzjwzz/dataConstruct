@@ -1,6 +1,6 @@
 import { Point3 } from "./Geometry/Point";
 import { MathHelper } from "./math/MathHelper";
-import { Matrix4, Vector3 } from "./math/TSM";
+import { Matrix4, quat, Vector2, Vector3 } from "./math/TSM";
 
 
 export enum ECameraType {
@@ -42,7 +42,7 @@ export class Camera {
     this.controlByMouse = false;
     this.position = new Point3(500, 500, 500)
     this.target = new Point3(0, 0, 0)
-      
+
     this.update(0)
   }
 
@@ -76,5 +76,54 @@ export class Camera {
   }
   lookAt(target: Point3 = this.target) {
     this.viewMatrix = Matrix4.lookAt(this.position, target, Vector3.up)
+  }
+  /**
+   * 前后移动
+   * @param speed 
+   */
+  public moveForward(speed: number): void {
+    const position = this.position
+    const target = this.target
+    const dir = position.subtract(target).normalize()
+    const dis = dir.multiply(speed)
+    this.setPosition([position.x += dis.x, position.y += dis.y, position.z += dis.z])
+  }
+  /**
+     * 转动
+     * @param angle 
+     */
+  public roll(delta: Vector2): void {
+    let eye = this.position.subtract(this.target)
+    let eyeDirection = eye.normalize()
+    let angle = delta.length
+    const moveDirection = this.getMoveVector(delta) 
+    const axis = Vector3.cross(eyeDirection, moveDirection).normalize()
+
+    const quaternion = quat.fromAxis(axis, angle).normalize();
+
+    this.yAxis.applyQuaternion(quaternion);
+    this.position.applyQuaternion(quaternion);
+
+  }
+  public pan(delta: Vector2) {
+  
+    const moveDirection = this.getMoveVector(delta) 
+    const newPosition = this.position.add(moveDirection.multiply(this.position.subtract(this.target).length * 0.30))
+    const newTarget = this.target.add(moveDirection.multiply(this.position.subtract(this.target).length * 0.30))
+
+    this.target = newTarget
+    this.setPosition(newPosition)
+  }
+  private getMoveVector(delta: Vector2) {
+    let eye = this.position.subtract(this.target)
+    let eyeDirection = eye.normalize()
+
+    let objectUpDirection = this.yAxis.copy().normalize();
+    let objectSidewaysDirection = Vector3.cross(objectUpDirection, eyeDirection).normalize()
+    objectUpDirection = objectUpDirection.multiply(delta.y)
+    objectSidewaysDirection = objectSidewaysDirection.multiply(delta.x)
+
+    const moveDirection = objectUpDirection.add(objectSidewaysDirection);
+    return moveDirection
   }
 }

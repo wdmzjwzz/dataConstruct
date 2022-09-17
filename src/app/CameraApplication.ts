@@ -10,7 +10,7 @@ import { GLWorldMatrixStack } from "./GLMatrixStack";
 
 import GLProgram, { BufferData, BufferInfo } from "./GLProgram";
 import { GLHelper } from "./GLHepler";
-import { Matrix4, quat, Vector2, Vector3 } from "./math/TSM";
+import { Matrix4, Vector2, Vector3 } from "./math/TSM";
 
 export class CameraApplication extends Application {
   public camera: Camera; // 在WebGLApplication的基础上增加了对摄像机系统的支持
@@ -84,7 +84,7 @@ export class CameraApplication extends Application {
   public render(): void {
     this.angle += 0.5;
     this.matStack.pushMatrix()
-    // this.matStack.rotate(this.angle, Vector3.up)
+    this.matStack.rotate(this.angle, Vector3.up)
     const projectionMat4 = this.camera.viewProjMatrix
     const modelProjectionMatrix = Matrix4.product(projectionMat4, this.matStack.modelViewMatrix)
     const uniformData = {
@@ -103,65 +103,34 @@ export class CameraApplication extends Application {
     this.lastPoint = this.getMouseOnCircle(evt.canvasPosition.x, evt.canvasPosition.y)
   }
   public onWheel(evt: CanvasMouseEvent) {
-    // 放大
-    const position = this.camera.position
-    const lookAt = this.camera.target
-    const dir = position.subtract(lookAt).normalize()
-    const dis = dir.multiply(50)
     if (evt.wheelDelta < 0) {
-      this.camera.setPosition([position.x -= dis.x, position.y -= dis.y, position.z -= dis.z])
+      // 前进
+      this.camera.moveForward(50)
     } else {
-      // 缩小
-      this.camera.setPosition([position.x += dis.x, position.y += dis.y, position.z += dis.z])
+      // 后退
+      this.camera.moveForward(-50)
     }
-
   }
 
-  protected onMouseMove(evt: CanvasMouseEvent): void {
-
-
+  protected onMouseMove(evt: CanvasMouseEvent): void { 
     if (!this._isMouseDown && !this._isRightMouseDown) {
       return
     }
-    const target = this.camera.target
-    const cameraPosition = this.camera.position
+    
     const endPoint = this.getMouseOnCircle(evt.canvasPosition.x, evt.canvasPosition.y)
-    const delta = endPoint.subtract(this.lastPoint)
-
-    let eye = cameraPosition.subtract(target)
-    let eyeDirection = eye.normalize()
-    let angle = delta.length
-    let objectUpDirection = this.camera.yAxis.copy().normalize();
-    let objectSidewaysDirection = Vector3.cross(objectUpDirection, eyeDirection).normalize()
-    objectUpDirection = objectUpDirection.multiply(delta.y)
-    objectSidewaysDirection = objectSidewaysDirection.multiply(delta.x)
-
-    const moveDirection = objectUpDirection.add(objectSidewaysDirection);
-
+    const delta = endPoint.subtract(this.lastPoint) 
     this.lastPoint = this.getMouseOnCircle(evt.canvasPosition.x, evt.canvasPosition.y)
     if (this._isRightMouseDown) {
-      const newPosition = cameraPosition.add(moveDirection.multiply(cameraPosition.subtract(target).length * 0.30))
-      const newTarget = target.add(moveDirection.multiply(cameraPosition.subtract(target).length * 0.30))
-
-      this.camera.target = newTarget
-      this.camera.setPosition(newPosition)
-
+      this.camera.pan(delta) 
       return
     }
     if (this._isMouseDown) {
-
-      const axis = Vector3.cross(eyeDirection, moveDirection).normalize()
-
-      const quaternion = quat.fromAxis(axis, angle).normalize();
-
-      this.camera.yAxis.applyQuaternion(quaternion);
-      cameraPosition.applyQuaternion(quaternion);
+      this.camera.roll(delta)
     }
   }
 
   getMouseOnCircle(pageX: number, pageY: number) {
-    const vector = new Vector2()
-
+    const vector = new Vector2() 
     vector.x = -(pageX - this.canvas.width * 0.5) / (this.canvas.width * 0.5)
     vector.y = (pageY - this.canvas.height * 0.5) / (this.canvas.height * 0.5)
 
